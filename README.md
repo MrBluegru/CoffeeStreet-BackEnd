@@ -13,7 +13,7 @@ Api de proyecto final para Soy Henry - FT-29a
 4. Una vez instalada las dependencias, se realiza la creación de las entidades con prisma. Ejecuta el siguiente comando
    `npx prisma migrate dev --name init`
 
-<!-- \*\*\* En el caso de querer hacer un vaciado de la base de datos (borrar la carpeta de migrations), ejecuta el comando `npm run prisma-d`, para después crear ejecutar `npx prisma migrate dev --name init` (crearla de nuevo). -->
+\*\*\* En el caso de querer hacer un vaciado de la base de datos (borrar la carpeta de migrations), ejecuta el comando `npm run prisma-d`, para después crear ejecutar `npx prisma migrate dev --name init` (crearla de nuevo).
 
 ## Entity Relationship Diagram 📊
 
