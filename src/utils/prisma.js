@@ -1,5 +1,5 @@
-// const { PrismaClient } = require("@prisma/client");
-// const prisma = new PrismaClient({ log: ["query", "info", "warn", "error"] });
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient({ log: ["query", "info", "warn", "error"] });
 
 // Instancia de prisma
 // prisma se importará en las rutas cuando sea necesario
@@ -21,4 +21,4 @@
 //     await prisma.$disconnect();
 //   });
 
-// module.exports = prisma;
+module.exports = prisma;

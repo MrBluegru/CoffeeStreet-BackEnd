@@ -9,3 +9,26 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Auth {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String?
+  isGoogle Boolean @default(false)
+  user     User?
+}
+
+model User {
+  id      String @id @default(uuid())
+  name    String
+  surname String
+  role    Role
+  Auth    Auth?  @relation(fields: [idAuth], references: [id])
+  idAuth  String @unique
+}
+
+enum Role {
+  Admin
+  Employee
+  Client
+}
