@@ -1,5 +1,9 @@
 # CoffeeStreet-back-end
 
+<p align="center">
+  <img height="350" src="./img/coffeeStreet.png" />
+</p>
+
 Api de proyecto final para Soy Henry - FT-29a
 
 # Arrancar el proyecto de manera local
