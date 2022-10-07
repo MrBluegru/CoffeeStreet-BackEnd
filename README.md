@@ -12,7 +12,7 @@ Api de proyecto final para Soy Henry - FT-29a
 
 2. Instalar las dependencias necesarias para el correcto funcionamiento, ejecuta el comando `npm install`
 
-3. Clonar el archivo `.env.template`y renombrarlo a `.env`
+3. Clonar el archivo `.env.template` y renombrarlo a `.env`
 
 4. Una vez instalada las dependencias, se realiza la creación de las entidades con prisma. Ejecuta el siguiente comando
    `npx prisma migrate dev --name init`
