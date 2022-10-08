@@ -6,8 +6,6 @@ const routes = require("./routes/index.js");
 const { CORS_URL } = process.env;
 const cors = require("cors");
 
-// require("./utils/prisma");
-
 const server = express();
 
 server.name = "API";

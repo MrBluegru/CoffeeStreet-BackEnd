@@ -2,8 +2,9 @@ const prisma = require("../utils/prisma");
 const usersData = require("../data/userData");
 
 const setUsersDB = async () => {
-  const auth = await prisma.auth.findMany();
   try {
+    const auth = await prisma.auth.findMany();
+
     for (let i = 0; i < auth.length; i++) {
       await prisma.user.create({
         data: { ...usersData[i], idAuth: auth[i].id }

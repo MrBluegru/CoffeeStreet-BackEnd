@@ -23,12 +23,140 @@ model User {
   name    String
   surname String
   role    Role
-  Auth    Auth?  @relation(fields: [idAuth], references: [id])
+  Auth    Auth   @relation(fields: [idAuth], references: [id])
   idAuth  String @unique
+  order   Order?
+}
+
+model Product {
+  id            String         @id @default(uuid())
+  name          String
+  description   String
+  image         String
+  price         Float
+  category      Category
+  lactose       Boolean
+  gluten        Boolean
+  alcohol       Boolean
+  stock         Boolean
+  ingredients   Json
+  order_product Order_Product?
+  discount      Discount?      @relation(fields: [idDiscount], references: [id])
+  idDiscount    String?        @unique
+  attribute     Attribute?
+}
+
+model Attribute {
+  id            String     @id @default(uuid())
+  cream         Boolean
+  originCountry String
+  texture       Texture
+  body          Body
+  acidity       Acidity
+  bitterness    Bitterness
+  roast         Roast
+  color         Color
+  product       Product    @relation(fields: [idProduct], references: [id])
+  idProduct     String     @unique
+}
+
+model Discount {
+  id         String     @id @default(uuid())
+  percentage Percentage
+  product    Product?
+}
+
+model Order {
+  id            String         @id @default(uuid())
+  status        Status
+  date          DateTime
+  user          User           @relation(fields: [idUser], references: [id])
+  idUser        String         @unique
+  order_product Order_Product?
+}
+
+model Order_Product {
+  id        String  @id @default(uuid())
+  quantity  Int
+  total     Float
+  product   Product @relation(fields: [idProduct], references: [id])
+  idProduct String  @unique
+  order     Order   @relation(fields: [idOrder], references: [id])
+  idOrder   String  @unique
 }
 
 enum Role {
-  Admin
-  Employee
-  Client
+  admin
+  employee
+  client
+}
+
+enum Category {
+  coffee
+  tea
+  sweetBakery
+  saltyBakery
+  other
+}
+
+enum Texture {
+  desertDunes
+  coarse
+  medium
+  fine
+  veryFine
+}
+
+enum Body {
+  light
+  perceivable
+  medium
+  thick
+  sirupy
+}
+
+enum Acidity {
+  notFound
+  light
+  perceivable
+  fresh
+  high
+}
+
+enum Bitterness {
+  light
+  perceivable
+  medium
+  high
+  veryHigh
+}
+
+enum Roast {
+  cinnamon
+  light
+  city
+  fullCity
+  dark
+  french
+  italian
+}
+
+enum Color {
+  yellow
+  amber
+  lightBrown
+  hazelnut
+  darkBrown
+  dark
+}
+
+enum Percentage {
+  five
+  ten
+  fifteen
+}
+
+enum Status {
+  pending
+  complete
 }

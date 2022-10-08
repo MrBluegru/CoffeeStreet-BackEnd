@@ -2,8 +2,8 @@ const prisma = require("../utils/prisma");
 const authFunction = require("../data/authData");
 
 const setAuth = async () => {
-  const array = await authFunction();
   try {
+    const array = await authFunction();
     const auth = await prisma.auth.createMany({ data: array });
 
     return { message: "The auth table has been successfully created" };

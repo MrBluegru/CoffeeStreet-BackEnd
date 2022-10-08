@@ -1,13 +1,13 @@
 require("dotenv").config();
-const { PORT } = process.env;
 const server = require("./src/app");
-
-const { setUsersDB } = require("./src/seed/user.seed");
-const { setAuth } = require("./src/seed/auth.seed");
+const { PORT } = process.env;
 
 const prisma = require("./src/utils/prisma");
 
-server.listen(PORT || 3001, () => {
+const { setAuth } = require("./src/seed/auth.seed");
+const { setUsersDB } = require("./src/seed/user.seed");
+
+server.listen(PORT || 3002, () => {
   prisma.auth
     .findMany()
     .then(e => {
@@ -16,5 +16,5 @@ server.listen(PORT || 3001, () => {
       }
     })
     .catch(error => console.error(error));
-  console.log(`Listening at 3001 or ${PORT} `);
+  PORT ? console.log(`Listening at port ${PORT}`) : console.log("Listening at port 3002");
 });

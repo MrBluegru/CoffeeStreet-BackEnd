@@ -5,7 +5,7 @@ const path = require("path");
 
 fs.rmdir("./prisma/migrations", { recursive: true, force: true }, err => {
   if (err) {
-    return console.log("error occurred in deleting directory", err);
+    return console.log("Error occurred in deleting directory", err);
   }
 
   console.log("Migrations directory deleted successfully");
