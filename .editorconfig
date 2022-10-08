@@ -1,6 +1,10 @@
-indent_style = tab
-end_of_line = lf
-insert_final_newline = true
-tab_width = 2
-charset = utf-8
-trim_trailing_whitespace = true
+root = true
+
+[*]                     					# lo soguiente afecta a todos los archivos del repo
+end_of_line = crlf								# lf(al final de cada linea:\n [Unix]) || crlf(al final de cada linea: \r\n [Win])
+charset = utf-8										# codificacion de caracteres (universal[utf-8])
+indent_style = tab								# tab = /t || spaces = espacios separados
+indent_size = 2										# cuantos espacios deja al usar el varlor que se elija en la linea anterior
+max_line_length = 90							# caractares maximos por linea
+trim_trailing_whitespace = true 	# true: al guardar se elimina los espacios en blanco al final de cada linea
+insert_final_newline = true				# true: linea en blanco al final del archivo al guardar
