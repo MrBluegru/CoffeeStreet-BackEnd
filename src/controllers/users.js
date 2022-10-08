@@ -1,7 +1,8 @@
-const authMethods = require("../methods/auth.methods");
+const authMethods = require("../methods/auth");
 
 const getUser = async (req, res, next) => {
   const email = req.body.email;
+
   try {
     const user = await authMethods.emailVerify(email);
 
@@ -15,6 +16,4 @@ const getUser = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  getUser
-};
+module.exports = { getUser };

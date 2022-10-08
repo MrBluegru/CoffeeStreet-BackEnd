@@ -2,17 +2,17 @@ const usersData = [
   {
     name: "Admin",
     surname: "Tigfive",
-    role: "Admin"
+    role: "admin"
   },
   {
     name: "Boris",
     surname: "Webster",
-    role: "Client"
+    role: "client"
   },
   {
     name: "Alan",
     surname: "Tait",
-    role: "Employee"
+    role: "employee"
   }
 ];
 

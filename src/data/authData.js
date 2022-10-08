@@ -8,6 +8,8 @@ const authFunction = async () => {
     { email: "boris@gmail.com", password: hashedPass },
     { email: "alan@gmail.com", password: hashedPass }
   ];
+
   return AuthData;
 };
+
 module.exports = authFunction;
