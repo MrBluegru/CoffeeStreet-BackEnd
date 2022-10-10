@@ -19,16 +19,159 @@ model Auth {
 }
 
 model User {
-  id      String @id @default(uuid())
-  name    String
-  surname String
-  role    Role
-  Auth    Auth?  @relation(fields: [idAuth], references: [id])
-  idAuth  String @unique
+  id       String    @id @default(uuid())
+  name     String
+  surname  String
+  role     Role
+  Auth     Auth?     @relation(fields: [idAuth], references: [id])
+  idAuth   String    @unique
+  order    Order[]
+  products Product[]
+  review   Review[]
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  description String
+  date        DateTime
+  rating      Rating
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+}
+
+enum Rating {
+  one
+  two
+  three
+  four
+  five
 }
 
 enum Role {
-  Admin
-  Employee
-  Client
+  admin
+  employee
+  client
+}
+
+model Order {
+  id       String    @id @default(uuid())
+  status   Status
+  date     DateTime
+  user     User      @relation(fields: [userId], references: [id])
+  userId   String
+  products Product[] @relation("Order_Product")
+}
+
+enum Status {
+  pending
+  complete
+  cancelled
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String
+  image       String
+  price       Float
+  category    Category
+  lactose     Boolean
+  gluten      Boolean
+  alcohol     Boolean
+  stock       Boolean
+  ingredients String[]
+  users       User[]
+  order       Order[]   @relation("Order_Product")
+  discount    Discount? @relation(fields: [discountId], references: [id])
+  discountId  String
+}
+
+enum Category {
+  coffee
+  tea
+  sweetBakery
+  saltyBakery
+  snacks
+  other
+}
+
+model Order_Product {
+  id       String @id @default(uuid())
+  quantity Int
+  total    Float
+}
+
+model Discount {
+  id         String     @id @default(uuid())
+  percentage Percentage
+  products   Product[]
+}
+
+enum Percentage {
+  five
+  ten
+  fifteen
+}
+
+model Attribute {
+  id            String     @id @default(uuid())
+  texture       Texture
+  body          Body
+  acidity       Acidity
+  bitterness    Bitterness
+  cream         Boolean
+  roast         Roast
+  originCountry String
+  color         Color
+}
+
+enum Texture {
+  desert_dunes
+  coarse
+  medium
+  fine
+  very_fine
+}
+
+enum Body {
+  light
+  perceivable
+  medium
+  thick
+  sirupy
+}
+
+enum Acidity {
+  not_found
+  light
+  perceivable
+  fresh
+  high
+}
+
+enum Bitterness {
+  light
+  perceivable
+  medium
+  high
+  very_high
+}
+
+enum Roast {
+  cinnamon
+  light
+  city
+  full_city
+  dark
+  french
+  italian
+}
+
+enum Color {
+  yellow
+  amber
+  light_brown
+  hazelnut
+  dark_brown
+  dark
 }
