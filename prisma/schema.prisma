@@ -23,7 +23,7 @@ model User {
   name    String
   surname String
   role    Role
-  Auth    Auth   @relation(fields: [idAuth], references: [id])
+  auth    Auth   @relation(fields: [idAuth], references: [id])
   idAuth  String @unique
   order   Order?
 }
