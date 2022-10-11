@@ -11,4 +11,12 @@ const getSweetBakery = async () => {
 	return data;
 };
 
-module.exports = getSweetBakery;
+const getTes = async () => {
+	const { data } = await axios.get("https://apimocha.com/tea-data/info");
+	return data;
+};
+
+module.exports = {
+	getSweetBakery,
+	getTes
+};

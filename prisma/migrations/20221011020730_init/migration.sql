@@ -41,8 +41,8 @@ CREATE TABLE "Auth" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "surname" TEXT NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "surname" VARCHAR(255) NOT NULL,
     "role" "Role" NOT NULL,
     "idAuth" TEXT NOT NULL,
 
@@ -52,15 +52,15 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "description" VARCHAR(500) NOT NULL,
     "image" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "category" "Category" NOT NULL,
     "lactose" BOOLEAN NOT NULL,
     "gluten" BOOLEAN NOT NULL,
     "alcohol" BOOLEAN NOT NULL,
-    "stock" BOOLEAN NOT NULL,
+    "stock" BOOLEAN NOT NULL DEFAULT true,
     "ingredients" JSONB NOT NULL,
     "idDiscount" TEXT,
 
@@ -71,7 +71,7 @@ CREATE TABLE "Product" (
 CREATE TABLE "Attribute" (
     "id" TEXT NOT NULL,
     "cream" BOOLEAN NOT NULL,
-    "originCountry" TEXT NOT NULL,
+    "originCountry" VARCHAR(50) NOT NULL,
     "texture" "Texture" NOT NULL,
     "body" "Body" NOT NULL,
     "acidity" "Acidity" NOT NULL,
@@ -117,6 +117,9 @@ CREATE UNIQUE INDEX "Auth_email_key" ON "Auth"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_idAuth_key" ON "User"("idAuth");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Product_idDiscount_key" ON "Product"("idDiscount");
