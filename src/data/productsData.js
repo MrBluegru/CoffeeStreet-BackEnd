@@ -11,12 +11,12 @@ const getSweetBakery = async () => {
 	return data;
 };
 
-const getTes = async () => {
+const getTeas = async () => {
 	const { data } = await axios.get("https://apimocha.com/tea-data/info");
 	return data;
 };
 
 module.exports = {
 	getSweetBakery,
-	getTes
+	getTeas
 };
