@@ -19,35 +19,34 @@ model Auth {
 }
 
 model User {
-  id      String @id @default(uuid())
-  name    String @db.VarChar(255)
-  surname String @db.VarChar(255)
-  role    Role
-  auth    Auth   @relation(fields: [idAuth], references: [id])
-  idAuth  String @unique
-  order   Order?
-	products Product[]
-  review   Review[]
+  id                String             @id @default(uuid())
+  name              String             @db.VarChar(255)
+  surname           String             @db.VarChar(255)
+  role              Role
+  auth              Auth               @relation(fields: [idAuth], references: [id])
+  idAuth            String             @unique
+  order             Order?
+  review            Review[]
+  favourite_product Favourite_Product?
 }
 
 model Product {
-  id            String         @id @default(uuid())
-  name          String         @unique @db.VarChar(255)
-  description   String         @db.VarChar(500)
-  image         String
-  price         Float
-  category      Category
-  lactose       Boolean
-  gluten        Boolean
-  alcohol       Boolean
-  stock         Boolean        @default(true)
-  ingredients   Json
-  order_product Order_Product?
-  discount      Discount?      @relation(fields: [idDiscount], references: [id])
-  idDiscount    String?        @unique
-  attribute     Attribute?
-	user          User?          @relation(fields: [userId], references: [id])
-  userId        String?
+  id                String             @id @default(uuid())
+  name              String             @unique @db.VarChar(255)
+  description       String             @db.VarChar(500)
+  image             String
+  price             Float
+  category          Category
+  lactose           Boolean
+  gluten            Boolean
+  alcohol           Boolean
+  stock             Boolean            @default(true)
+  ingredients       Json
+  order_product     Order_Product?
+  discount          Discount?          @relation(fields: [idDiscount], references: [id])
+  idDiscount        String?            @unique
+  attribute         Attribute?
+  favourite_product Favourite_Product?
 }
 
 model Attribute {
@@ -89,13 +88,20 @@ model Order_Product {
   idOrder   String  @unique
 }
 
+model Favourite_Product {
+  user      User    @relation(fields: [idUser], references: [id])
+  idUser    String  @unique
+  product   Product @relation(fields: [idProduct], references: [id])
+  idProduct String  @unique
+}
+
 model Review {
   id          String   @id @default(uuid())
   description String
   date        DateTime
   rating      Rating
-  user        User?    @relation(fields: [userId], references: [id])
-  userId      String?
+  user        User?    @relation(fields: [idUser], references: [id])
+  idUser      String?
 }
 
 enum Role {
