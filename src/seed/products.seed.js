@@ -6,7 +6,7 @@ const setProducts = async () => {
 		const sweet_Bakery = await products.getSweetBakery();
 		const tes = await products.getTes();
 		const data = [...tes, ...sweet_Bakery];
-		const infoInDb = await prisma.Product.createMany({
+		const infoInDb = await prisma.product.createMany({
 			data
 		});
 		if (infoInDb) return { message: "The products have been successfully set on Db" };
