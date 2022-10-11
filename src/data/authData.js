@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const authFunction = async () => {
 	const hashedPass = await bcrypt.hash("12345", 10);
 
-	const AuthData = [
+	const authData = [
 		{ email: "admin@gmail.com", password: hashedPass },
 		{ email: "francesco@gmail.com", password: hashedPass },
 		{ email: "aaron@gmail.com", password: hashedPass },
@@ -26,7 +26,7 @@ const authFunction = async () => {
 		{ email: "lonny@gmail.com", password: hashedPass }
 	];
 
-	return AuthData;
+	return authData;
 };
 
 module.exports = authFunction;
