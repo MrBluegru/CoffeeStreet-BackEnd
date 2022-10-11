@@ -26,6 +26,8 @@ model User {
   auth    Auth   @relation(fields: [idAuth], references: [id])
   idAuth  String @unique
   order   Order?
+	products Product[]
+  review   Review[]
 }
 
 model Product {
@@ -44,6 +46,8 @@ model Product {
   discount      Discount?      @relation(fields: [idDiscount], references: [id])
   idDiscount    String?        @unique
   attribute     Attribute?
+	user          User?          @relation(fields: [userId], references: [id])
+  userId        String?
 }
 
 model Attribute {
@@ -83,6 +87,15 @@ model Order_Product {
   idProduct String  @unique
   order     Order   @relation(fields: [idOrder], references: [id])
   idOrder   String  @unique
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  description String
+  date        DateTime
+  rating      Rating
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
 }
 
 enum Role {
@@ -159,4 +172,12 @@ enum Percentage {
 enum Status {
   pending
   complete
+}
+
+enum Rating {
+  one
+  two
+  three
+  four
+  five
 }
