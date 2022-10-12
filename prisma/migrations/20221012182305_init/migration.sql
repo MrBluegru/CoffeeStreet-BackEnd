@@ -44,8 +44,8 @@ CREATE TABLE "Auth" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "surname" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "surname" VARCHAR(50) NOT NULL,
     "role" "Role" NOT NULL,
     "idAuth" TEXT NOT NULL,
 
@@ -55,8 +55,8 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "description" VARCHAR(500) NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "description" TEXT NOT NULL,
     "image" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "category" "Category" NOT NULL,
@@ -65,6 +65,7 @@ CREATE TABLE "Product" (
     "alcohol" BOOLEAN NOT NULL,
     "stock" BOOLEAN NOT NULL DEFAULT true,
     "ingredients" JSONB NOT NULL,
+    "originCountry" VARCHAR(50) NOT NULL,
     "isPrepared" BOOLEAN NOT NULL DEFAULT true,
     "idDiscount" TEXT,
 
@@ -75,7 +76,6 @@ CREATE TABLE "Product" (
 CREATE TABLE "Attribute" (
     "id" TEXT NOT NULL,
     "cream" BOOLEAN NOT NULL,
-    "originCountry" VARCHAR(50) NOT NULL,
     "texture" "Texture" NOT NULL,
     "body" "Body" NOT NULL,
     "acidity" "Acidity" NOT NULL,
