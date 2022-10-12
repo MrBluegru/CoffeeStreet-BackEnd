@@ -42,6 +42,7 @@ model Product {
   alcohol           Boolean
   stock             Boolean            @default(true)
   ingredients       Json
+  isPrepared        Boolean            @default(true)
   order_product     Order_Product?
   discount          Discount?          @relation(fields: [idDiscount], references: [id])
   idDiscount        String?            @unique
