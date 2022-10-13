@@ -40,4 +40,30 @@ const createProduct = async (req, res, next) => {
 	}
 };
 
-module.exports = { getProducts, getProductById, createProduct };
+const getProductName = async (req, res) => {
+	const { name } = req.params;
+	try {
+		if (name) {
+			const findProductName = await prisma.product.findMany({
+				where: {
+					name: {
+						contains: name,
+						mode: "insensitive"
+					}
+				}
+			});
+
+			findProductName.length
+				? res.status(200).json(findProductName)
+				: res.status(404).json("No product with the searched name was found");
+		} else {
+			const productsFound = await prisma.product.findMany();
+			productsFound ? res.status(200).json(productsFound) : res.status(404).json("Products not found");
+		}
+	} catch (err) {
+		console.log("An error ocurred in getProductQuery");
+		throw new Error("An error ocurred!");
+	}
+};
+
+module.exports = { getProducts, getProductById, createProduct, getProductName };
