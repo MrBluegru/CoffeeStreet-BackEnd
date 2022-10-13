@@ -28,7 +28,7 @@ const updateUser = async (req, res, next) => {
     const userFound = await userMethods.findById(id);
     if (!userFound)
       return res.status(400).json({ errorMessage: "This user doesn't exist" });
-    const update = await userMethods.updateUser(id, name, surname , role);
+    const update = await userMethods.updateUser(id, name, surname, role);
     return res.status(200).json(update);
   } catch (error) {
     next(error);
