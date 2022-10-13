@@ -47,7 +47,8 @@ model Product {
   order_product     Order_Product?
   discount          Discount?          @relation(fields: [idDiscount], references: [id])
   idDiscount        String?            @unique
-  attribute         Attribute?
+  attribute         Attribute?         @relation(fields: [idAttribute], references: [id])
+  idAttribute       String?            @unique
   favourite_product Favourite_Product?
 }
 
@@ -60,8 +61,7 @@ model Attribute {
   bitterness Bitterness
   roast      Roast
   color      Color
-  product    Product    @relation(fields: [idProduct], references: [id])
-  idProduct  String     @unique
+  product    Product?
 }
 
 model Discount {

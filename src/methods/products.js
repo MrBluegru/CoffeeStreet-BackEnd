@@ -4,6 +4,22 @@ const findById = async id => {
 	const product = await prisma.product.findUnique({
 		where: {
 			id
+		},
+		select: {
+			name: true,
+			description: true,
+			image: true,
+			price: true,
+			category: true,
+			lactose: true,
+			gluten: true,
+			alcohol: true,
+			stock: true,
+			ingredients: true,
+			originCountry: true,
+			isPrepared: true,
+			idDiscount: true,
+			attribute: true
 		}
 	});
 	return product;

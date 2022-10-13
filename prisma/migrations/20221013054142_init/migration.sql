@@ -68,6 +68,7 @@ CREATE TABLE "Product" (
     "originCountry" VARCHAR(50) NOT NULL,
     "isPrepared" BOOLEAN NOT NULL DEFAULT true,
     "idDiscount" TEXT,
+    "idAttribute" TEXT,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -82,7 +83,6 @@ CREATE TABLE "Attribute" (
     "bitterness" "Bitterness" NOT NULL,
     "roast" "Roast" NOT NULL,
     "color" "Color" NOT NULL,
-    "idProduct" TEXT NOT NULL,
 
     CONSTRAINT "Attribute_pkey" PRIMARY KEY ("id")
 );
@@ -146,7 +146,7 @@ CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 CREATE UNIQUE INDEX "Product_idDiscount_key" ON "Product"("idDiscount");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Attribute_idProduct_key" ON "Attribute"("idProduct");
+CREATE UNIQUE INDEX "Product_idAttribute_key" ON "Product"("idAttribute");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_idUser_key" ON "Order"("idUser");
@@ -170,7 +170,7 @@ ALTER TABLE "User" ADD CONSTRAINT "User_idAuth_fkey" FOREIGN KEY ("idAuth") REFE
 ALTER TABLE "Product" ADD CONSTRAINT "Product_idDiscount_fkey" FOREIGN KEY ("idDiscount") REFERENCES "Discount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_idProduct_fkey" FOREIGN KEY ("idProduct") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Product" ADD CONSTRAINT "Product_idAttribute_fkey" FOREIGN KEY ("idAttribute") REFERENCES "Attribute"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
