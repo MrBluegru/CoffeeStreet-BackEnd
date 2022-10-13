@@ -2,10 +2,26 @@ const prisma = require("../utils/prisma");
 const { findById, create, verifyDataCreate, verifyName, verifyIngredients } = require("../methods/products");
 
 const getProducts = async (req, res, next) => {
+	const { name } = req.query;
 	try {
-		const productsInDb = await prisma.product.findMany();
-		if (productsInDb) return res.status(200).json(productsInDb);
-		else return res.status(404).json({ errorMessage: "Products not found" });
+		if (name) {
+			const findProductName = await prisma.product.findMany({
+				where: {
+					name: {
+						contains: name,
+						mode: "insensitive"
+					}
+				}
+			});
+
+			findProductName.length
+				? res.status(200).json(findProductName)
+				: res.status(404).json("No product with the searched name was found");
+		} else {
+			const productsInDb = await prisma.product.findMany();
+			if (productsInDb) return res.status(200).json(productsInDb);
+			else return res.status(404).json({ errorMessage: "Products not found" });
+		}
 	} catch (error) {
 		next(error);
 	}
@@ -40,30 +56,103 @@ const createProduct = async (req, res, next) => {
 	}
 };
 
-const getProductName = async (req, res) => {
-	const { name } = req.params;
+// const getProductName = async (req, res) => {
+// 	const { name } = req.query;
+// 	console.log(name);
+// 	try {
+// 		if (name) {
+// 			const findProductName = await prisma.product.findMany({
+// 				where: {
+// 					name: {
+// 						contains: name,
+// 						mode: "insensitive"
+// 					}
+// 				}
+// 			});
+// 			console.log(findProductName);
+
+// 			findProductName.length
+// 				? res.status(200).json(findProductName)
+// 				: res.status(404).json("No product with the searched name was found");
+// 		} else {
+// 			res.status(404).json("Products not found");
+// 		}
+// 	} catch (err) {
+// 		console.log("An error ocurred in getProductQuery");
+// 		throw new Error("An error ocurred!");
+// 	}
+// };
+
+const updateProduct = async (req, res) => {
+	const { id } = req.params;
+	const {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		stock,
+		ingredients,
+		originCountry,
+		isPrepared,
+		discount, //
+		cream,
+		texture,
+		body,
+		acidity,
+		bitterness,
+		roast,
+		color,
+		product
+	} = req.body;
+
 	try {
-		if (name) {
-			const findProductName = await prisma.product.findMany({
+		const productFound = await prisma.product.findUnique({
+			where: {
+				id: id
+			}
+		});
+
+		if (productFound) {
+			const productUpdated = await prisma.product.update({
 				where: {
-					name: {
-						contains: name,
-						mode: "insensitive"
-					}
+					id: id
+				},
+				data: {
+					name,
+					description,
+					image,
+					price,
+					category,
+					lactose,
+					gluten,
+					alcohol,
+					stock,
+					ingredients,
+					originCountry,
+					isPrepared,
+					discount,
+					cream,
+					texture,
+					body,
+					acidity,
+					bitterness,
+					roast,
+					color,
+					product
 				}
 			});
 
-			findProductName.length
-				? res.status(200).json(findProductName)
-				: res.status(404).json("No product with the searched name was found");
+			res.status(200).json(productUpdated);
 		} else {
-			const productsFound = await prisma.product.findMany();
-			productsFound ? res.status(200).json(productsFound) : res.status(404).json("Products not found");
+			res.status(404).json("No product found with that id");
 		}
 	} catch (err) {
-		console.log("An error ocurred in getProductQuery");
-		throw new Error("An error ocurred!");
+		console.log("An error ocurred in updateProduct");
+		throw new Error(err);
 	}
 };
-
-module.exports = { getProducts, getProductById, createProduct, getProductName };
+module.exports = { getProducts, getProductById, createProduct, updateProduct };
