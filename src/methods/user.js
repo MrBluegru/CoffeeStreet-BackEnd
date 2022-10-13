@@ -11,12 +11,14 @@ const findById = async (id) => {
 
 
 
-const updateUser = async (id, role) => {
+const updateUser = async (id, name, surname, role) => {
   const user = await prisma.user.update({
     where: {
       id,
     },
     data: {
+			name,
+			surname,
       role,
     },
   });
