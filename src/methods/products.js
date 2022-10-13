@@ -1,5 +1,27 @@
 const prisma = require("../utils/prisma");
 
+const getAll = async id => {
+	const products = await prisma.product.findMany({
+		select: {
+			name: true,
+			description: true,
+			image: true,
+			price: true,
+			category: true,
+			lactose: true,
+			gluten: true,
+			alcohol: true,
+			stock: true,
+			ingredients: true,
+			originCountry: true,
+			isPrepared: true,
+			idDiscount: true,
+			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
+		}
+	});
+	return products;
+};
+
 const findById = async id => {
 	const product = await prisma.product.findUnique({
 		where: {
@@ -64,4 +86,4 @@ const verifyIngredients = async data => {
 	return data.ingredients.some(e => typeof e !== "string");
 };
 
-module.exports = { findById, create, verifyDataCreate, verifyName, verifyIngredients };
+module.exports = { findById, create, verifyDataCreate, verifyName, verifyIngredients, getAll };
