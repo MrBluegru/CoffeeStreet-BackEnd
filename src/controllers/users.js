@@ -22,7 +22,7 @@ const getUsers = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   const { id } = req.params;
-  const { name, surname, role } = req.body;
+  const { role } = req.body;
 
   try {
     const userFound = await userMethods.findById(id);
