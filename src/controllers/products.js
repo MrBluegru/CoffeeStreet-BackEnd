@@ -1,5 +1,5 @@
 const prisma = require("../utils/prisma");
-const { findById, create, verifyDataCreate, verifyName, verifyIngredients, getAll } = require("../methods/products");
+const { findById, create, verifyDataCreate, verifyName, verifyIngredients } = require("../methods/products");
 
 const getProducts = async (req, res, next) => {
 	try {
@@ -24,23 +24,7 @@ const getProductById = async (req, res, next) => {
 	}
 };
 
-const createProduct = async (req, res, next) => {
-	const data = req.body.data;
-
-	try {
-		if (!data) return res.status(404).json({ errorMessage: "No data object given" });
-		if (await verifyDataCreate(data)) return res.status(404).json({ errorMessage: "Data missing or datatype error" });
-		if (await verifyName(data)) return res.status(404).json({ errorMessage: "Product name is already on database" });
-		if (await verifyIngredients(data)) return res.status(404).json({ errorMessage: "Datatype error on ingredients" });
-		const product = await create(data);
-		if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
-		else return res.status(200).json({ message: "Product successfully created" });
-	} catch (error) {
-		next(error);
-	}
-};
-
-const getProductName = async (req, res) => {
+const getProductByName = async (req, res) => {
 	const { name } = req.params;
 	try {
 		if (name) {
@@ -66,4 +50,46 @@ const getProductName = async (req, res) => {
 	}
 };
 
-module.exports = { getProducts, getProductById, createProduct, getProductName };
+const createProduct = async (req, res, next) => {
+	const data = req.body.data;
+
+	try {
+		if (!data) return res.status(404).json({ errorMessage: "No data object given" });
+		if (await verifyDataCreate(data)) return res.status(404).json({ errorMessage: "Data missing or datatype error" });
+		if (await verifyName(data)) return res.status(404).json({ errorMessage: "Product name is already on database" });
+		if (await verifyIngredients(data)) return res.status(404).json({ errorMessage: "Datatype error on ingredients" });
+		const product = await create(data);
+		if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
+		else return res.status(200).json({ message: "Product successfully created" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const deleteProduct = async (req, res, next) => {
+	const { id } = req.params;
+
+	try {
+		const doesProductExist = await prisma.product.findUnique({
+			where: {
+				id
+			}
+		});
+
+		if (doesProductExist) {
+			const productToDelete = await prisma.product.delete({
+				where: {
+					id
+				}
+			});
+
+			return res
+				.status(200)
+				.json({ message: `'${productToDelete.name}' deleted successfully from the Products in DB` });
+		} else return res.status(404).json({ errorMessage: "There is no product with that id" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { getProducts, getProductById, getProductByName, createProduct, deleteProduct };
