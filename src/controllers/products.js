@@ -1,9 +1,9 @@
 const prisma = require("../utils/prisma");
-const { findById, create, verifyDataCreate, verifyName, verifyIngredients } = require("../methods/products");
+const { findById, create, verifyDataCreate, verifyName, verifyIngredients, getAll } = require("../methods/products");
 
 const getProducts = async (req, res, next) => {
 	try {
-		const productsInDb = await prisma.product.findMany();
+		const productsInDb = await getAll();
 		if (productsInDb) return res.status(200).json(productsInDb);
 		else return res.status(404).json({ errorMessage: "Products not found" });
 	} catch (error) {
