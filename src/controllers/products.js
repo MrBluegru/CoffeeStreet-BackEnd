@@ -18,10 +18,9 @@ const getProducts = async (req, res, next) => {
 				? res.status(200).json(findProductName)
 				: res.status(404).json("No product with the searched name was found");
 		} else {
-			const productsInDb = await prisma.product.findMany();
-			if (productsInDb) return res.status(200).json(productsInDb);
-			else return res.status(404).json({ errorMessage: "Products not found" });
-		}
+      const productsInDb = await getAll();
+		  if (productsInDb) return res.status(200).json(productsInDb);
+		  else return res.status(404).json({ errorMessage: "Products not found" });
 	} catch (error) {
 		next(error);
 	}
@@ -56,33 +55,6 @@ const createProduct = async (req, res, next) => {
 	}
 };
 
-// const getProductName = async (req, res) => {
-// 	const { name } = req.query;
-// 	console.log(name);
-// 	try {
-// 		if (name) {
-// 			const findProductName = await prisma.product.findMany({
-// 				where: {
-// 					name: {
-// 						contains: name,
-// 						mode: "insensitive"
-// 					}
-// 				}
-// 			});
-// 			console.log(findProductName);
-
-// 			findProductName.length
-// 				? res.status(200).json(findProductName)
-// 				: res.status(404).json("No product with the searched name was found");
-// 		} else {
-// 			res.status(404).json("Products not found");
-// 		}
-// 	} catch (err) {
-// 		console.log("An error ocurred in getProductQuery");
-// 		throw new Error("An error ocurred!");
-// 	}
-// };
-
 const updateProduct = async (req, res) => {
 	const { id } = req.params;
 	const {
@@ -108,7 +80,7 @@ const updateProduct = async (req, res) => {
 		color,
 		product
 	} = req.body;
-
+  
 	try {
 		const productFound = await prisma.product.findUnique({
 			where: {
@@ -155,4 +127,31 @@ const updateProduct = async (req, res) => {
 		throw new Error(err);
 	}
 };
-module.exports = { getProducts, getProductById, createProduct, updateProduct };
+
+const deleteProduct = async (req, res, next) => {
+	const { id } = req.params;
+
+	try {
+		const doesProductExist = await prisma.product.findUnique({
+			where: {
+				id
+			}
+		});
+
+		if (doesProductExist) {
+			const productToDelete = await prisma.product.delete({
+				where: {
+					id
+				}
+			});
+
+			return res
+				.status(200)
+				.json({ message: `'${productToDelete.name}' deleted successfully from the Products in DB` });
+		} else return res.status(404).json({ errorMessage: "There is no product with that id" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { getProducts, getProductById, createProduct, updateProduct, deleteProduct };
