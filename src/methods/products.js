@@ -1,8 +1,9 @@
 const prisma = require("../utils/prisma");
 
-const getAll = async id => {
+const getAll = async () => {
 	const products = await prisma.product.findMany({
 		select: {
+			id: true,
 			name: true,
 			description: true,
 			image: true,
@@ -16,7 +17,8 @@ const getAll = async id => {
 			originCountry: true,
 			isPrepared: true,
 			idDiscount: true,
-			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
+			attribute: true, // preguntar a front si lo necesitan, sino, para eliminar este campo
+			state: true
 		}
 	});
 	return products;
