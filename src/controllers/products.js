@@ -1,5 +1,5 @@
 const prisma = require("../utils/prisma");
-const { findById, create, verifyDataCreate, verifyName, verifyIngredients } = require("../methods/products");
+const { getAll, findById, create, verifyDataCreate, verifyName, verifyIngredients } = require("../methods/products");
 
 const getProducts = async (req, res, next) => {
 	try {
@@ -77,9 +77,12 @@ const deleteProduct = async (req, res, next) => {
 		});
 
 		if (doesProductExist) {
-			const productToDelete = await prisma.product.delete({
+			const productToDelete = await prisma.product.update({
 				where: {
 					id
+				},
+				data: {
+					state: "inactive"
 				}
 			});
 
