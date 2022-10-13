@@ -28,6 +28,9 @@ CREATE TYPE "Percentage" AS ENUM ('five', 'ten', 'fifteen');
 -- CreateEnum
 CREATE TYPE "Status" AS ENUM ('pending', 'complete');
 
+-- CreateEnum
+CREATE TYPE "Rating" AS ENUM ('one', 'two', 'three', 'four', 'five');
+
 -- CreateTable
 CREATE TABLE "Auth" (
     "id" TEXT NOT NULL,
@@ -41,8 +44,8 @@ CREATE TABLE "Auth" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "surname" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "surname" VARCHAR(50) NOT NULL,
     "role" "Role" NOT NULL,
     "idAuth" TEXT NOT NULL,
 
@@ -52,8 +55,8 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "description" VARCHAR(500) NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "description" TEXT NOT NULL,
     "image" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "category" "Category" NOT NULL,
@@ -62,7 +65,10 @@ CREATE TABLE "Product" (
     "alcohol" BOOLEAN NOT NULL,
     "stock" BOOLEAN NOT NULL DEFAULT true,
     "ingredients" JSONB NOT NULL,
+    "originCountry" VARCHAR(50) NOT NULL,
+    "isPrepared" BOOLEAN NOT NULL DEFAULT true,
     "idDiscount" TEXT,
+    "idAttribute" TEXT,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -71,14 +77,12 @@ CREATE TABLE "Product" (
 CREATE TABLE "Attribute" (
     "id" TEXT NOT NULL,
     "cream" BOOLEAN NOT NULL,
-    "originCountry" VARCHAR(50) NOT NULL,
     "texture" "Texture" NOT NULL,
     "body" "Body" NOT NULL,
     "acidity" "Acidity" NOT NULL,
     "bitterness" "Bitterness" NOT NULL,
     "roast" "Roast" NOT NULL,
     "color" "Color" NOT NULL,
-    "idProduct" TEXT NOT NULL,
 
     CONSTRAINT "Attribute_pkey" PRIMARY KEY ("id")
 );
@@ -112,6 +116,23 @@ CREATE TABLE "Order_Product" (
     CONSTRAINT "Order_Product_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Favourite_Product" (
+    "idUser" TEXT NOT NULL,
+    "idProduct" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Review" (
+    "id" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "rating" "Rating" NOT NULL,
+    "idUser" TEXT,
+
+    CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Auth_email_key" ON "Auth"("email");
 
@@ -125,7 +146,7 @@ CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 CREATE UNIQUE INDEX "Product_idDiscount_key" ON "Product"("idDiscount");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Attribute_idProduct_key" ON "Attribute"("idProduct");
+CREATE UNIQUE INDEX "Product_idAttribute_key" ON "Product"("idAttribute");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_idUser_key" ON "Order"("idUser");
@@ -136,6 +157,12 @@ CREATE UNIQUE INDEX "Order_Product_idProduct_key" ON "Order_Product"("idProduct"
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_Product_idOrder_key" ON "Order_Product"("idOrder");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Favourite_Product_idUser_key" ON "Favourite_Product"("idUser");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Favourite_Product_idProduct_key" ON "Favourite_Product"("idProduct");
+
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_idAuth_fkey" FOREIGN KEY ("idAuth") REFERENCES "Auth"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -143,7 +170,7 @@ ALTER TABLE "User" ADD CONSTRAINT "User_idAuth_fkey" FOREIGN KEY ("idAuth") REFE
 ALTER TABLE "Product" ADD CONSTRAINT "Product_idDiscount_fkey" FOREIGN KEY ("idDiscount") REFERENCES "Discount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_idProduct_fkey" FOREIGN KEY ("idProduct") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Product" ADD CONSTRAINT "Product_idAttribute_fkey" FOREIGN KEY ("idAttribute") REFERENCES "Attribute"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -153,3 +180,12 @@ ALTER TABLE "Order_Product" ADD CONSTRAINT "Order_Product_idProduct_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "Order_Product" ADD CONSTRAINT "Order_Product_idOrder_fkey" FOREIGN KEY ("idOrder") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Favourite_Product" ADD CONSTRAINT "Favourite_Product_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Favourite_Product" ADD CONSTRAINT "Favourite_Product_idProduct_fkey" FOREIGN KEY ("idProduct") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

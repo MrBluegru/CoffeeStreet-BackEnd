@@ -11,7 +11,7 @@ const setUsersDB = async () => {
 			});
 		}
 
-		return { message: "The users have been successfully set on Db" };
+		return { message: "The users have been successfully set on DB" };
 	} catch (error) {
 		throw new Error(error.message);
 	}
