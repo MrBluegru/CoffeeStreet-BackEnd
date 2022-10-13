@@ -22,13 +22,13 @@ const getUsers = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   const { id } = req.params;
-  const { role } = req.body;
+  const { role , name, surname} = req.body;
 
   try {
     const userFound = await userMethods.findById(id);
     if (!userFound)
       return res.status(400).json({ errorMessage: "This user doesn't exist" });
-    const update = await userMethods.updateUser(id, role);
+    const update = await userMethods.updateUser(id, , name, surname , role);
     return res.status(200).json(update);
   } catch (error) {
     next(error);
