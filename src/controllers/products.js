@@ -12,6 +12,7 @@ const { createNewAttribute, verifyDataAttributes } = require("../methods/attribu
 
 const getProducts = async (req, res, next) => {
 	const { name } = req.query;
+
 	try {
 		if (name) {
 			const findProductName = await prisma.product.findMany({
@@ -25,7 +26,7 @@ const getProducts = async (req, res, next) => {
 
 			findProductName.length
 				? res.status(200).json(findProductName)
-				: res.status(404).json("No product with the searched name was found");
+				: res.status(200).json({ errorMessage: "There is no product with that name" });
 		} else {
 			const productsInDb = await getAll();
 			if (productsInDb) return res.status(200).json(productsInDb);
@@ -40,9 +41,8 @@ const getProductById = async (req, res, next) => {
 	const { id } = req.params;
 
 	try {
-		if (!id) return res.status(400).json({ errorMessage: "No id given" });
 		const product = await findById(id);
-		if (!product) return res.status(404).json({ errorMessage: "No product found with that id" });
+		if (!product) return res.status(404).json({ errorMessage: "There is no product with that id" });
 		else return res.status(200).json(product);
 	} catch (error) {
 		next(error);
@@ -103,27 +103,23 @@ const updateProduct = async (req, res) => {
 		stock,
 		ingredients,
 		originCountry,
-		isPrepared,
-		discount, //
-		cream,
-		texture,
-		body,
-		acidity,
-		bitterness,
-		roast,
-		color,
-		product
+		isPrepared
+		// discount,
+		// cream,
+		// texture,
+		// body,
+		// acidity,
+		// bitterness,
+		// roast,
+		// color,
+		// product
 	} = req.body;
 
 	try {
-		const productFound = await prisma.product.findUnique({
-			where: {
-				id: id
-			}
-		});
+		const productFound = await findById(id);
 
 		if (productFound) {
-			const productUpdated = await prisma.product.update({
+			await prisma.product.update({
 				where: {
 					id: id
 				},
@@ -139,26 +135,23 @@ const updateProduct = async (req, res) => {
 					stock,
 					ingredients,
 					originCountry,
-					isPrepared,
-					discount,
-					cream,
-					texture,
-					body,
-					acidity,
-					bitterness,
-					roast,
-					color,
-					product
+					isPrepared
+					// discount,
+					// cream,
+					// texture,
+					// body,
+					// acidity,
+					// bitterness,
+					// roast,
+					// color,
+					// product
 				}
 			});
 
-			res.status(200).json(productUpdated);
-		} else {
-			res.status(404).json("No product found with that id");
-		}
+			return res.status(200).json({ message: `'${productFound.name}' updated successfully` });
+		} else return res.status(404).json({ errorMessage: "There is no product with that id" });
 	} catch (err) {
-		console.log("An error ocurred in updateProduct");
-		throw new Error(err);
+		next(err);
 	}
 };
 
@@ -166,11 +159,7 @@ const deleteProduct = async (req, res, next) => {
 	const { id } = req.params;
 
 	try {
-		const doesProductExist = await prisma.product.findUnique({
-			where: {
-				id
-			}
-		});
+		const doesProductExist = await findById(id);
 
 		if (doesProductExist) {
 			const productToDelete = await prisma.product.update({
@@ -191,4 +180,10 @@ const deleteProduct = async (req, res, next) => {
 	}
 };
 
-module.exports = { getProducts, getProductById, createProduct, updateProduct, deleteProduct };
+module.exports = {
+	getProducts,
+	getProductById,
+	createProduct,
+	updateProduct,
+	deleteProduct
+};

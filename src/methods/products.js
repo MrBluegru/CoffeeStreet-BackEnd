@@ -124,4 +124,11 @@ const verifyIngredients = async data => {
 	return data.ingredients.some(e => typeof e !== "string");
 };
 
-module.exports = { findById, createNewProduct, verifyDataProduct, verifyName, verifyIngredients, getAll };
+module.exports = {
+	findById,
+	createNewProduct,
+	verifyDataProduct,
+	verifyName,
+	verifyIngredients,
+	getAll
+};
