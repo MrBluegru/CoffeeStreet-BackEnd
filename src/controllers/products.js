@@ -68,8 +68,8 @@ const createProduct = async (req, res, next) => {
 				product: { id: attributes.product.id, name: attributes.product.name }
 			});
 		} else {
-			data.idAttribute = attributes.attributeObj.id;
-			const product = await createNewProduct(data);
+			data.idAttribute = attributes.newAttribute.id; //se agrega el id recién creado en la tabla Attribute (attributes.newAttribute.id) a la data enviada del front
+			const product = await createNewProduct(data); // se envía data como argumento, ya tiene incluído su idAttribute recién creado
 			if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
 			else return res.status(200).json({ message: "Product successfully created" });
 		}
