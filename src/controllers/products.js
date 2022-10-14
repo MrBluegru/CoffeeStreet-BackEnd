@@ -65,7 +65,6 @@ const createProduct = async (req, res, next) => {
 		if (attributes.repeated) {
 			return res.status(404).json({
 				errorMessage: `This combination of attributes already exist:`,
-				repeated: true,
 				product: { id: attributes.product.id, name: attributes.product.name }
 			});
 		} else {
