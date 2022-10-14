@@ -4,7 +4,7 @@ const texture = ["veryFine", "fine", "medium", "coarse", "desertDunes"];
 const body = ["light", "perceivable", "medium", "thick", "sirupy"];
 const acidity = ["notFound", "light", "perceivable", "fresh", "high"];
 const bitterness = ["light", "perceivable", "medium", "high", "veryHigh"];
-const roast = ["cinnamon", "light", "city", "fullcity", "dark", "french", "italian"];
+const roast = ["cinnamon", "light", "city", "fullCity", "dark", "french", "italian"];
 const color = ["yellow", "amber", "lightBrown", "hazelnut", "darkBrown", "dark"];
 
 const verifyDataAttributes = async data => {
@@ -33,6 +33,7 @@ const createNewAttribute = async data => {
 			body,
 			acidity,
 			bitterness,
+			roast,
 			color
 		}
 	});
