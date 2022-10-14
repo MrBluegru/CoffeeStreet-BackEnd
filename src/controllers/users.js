@@ -6,8 +6,8 @@ const getUsers = async (req, res, next) => {
 
 	try {
 		if (email) {
-			const user = await authMethods.emailVerify(email);
-			if (!user) return res.status(400).json({ errorMessage: "This email doesn't exist" });
+			const userEmail = await authMethods.emailVerify(email);
+			if (!userEmail) return res.status(400).json({ errorMessage: "This email is not registered" });
 			else return res.status(200).json(user);
 		} else {
 			const users = await prisma.user.findMany();

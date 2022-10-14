@@ -7,7 +7,7 @@ const bitterness = ["light", "perceivable", "medium", "high", "veryHigh"];
 const roast = ["cinnamon", "light", "city", "fullCity", "dark", "french", "italian"];
 const color = ["yellow", "amber", "lightBrown", "hazelnut", "darkBrown", "dark"];
 
-const verifyDataAttributes = async data => {
+const verifyDataAttributes = data => {
 	////valido que la data enviada de attributes exista y que su datatype sea el correcto, si hay un solo error la función retornará true
 
 	console.log(data.cream);
@@ -23,6 +23,7 @@ const verifyDataAttributes = async data => {
 		!color.includes(data.color)
 	)
 		return true;
+	else return false;
 };
 
 const createNewAttribute = async data => {
@@ -31,7 +32,6 @@ const createNewAttribute = async data => {
 
 	//Primero verifco que la combinación de attributes enviada no exista ya en la db, si es así, se enviará la data necesaria para bloquear
 	//y pedir corrección en la creación de los attributes del nuevo producto
-
 	const repeated = await prisma.attribute.findFirst({
 		where: {
 			cream,
@@ -43,16 +43,15 @@ const createNewAttribute = async data => {
 			color
 		}
 	});
+
 	if (repeated) {
 		const product = await prisma.product.findFirst({ where: { idAttribute: repeated.id } });
 		return { repeated: true, product };
+	} else {
+		//Si no existe la combinación de attributos enviada desde el front, se crea un nuevo elemento en la tabla de attributes
+		const newAttribute = await prisma.attribute.create({ data: dataAttributes });
+		return { repeated: false, newAttribute };
 	}
-	//Si no existe la combinación de attributos enviada desde el front, se crea un nuevo elemento en la tabla de attributes
-	const newAttribute = await prisma.attribute.create({ data: dataAttributes });
-	return { repeated: false, newAttribute };
 };
 
-module.exports = {
-	verifyDataAttributes,
-	createNewAttribute
-};
+module.exports = { verifyDataAttributes, createNewAttribute };
