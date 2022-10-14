@@ -58,21 +58,32 @@ const createProduct = async (req, res, next) => {
 			return res.status(404).json({ errorMessage: "Product data missing or datatype error" });
 		if (await verifyName(data)) return res.status(404).json({ errorMessage: "Product name is already on database" });
 		if (await verifyIngredients(data)) return res.status(404).json({ errorMessage: "Datatype error on ingredients" });
-		if (await verifyDataAttributes(data))
-			return res.status(404).json({ errorMessage: "Attributes data missing or datatype error" });
 
-		const attributes = await createNewAttribute(data);
-		if (attributes.repeated) {
-			return res.status(404).json({
-				errorMessage: `This combination of attributes already exist:`,
-				product: { id: attributes.product.id, name: attributes.product.name }
-			});
-		} else {
-			data.idAttribute = attributes.newAttribute.id; //se agrega el id recién creado en la tabla Attribute (attributes.newAttribute.id) a la data enviada del front
-			const product = await createNewProduct(data); // se envía data como argumento, ya tiene incluído su idAttribute recién creado
-			if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
-			else return res.status(200).json({ message: "Product successfully created" });
+		// Condicional para ejecutar todo lo relacionado a attributes
+		if (data.category === "coffee" && data.isPrepared === true) {
+			if (await verifyDataAttributes(data))
+				return res.status(404).json({ errorMessage: "Attributes data missing or datatype error" });
+			const attributes = await createNewAttribute(data);
+			if (attributes.repeated) {
+				return res.status(404).json({
+					errorMessage: `This combination of attributes already exist:`,
+					product: { id: attributes.product.id, name: attributes.product.name }
+				});
+			} else {
+				data.idAttribute = attributes.newAttribute.id; //se agrega el id recién creado en la tabla Attribute (attributes.newAttribute.id) a la data enviada del front
+			}
 		}
+		//Preparar data con info default, en el caso de que envíen un café de caja
+		if (data.category === "coffee" && data.isPrepared === false) {
+			data.lactose = false;
+			data.gluten = false;
+			data.alcohol = false;
+			data.ingredients = ["coffee"];
+		}
+		// Creación de producto: se envía data como argumento, ya tiene incluído su idAttribute recién creado
+		const product = await createNewProduct(data);
+		if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
+		else return res.status(200).json({ message: "Product successfully created" });
 	} catch (error) {
 		next(error);
 	}
