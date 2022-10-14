@@ -21,18 +21,47 @@ const getUsers = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
-	const { id } = req.params;
-	const { name, surname, role } = req.body;
+	const { email, password, id } = req.body;
 
 	try {
+		if (!email || !password) return res.status(400).json({ errorMessage: "Email and Password Required" });
+		const registered = await authMethods.emailVerify(email);
+		if (!registered) return res.status(400).json({ errorMessage: "Email is not registered" });
+		const isAdmin = await userMethods.isAdmin();
+		if (!isAdmin)
+			return res.status(200).json({ errorMessage: "You are not an Admin. You cannot change the User's role" });
+
 		const userFound = await userMethods.findById(id);
 		if (!userFound) return res.status(400).json({ errorMessage: "This user doesn't exist" });
-		const updated = await userMethods.updateUser(id, name, surname, role);
-		return res.status(200).json(updateUser);
-		console.log(updated);
+		const updated = await userMethods.updateUser(id, role);
+		return res.status(200).json(updated);
 	} catch (error) {
 		next(error);
 	}
 };
 
-module.exports = { getUsers, updateUser };
+
+const deleteUser = async (req, res, next) => {
+	const { email } = req.query;
+
+	try {
+		const userFound = await userMethods.findByEmail(email);
+
+		if (userFound) {
+			const userToDelete = await prisma.user.update({
+				where: {
+					email
+				},
+				data: {
+					state: "inactive"
+				}
+			});
+
+			return res.status(200).json({ message: `'${userToDelete.name}' deleted successfully from the Users in DB` });
+		} else return res.status(404).json({ errorMessage: "There is no user with that email" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { getUsers, updateUser, deleteUser };

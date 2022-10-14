@@ -9,19 +9,25 @@ const findById = async id => {
 	return user;
 };
 
-const updateUser = async (id, name, surname, role) => {
+const isAdmin = async () => {
+	const admin = await prisma.user.findUnique({
+		where: {
+			role: "admin"
+		}
+	});
+	return admin;
+};
+
+const updateUser = async (id, role) => {
 	const user = await prisma.user.update({
 		where: {
 			id
 		},
 		data: {
-			name,
-			surname,
 			role
 		}
 	});
-	return user
+	return user;
 };
 
-module.exports = { findById, updateUser
-}
+module.exports = { findById, updateUser, isAdmin };
