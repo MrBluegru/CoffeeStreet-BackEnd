@@ -2,10 +2,25 @@ const prisma = require("../utils/prisma");
 const { getAll, findById, create, verifyDataCreate, verifyName, verifyIngredients } = require("../methods/products");
 
 const getProducts = async (req, res, next) => {
+	const { name } = req.query;
 	try {
-		const productsInDb = await getAll();
-		if (productsInDb) return res.status(200).json(productsInDb);
-		else return res.status(404).json({ errorMessage: "Products not found" });
+		if (name) {
+			const findProductName = await prisma.product.findMany({
+				where: {
+					name: {
+						contains: name,
+						mode: "insensitive"
+					}
+				}
+			});
+
+			findProductName.length
+				? res.status(200).json(findProductName)
+				: res.status(404).json("No product with the searched name was found");
+		} else {
+      const productsInDb = await getAll();
+		  if (productsInDb) return res.status(200).json(productsInDb);
+		  else return res.status(404).json({ errorMessage: "Products not found" });
 	} catch (error) {
 		next(error);
 	}
@@ -24,32 +39,6 @@ const getProductById = async (req, res, next) => {
 	}
 };
 
-const getProductByName = async (req, res) => {
-	const { name } = req.params;
-	try {
-		if (name) {
-			const findProductName = await prisma.product.findMany({
-				where: {
-					name: {
-						contains: name,
-						mode: "insensitive"
-					}
-				}
-			});
-
-			findProductName.length
-				? res.status(200).json(findProductName)
-				: res.status(404).json("No product with the searched name was found");
-		} else {
-			const productsFound = await prisma.product.findMany();
-			productsFound ? res.status(200).json(productsFound) : res.status(404).json("Products not found");
-		}
-	} catch (err) {
-		console.log("An error ocurred in getProductQuery");
-		throw new Error("An error ocurred!");
-	}
-};
-
 const createProduct = async (req, res, next) => {
 	const data = req.body.data;
 
@@ -63,6 +52,79 @@ const createProduct = async (req, res, next) => {
 		else return res.status(200).json({ message: "Product successfully created" });
 	} catch (error) {
 		next(error);
+	}
+};
+
+const updateProduct = async (req, res) => {
+	const { id } = req.params;
+	const {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		stock,
+		ingredients,
+		originCountry,
+		isPrepared,
+		discount, //
+		cream,
+		texture,
+		body,
+		acidity,
+		bitterness,
+		roast,
+		color,
+		product
+	} = req.body;
+  
+	try {
+		const productFound = await prisma.product.findUnique({
+			where: {
+				id: id
+			}
+		});
+
+		if (productFound) {
+			const productUpdated = await prisma.product.update({
+				where: {
+					id: id
+				},
+				data: {
+					name,
+					description,
+					image,
+					price,
+					category,
+					lactose,
+					gluten,
+					alcohol,
+					stock,
+					ingredients,
+					originCountry,
+					isPrepared,
+					discount,
+					cream,
+					texture,
+					body,
+					acidity,
+					bitterness,
+					roast,
+					color,
+					product
+				}
+			});
+
+			res.status(200).json(productUpdated);
+		} else {
+			res.status(404).json("No product found with that id");
+		}
+	} catch (err) {
+		console.log("An error ocurred in updateProduct");
+		throw new Error(err);
 	}
 };
 
@@ -95,4 +157,4 @@ const deleteProduct = async (req, res, next) => {
 	}
 };
 
-module.exports = { getProducts, getProductById, getProductByName, createProduct, deleteProduct };
+module.exports = { getProducts, getProductById, createProduct, updateProduct, deleteProduct };
