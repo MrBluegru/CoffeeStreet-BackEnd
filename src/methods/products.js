@@ -49,12 +49,43 @@ const findById = async id => {
 	return product;
 };
 
-const create = async data => {
-	return await prisma.product.create({ data });
+const createNewProduct = async data => {
+	//se crea el nuevo producto
+	const {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		ingredients,
+		originCountry,
+		isPrepared,
+		idAttribute
+	} = data;
+	const newProduct = {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		ingredients,
+		originCountry,
+		isPrepared,
+		idAttribute
+	};
+
+	return await prisma.product.create({ data: newProduct });
 };
 
 const verifyName = async data => {
 	const nameUnique = await prisma.product.findUnique({
+		// verifico que el producto nuevo a crear no tenga un nombre que ya está en la base de datos
 		where: {
 			name: data.name
 		}
@@ -62,7 +93,8 @@ const verifyName = async data => {
 	return nameUnique;
 };
 
-const verifyDataCreate = async data => {
+const verifyDataProduct = async data => {
+	////valido que la data enviada del product a crear exista y que su datatype sea el correcto, si hay un solo error la función retornará true
 	if (
 		!data.name ||
 		typeof data.name !== "string" ||
@@ -79,13 +111,17 @@ const verifyDataCreate = async data => {
 		!(data.alcohol === false || data.alcohol === true) ||
 		!data.ingredients ||
 		typeof data.ingredients !== "object" ||
-		!data.ingredients.length
+		!data.ingredients.length ||
+		!data.originCountry ||
+		typeof data.originCountry !== "string" ||
+		!(data.isPrepared === false || data.isPrepared === true)
 	)
 		return true;
 };
 
 const verifyIngredients = async data => {
+	//verifico que todos los ingredientes sean de tipo string, si hay alguno que no lo es, ésta función retornará true
 	return data.ingredients.some(e => typeof e !== "string");
 };
 
-module.exports = { findById, create, verifyDataCreate, verifyName, verifyIngredients, getAll };
+module.exports = { findById, createNewProduct, verifyDataProduct, verifyName, verifyIngredients, getAll };
