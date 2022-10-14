@@ -26,7 +26,7 @@ const getProducts = async (req, res, next) => {
 
 			findProductName.length
 				? res.status(200).json(findProductName)
-				: res.status(404).json({ errorMessage: "There is no product with that name" });
+				: res.status(200).json({ errorMessage: "There is no product with that name" });
 		} else {
 			const productsInDb = await getAll();
 			if (productsInDb) return res.status(200).json(productsInDb);
