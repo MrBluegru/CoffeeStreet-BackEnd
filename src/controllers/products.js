@@ -1,5 +1,14 @@
 const prisma = require("../utils/prisma");
-const { getAll, findById, create, verifyDataCreate, verifyName, verifyIngredients } = require("../methods/products");
+const {
+	getAll,
+	findById,
+	createNewProduct,
+	verifyDataProduct,
+	verifyName,
+	verifyIngredients
+} = require("../methods/products");
+
+const { createNewAttribute, verifyDataAttributes } = require("../methods/attributes");
 
 const getProducts = async (req, res, next) => {
 	const { name } = req.query;
@@ -18,9 +27,10 @@ const getProducts = async (req, res, next) => {
 				? res.status(200).json(findProductName)
 				: res.status(404).json("No product with the searched name was found");
 		} else {
-      const productsInDb = await getAll();
-		  if (productsInDb) return res.status(200).json(productsInDb);
-		  else return res.status(404).json({ errorMessage: "Products not found" });
+			const productsInDb = await getAll();
+			if (productsInDb) return res.status(200).json(productsInDb);
+			else return res.status(404).json({ errorMessage: "Products not found" });
+		}
 	} catch (error) {
 		next(error);
 	}
@@ -44,10 +54,16 @@ const createProduct = async (req, res, next) => {
 
 	try {
 		if (!data) return res.status(404).json({ errorMessage: "No data object given" });
-		if (await verifyDataCreate(data)) return res.status(404).json({ errorMessage: "Data missing or datatype error" });
+		if (await verifyDataProduct(data))
+			return res.status(404).json({ errorMessage: "Product data missing or datatype error" });
 		if (await verifyName(data)) return res.status(404).json({ errorMessage: "Product name is already on database" });
 		if (await verifyIngredients(data)) return res.status(404).json({ errorMessage: "Datatype error on ingredients" });
-		const product = await create(data);
+		if (await verifyDataAttributes(data))
+			return res.status(404).json({ errorMessage: "Attributes data missing or datatype error" });
+
+		const attributes = await createNewAttribute(data);
+		data.idAttribute = attributes.id;
+		const product = await createNewProduct(data);
 		if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
 		else return res.status(200).json({ message: "Product successfully created" });
 	} catch (error) {
@@ -80,7 +96,7 @@ const updateProduct = async (req, res) => {
 		color,
 		product
 	} = req.body;
-  
+
 	try {
 		const productFound = await prisma.product.findUnique({
 			where: {
