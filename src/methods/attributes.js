@@ -26,7 +26,22 @@ const verifyDataAttributes = async data => {
 const createNewAttribute = async data => {
 	const { cream, texture, body, acidity, bitterness, roast, color } = data;
 	const dataAttributes = { cream, texture, body, acidity, bitterness, roast, color };
-	return await prisma.attribute.create({ data: dataAttributes });
+	const repeated = await prisma.attribute.findFirst({
+		where: {
+			cream,
+			texture,
+			body,
+			acidity,
+			bitterness,
+			color
+		}
+	});
+	if (repeated) {
+		const product = await prisma.product.findFirst({ where: { idAttribute: repeated.id } });
+		return { repeated: true, attributeObj: repeated, product };
+	}
+	const newAttribute = await prisma.attribute.create({ data: dataAttributes });
+	return { repeated: false, attributeObj: newAttribute };
 };
 
 module.exports = {

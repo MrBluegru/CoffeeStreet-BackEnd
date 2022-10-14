@@ -62,10 +62,17 @@ const createProduct = async (req, res, next) => {
 			return res.status(404).json({ errorMessage: "Attributes data missing or datatype error" });
 
 		const attributes = await createNewAttribute(data);
-		data.idAttribute = attributes.id;
-		const product = await createNewProduct(data);
-		if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
-		else return res.status(200).json({ message: "Product successfully created" });
+		if (attributes.repeated) {
+			return res.status(404).json({
+				errorMessage: `This combination of attributes already exist:`,
+				product: { id: attributes.product.id, name: attributes.product.name }
+			});
+		} else {
+			data.idAttribute = attributes.attributeObj.id;
+			const product = await createNewProduct(data);
+			if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
+			else return res.status(200).json({ message: "Product successfully created" });
+		}
 	} catch (error) {
 		next(error);
 	}

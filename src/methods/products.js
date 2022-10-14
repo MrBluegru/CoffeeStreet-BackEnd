@@ -78,6 +78,7 @@ const createNewProduct = async data => {
 		isPrepared,
 		idAttribute
 	};
+
 	return await prisma.product.create({ data: newProduct });
 };
 
