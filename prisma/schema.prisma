@@ -35,7 +35,7 @@ model Product {
   id                String             @id @default(uuid())
   name              String             @unique @db.VarChar(50)
   description       String             @db.Text
-  image             String
+  image             String?
   price             Float
   category          Category
   lactose           Boolean
