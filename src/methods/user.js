@@ -1,5 +1,10 @@
 const prisma = require("../utils/prisma");
 
+const findAll = async () => {
+	const users = await prisma.user.findMany();
+	return users
+};
+
 const findById = async id => {
 	const user = await prisma.user.findUnique({
 		where: {
@@ -9,16 +14,7 @@ const findById = async id => {
 	return user;
 };
 
-const isAdmin = async () => {
-	const admin = await prisma.user.findUnique({
-		where: {
-			role: "admin"
-		}
-	});
-	return admin;
-};
-
-const updateUser = async (id, role) => {
+const updateRole = async (id, role) => {
 	const user = await prisma.user.update({
 		where: {
 			id
@@ -30,4 +26,4 @@ const updateUser = async (id, role) => {
 	return user;
 };
 
-module.exports = { findById, updateUser, isAdmin };
+module.exports = { findAll, findById, updateRole };
