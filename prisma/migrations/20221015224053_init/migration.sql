@@ -69,7 +69,7 @@ CREATE TABLE "Product" (
     "alcohol" BOOLEAN NOT NULL,
     "stock" BOOLEAN NOT NULL DEFAULT true,
     "ingredients" JSONB NOT NULL,
-    "originCountry" VARCHAR(50) NOT NULL,
+    "originCountry" VARCHAR(50),
     "isPrepared" BOOLEAN NOT NULL DEFAULT true,
     "idDiscount" TEXT,
     "idAttribute" TEXT,
