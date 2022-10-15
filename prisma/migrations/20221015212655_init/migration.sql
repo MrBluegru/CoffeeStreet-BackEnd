@@ -123,8 +123,11 @@ CREATE TABLE "Order_Product" (
 
 -- CreateTable
 CREATE TABLE "Favourite_Product" (
+    "id" TEXT NOT NULL,
     "idUser" TEXT NOT NULL,
-    "idProduct" TEXT NOT NULL
+    "idProduct" TEXT NOT NULL,
+
+    CONSTRAINT "Favourite_Product_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -161,12 +164,6 @@ CREATE UNIQUE INDEX "Order_Product_idProduct_key" ON "Order_Product"("idProduct"
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_Product_idOrder_key" ON "Order_Product"("idOrder");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Favourite_Product_idUser_key" ON "Favourite_Product"("idUser");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Favourite_Product_idProduct_key" ON "Favourite_Product"("idProduct");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_idAuth_fkey" FOREIGN KEY ("idAuth") REFERENCES "Auth"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
