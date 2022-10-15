@@ -9,6 +9,20 @@ const {
 } = require("../methods/products");
 
 const { createNewAttribute, verifyDataAttributes } = require("../methods/attributes");
+const {
+	validateName,
+	validateDescription,
+	validateImg,
+	validatePrice,
+	validateCategory,
+	validateLactose,
+	validateGluten,
+	validateAlcohol,
+	validateStock,
+	validateIngredients,
+	validateOriginCountry,
+	validateIsPrepared
+} = require("../validations/products");
 
 const getProducts = async (req, res, next) => {
 	const { name } = req.query;
@@ -104,20 +118,46 @@ const updateProduct = async (req, res) => {
 		ingredients,
 		originCountry,
 		isPrepared
-		// discount,
-		// cream,
-		// texture,
-		// body,
-		// acidity,
-		// bitterness,
-		// roast,
-		// color,
-		// product
 	} = req.body;
 
 	try {
-		const productFound = await findById(id);
+		//---------------------------------------------------------- VALIDACIONES --------------------------------------------------------//
+		console.log(category);
+		console.log(lactose);
+		if (!validateName(name)) return res.status(400).json({ errorMessage: "Enter the name correctly" });
 
+		if (!validateDescription(description))
+			return res.status(400).json({ errorMessage: "Enter the description correctly" });
+
+		if (!validateImg(image)) return res.status(400).json({ errorMessage: "Enter the image correctly" });
+
+		if (!validatePrice(price)) return res.status(400).json({ errorMessage: "Enter the price correctly" });
+
+		if (!validateCategory(category)) return res.status(400).json({ errorMessage: "Enter the category correctly" });
+
+		if (!validateLactose(lactose))
+			return res.status(400).json({ errorMessage: "Please select an option in the field of Lactose" });
+
+		if (!validateGluten(gluten))
+			return res.status(400).json({ errorMessage: "Please select an option in the field of gluten" });
+
+		if (!validateAlcohol(alcohol))
+			return res.status(400).json({ errorMessage: "Please select an option in the field of alcohol" });
+
+		if (!validateStock(stock))
+			return res.status(400).json({ errorMessage: "Please select an option in the field of stock" });
+
+		if (!validateIngredients(ingredients))
+			return res.status(400).json({ errorMessage: "Enter the ingredients correctly" });
+
+		if (!validateOriginCountry(originCountry))
+			return res.status(400).json({ errorMessage: "Enter the origin country correctly" });
+
+		if (!validateIsPrepared(isPrepared)) return res.status(400).json({ errorMessage: "Please select an option" });
+
+		//--------------------------------------------------------------------------------------------------------------------------------//
+
+		const productFound = await findById(id);
 		if (productFound) {
 			await prisma.product.update({
 				where: {
@@ -136,22 +176,13 @@ const updateProduct = async (req, res) => {
 					ingredients,
 					originCountry,
 					isPrepared
-					// discount,
-					// cream,
-					// texture,
-					// body,
-					// acidity,
-					// bitterness,
-					// roast,
-					// color,
-					// product
 				}
 			});
 
 			return res.status(200).json({ message: `'${productFound.name}' updated successfully` });
 		} else return res.status(404).json({ errorMessage: "There is no product with that id" });
 	} catch (err) {
-		next(err);
+		console.log(err);
 	}
 };
 
