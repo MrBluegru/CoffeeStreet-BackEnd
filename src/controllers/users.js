@@ -32,7 +32,7 @@ const updateUser = async (req, res, next) => {
 				const isOk = all.find(el => el.id === id && el.role !== "admin");
 				if (!isOk) return res.status(400).json({ errorMessage: "There must be at least one Admin" });
 			}
-			const updated = await userMethods.updateUser(id, role);
+			const updated = await userMethods.updateRole(id, role);
 			return res.status(200).json(updated);
 		} else return res.status(400).json({ errorMessage: "The role must be admin, employee or client" });
 	} catch (error) {
