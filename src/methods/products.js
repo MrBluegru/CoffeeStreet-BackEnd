@@ -126,7 +126,7 @@ const verifyCoffePreparedOrBakery = data => {
 };
 
 const verifyCoffeBox = data => {
-	return !data.originCountry || typeof data.originCountry !== "string" || data.originCountry.length < 5;
+	return !data.originCountry || typeof data.originCountry !== "string" || data.originCountry.length < 3;
 };
 
 const verifyIngredients = data => {

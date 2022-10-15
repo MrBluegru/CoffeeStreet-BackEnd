@@ -70,11 +70,48 @@ const getProductById = async (req, res, next) => {
 };
 
 const createProduct = async (req, res, next) => {
-	const data = req.body.data;
-	console.log(data);
-
+	const {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		ingredients,
+		originCountry,
+		isPrepared,
+		cream,
+		texture,
+		body,
+		acidity,
+		bitterness,
+		roast,
+		color
+	} = req.body;
+	const data = {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		ingredients,
+		originCountry,
+		isPrepared,
+		cream,
+		texture,
+		body,
+		acidity,
+		bitterness,
+		roast,
+		color
+	};
 	try {
-		if (!data) return res.status(404).json({ errorMessage: "No data object given" });
+		// if (!data) return res.status(404).json({ errorMessage: "No data object given" });
 
 		//Verificacion general para todos los productos
 		if (verifyCategory(data)) return res.status(404).json({ errorMessage: "Error on category type" });
