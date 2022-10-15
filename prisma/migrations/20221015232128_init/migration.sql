@@ -61,7 +61,7 @@ CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "description" TEXT NOT NULL,
-    "image" TEXT NOT NULL,
+    "image" TEXT,
     "price" DOUBLE PRECISION NOT NULL,
     "category" "Category" NOT NULL,
     "lactose" BOOLEAN NOT NULL,
