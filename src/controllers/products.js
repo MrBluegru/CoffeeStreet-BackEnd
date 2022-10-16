@@ -158,7 +158,6 @@ const createProduct = async (req, res, next) => {
 		}
 		// Verificacion especifica para tes
 		if (data.category === "tea") {
-			console.log("entre");
 			data.lactose = false;
 			data.gluten = false;
 			data.alcohol = false;
@@ -167,7 +166,6 @@ const createProduct = async (req, res, next) => {
 		}
 
 		if (data.category === "sweetBakery" || data.category === "saltyBakery") {
-			console.log("wat");
 			data.isPrepared === true;
 			if (verifyCoffePreparedOrBakery(data))
 				return res.status(404).json({
@@ -191,7 +189,6 @@ const createProduct = async (req, res, next) => {
 		const product = await createNewProduct(data);
 		if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
 		else {
-			console.log(product);
 			return res.status(200).json({ message: "Product successfully created" });
 		}
 	} catch (error) {
@@ -218,8 +215,7 @@ const updateProduct = async (req, res) => {
 
 	try {
 		//---------------------------------------------------------- VALIDACIONES --------------------------------------------------------//
-		console.log(category);
-		console.log(lactose);
+
 		if (!validateName(name)) return res.status(400).json({ errorMessage: "Enter the name correctly" });
 
 		if (!validateDescription(description))
@@ -252,7 +248,7 @@ const updateProduct = async (req, res) => {
 		if (!validateIsPrepared(isPrepared)) return res.status(400).json({ errorMessage: "Please select an option" });
 
 		//--------------------------------------------------------------------------------------------------------------------------------//
-
+		console.log("qui");
 		const productFound = await findById(id);
 		if (productFound) {
 			await prisma.product.update({

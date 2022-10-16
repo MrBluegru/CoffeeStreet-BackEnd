@@ -26,7 +26,6 @@ const setProductsDB = async () => {
 					}
 				});
 			} else {
-				console.log(i);
 				response = await prisma.product.create({
 					data: {
 						...allProducts[i],
