@@ -2,6 +2,9 @@
 CREATE TYPE "Role" AS ENUM ('admin', 'employee', 'client');
 
 -- CreateEnum
+CREATE TYPE "State" AS ENUM ('active', 'inactive');
+
+-- CreateEnum
 CREATE TYPE "Category" AS ENUM ('coffee', 'tea', 'sweetBakery', 'saltyBakery', 'other');
 
 -- CreateEnum
@@ -48,6 +51,7 @@ CREATE TABLE "User" (
     "surname" VARCHAR(50) NOT NULL,
     "role" "Role" NOT NULL,
     "idAuth" TEXT NOT NULL,
+    "state" "State" NOT NULL DEFAULT 'active',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -57,7 +61,7 @@ CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "description" TEXT NOT NULL,
-    "image" TEXT NOT NULL,
+    "image" TEXT,
     "price" DOUBLE PRECISION NOT NULL,
     "category" "Category" NOT NULL,
     "lactose" BOOLEAN NOT NULL,
@@ -65,10 +69,11 @@ CREATE TABLE "Product" (
     "alcohol" BOOLEAN NOT NULL,
     "stock" BOOLEAN NOT NULL DEFAULT true,
     "ingredients" JSONB NOT NULL,
-    "originCountry" VARCHAR(50) NOT NULL,
+    "originCountry" VARCHAR(50),
     "isPrepared" BOOLEAN NOT NULL DEFAULT true,
     "idDiscount" TEXT,
     "idAttribute" TEXT,
+    "state" "State" NOT NULL DEFAULT 'active',
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );

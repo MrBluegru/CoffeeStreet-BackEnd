@@ -1,8 +1,9 @@
 const prisma = require("../utils/prisma");
 
-const getAll = async id => {
+const getAll = async () => {
 	const products = await prisma.product.findMany({
 		select: {
+			id: true,
 			name: true,
 			description: true,
 			image: true,
@@ -16,7 +17,8 @@ const getAll = async id => {
 			originCountry: true,
 			isPrepared: true,
 			idDiscount: true,
-			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
+			attribute: true, // preguntar a front si lo necesitan, sino, para eliminar este campo
+			state: true
 		}
 	});
 	return products;
@@ -47,12 +49,43 @@ const findById = async id => {
 	return product;
 };
 
-const create = async data => {
-	return await prisma.product.create({ data });
+const createNewProduct = async data => {
+	//se crea el nuevo producto
+	const {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		ingredients,
+		originCountry,
+		isPrepared,
+		idAttribute
+	} = data;
+	const newProduct = {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		ingredients,
+		originCountry,
+		isPrepared,
+		idAttribute
+	};
+
+	return await prisma.product.create({ data: newProduct });
 };
 
 const verifyName = async data => {
 	const nameUnique = await prisma.product.findUnique({
+		// verifico que el producto nuevo a crear no tenga un nombre que ya está en la base de datos
 		where: {
 			name: data.name
 		}
@@ -60,30 +93,60 @@ const verifyName = async data => {
 	return nameUnique;
 };
 
-const verifyDataCreate = async data => {
+const verifyDataProduct = data => {
+	////valido que la data enviada del product a crear exista y que su datatype sea el correcto, si hay un solo error la función retornará true
 	if (
 		!data.name ||
 		typeof data.name !== "string" ||
+		data.name.length < 5 ||
 		!data.description ||
 		typeof data.description !== "string" ||
+		data.description < 20 ||
 		!data.image ||
 		typeof data.image !== "string" ||
 		!data.price ||
 		typeof data.price !== "number" ||
-		!data.category ||
-		typeof data.category !== "string" ||
-		!(data.lactose === false || data.lactose === true) ||
-		!(data.gluten === false || data.gluten === true) ||
-		!(data.alcohol === false || data.alcohol === true) ||
-		!data.ingredients ||
-		typeof data.ingredients !== "object" ||
-		!data.ingredients.length
+		!(data.isPrepared === false || data.isPrepared === true)
 	)
 		return true;
 };
 
-const verifyIngredients = async data => {
-	return data.ingredients.some(e => typeof e !== "string");
+const categories = ["coffee", "tea", "sweetBakery", "saltyBakery", "other"];
+
+const verifyCategory = data => {
+	return !data.category || typeof data.category !== "string" || !categories.some(e => e === data.category);
 };
 
-module.exports = { findById, create, verifyDataCreate, verifyName, verifyIngredients, getAll };
+const verifyCoffePreparedOrBakery = data => {
+	return (
+		!(data.lactose === false || data.lactose === true) ||
+		!(data.gluten === false || data.gluten === true) ||
+		!(data.alcohol === false || data.alcohol === true)
+	);
+};
+
+const verifyCoffeBox = data => {
+	return !data.originCountry || typeof data.originCountry !== "string" || data.originCountry.length < 3;
+};
+
+const verifyIngredients = data => {
+	//verifico que todos los ingredientes sean de tipo string, si hay alguno que no lo es, ésta función retornará true
+	return (
+		!data.ingredients ||
+		typeof data.ingredients !== "object" ||
+		!data.ingredients.length ||
+		data.ingredients.some(e => typeof e !== "string")
+	);
+};
+
+module.exports = {
+	findById,
+	createNewProduct,
+	verifyDataProduct,
+	verifyCoffePreparedOrBakery,
+	verifyCoffeBox,
+	verifyCategory,
+	verifyName,
+	verifyIngredients,
+	getAll
+};
