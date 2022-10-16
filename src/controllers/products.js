@@ -5,7 +5,12 @@ const {
 	createNewProduct,
 	verifyDataProduct,
 	verifyName,
-	verifyIngredients
+	verifyIngredients,
+	verifyCoffeBox,
+	verifyCoffePreparedAndBakery,
+	verifyCoffePreparedorBakery,
+	verifyCoffePreparedOrBakery,
+	verifyCategory
 } = require("../methods/products");
 
 const { createNewAttribute, verifyDataAttributes } = require("../methods/attributes");
@@ -23,6 +28,7 @@ const {
 	validateOriginCountry,
 	validateIsPrepared
 } = require("../validations/products");
+const { json } = require("body-parser");
 
 const getProducts = async (req, res, next) => {
 	const { name } = req.query;
@@ -64,40 +70,127 @@ const getProductById = async (req, res, next) => {
 };
 
 const createProduct = async (req, res, next) => {
-	const data = req.body.data;
-
+	const {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		ingredients,
+		originCountry,
+		isPrepared,
+		cream,
+		texture,
+		body,
+		acidity,
+		bitterness,
+		roast,
+		color
+	} = req.body;
+	const data = {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		ingredients,
+		originCountry,
+		isPrepared,
+		cream,
+		texture,
+		body,
+		acidity,
+		bitterness,
+		roast,
+		color
+	};
 	try {
-		if (!data) return res.status(404).json({ errorMessage: "No data object given" });
-		if (await verifyDataProduct(data))
-			return res.status(404).json({ errorMessage: "Product data missing or datatype error" });
-		if (await verifyName(data)) return res.status(404).json({ errorMessage: "Product name is already on database" });
-		if (await verifyIngredients(data)) return res.status(404).json({ errorMessage: "Datatype error on ingredients" });
+		// if (!data) return res.status(404).json({ errorMessage: "No data object given" });
 
-		// Condicional para ejecutar todo lo relacionado a attributes
-		if (data.category === "coffee" && data.isPrepared === true) {
-			if (await verifyDataAttributes(data))
-				return res.status(404).json({ errorMessage: "Attributes data missing or datatype error" });
-			const attributes = await createNewAttribute(data);
-			if (attributes.repeated) {
-				return res.status(404).json({
-					errorMessage: `This combination of attributes already exist:`,
-					product: { id: attributes.product.id, name: attributes.product.name }
-				});
+		//Verificacion general para todos los productos
+		if (verifyCategory(data)) return res.status(404).json({ errorMessage: "Error on category type" });
+		if (verifyDataProduct(data))
+			return res.status(404).json({
+				errorMessage:
+					"Basic product data missing, datatype error or not long enough on: name, description, image, price or isPrepared"
+			});
+		if (data.isPrepared !== false) {
+			data.originCountry = null;
+		}
+		if (await verifyName(data)) return res.status(404).json({ errorMessage: "Product name is already on database" });
+
+		if (data.isPrepared !== false) {
+			if (verifyIngredients(data))
+				return res.status(404).json({ errorMessage: "Missing data or datatype error on: ingredients" });
+		}
+		data.price = parseInt(data.price);
+		// Verificacion especifica para Cafes
+		if (data.category === "coffee") {
+			if (data.isPrepared === true) {
+				if (verifyCoffePreparedOrBakery(data))
+					return res.status(404).json({
+						errorMessage:
+							"Coffee ready to eat registration attempt. Data missing or datatype error on: lactose, gluten or alcohol"
+					});
+				if (verifyDataAttributes(data))
+					return res.status(404).json({
+						errorMessage: "Coffee ready to eat registration attempt. Data missing or datatype error on: attributes"
+					});
+				const attributes = await createNewAttribute(data);
+				data.idAttribute = attributes.id; //se agrega el id recién creado en la tabla Attribute (attributes.newAttribute.id) a la data enviada del front
 			} else {
-				data.idAttribute = attributes.newAttribute.id; //se agrega el id recién creado en la tabla Attribute (attributes.newAttribute.id) a la data enviada del front
+				data.lactose = false;
+				data.gluten = false;
+				data.alcohol = false;
+				data.ingredients = ["coffee"];
+				if (verifyCoffeBox(data))
+					return res.status(404).json({
+						errorMessage:
+							"Coffee Box registration attempt. Data missing, datatype error, or not long enough: originCountry "
+					});
 			}
 		}
-		//Preparar data con info default, en el caso de que envíen un café de caja
-		if (data.category === "coffee" && data.isPrepared === false) {
+		// Verificacion especifica para tes
+		if (data.category === "tea") {
 			data.lactose = false;
 			data.gluten = false;
 			data.alcohol = false;
-			data.ingredients = ["coffee"];
+			data.originCountry = null;
+			data.isPrepared === true;
 		}
+
+		if (data.category === "sweetBakery" || data.category === "saltyBakery") {
+			data.isPrepared === true;
+			if (verifyCoffePreparedOrBakery(data))
+				return res.status(404).json({
+					errorMessage: "Bakery registration attempt. Data missing or datatype error: lactose, gluten or alcohol"
+				});
+		}
+
+		if (data.category === "other") {
+			data.originCountry = null;
+			data.idAttribute = null;
+			if (verifyIngredients(data))
+				return res.status(404).json({ errorMessage: "Missing data or datatype error on: ingredients" });
+			if (verifyCoffePreparedOrBakery(data))
+				return res.status(404).json({
+					errorMessage:
+						"Other-category product registration attempt. Data missing or datatype error on: lactose, gluten or alcohol"
+				});
+		}
+
 		// Creación de producto: se envía data como argumento, ya tiene incluído su idAttribute recién creado
 		const product = await createNewProduct(data);
 		if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
-		else return res.status(200).json({ message: "Product successfully created" });
+		else {
+			return res.status(200).json({ message: "Product successfully created" });
+		}
 	} catch (error) {
 		next(error);
 	}
@@ -122,8 +215,7 @@ const updateProduct = async (req, res) => {
 
 	try {
 		//---------------------------------------------------------- VALIDACIONES --------------------------------------------------------//
-		console.log(category);
-		console.log(lactose);
+
 		if (!validateName(name)) return res.status(400).json({ errorMessage: "Enter the name correctly" });
 
 		if (!validateDescription(description))
@@ -156,7 +248,6 @@ const updateProduct = async (req, res) => {
 		if (!validateIsPrepared(isPrepared)) return res.status(400).json({ errorMessage: "Please select an option" });
 
 		//--------------------------------------------------------------------------------------------------------------------------------//
-
 		const productFound = await findById(id);
 		if (productFound) {
 			await prisma.product.update({
