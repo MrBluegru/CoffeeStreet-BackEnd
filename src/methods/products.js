@@ -111,7 +111,7 @@ const verifyDataProduct = data => {
 		return true;
 };
 
-const categories = ["coffee", "tea", "sweetBakery", "saltyBakery"];
+const categories = ["coffee", "tea", "sweetBakery", "saltyBakery", "other"];
 
 const verifyCategory = data => {
 	return !data.category || typeof data.category !== "string" || !categories.some(e => e === data.category);

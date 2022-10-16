@@ -175,6 +175,18 @@ const createProduct = async (req, res, next) => {
 				});
 		}
 
+		if (data.category === "other") {
+			data.originCountry = null;
+			data.idAttribute = null;
+			if (verifyIngredients(data))
+				return res.status(404).json({ errorMessage: "Missing data or datatype error on: ingredients" });
+			if (verifyCoffePreparedOrBakery(data))
+				return res.status(404).json({
+					errorMessage:
+						"Other-category product registration attempt. Data missing or datatype error on: lactose, gluten or alcohol"
+				});
+		}
+
 		// Creación de producto: se envía data como argumento, ya tiene incluído su idAttribute recién creado
 		const product = await createNewProduct(data);
 		if (!product) return res.status(400).json({ errorMessage: "Error at creating product" });
