@@ -248,7 +248,6 @@ const updateProduct = async (req, res) => {
 		if (!validateIsPrepared(isPrepared)) return res.status(400).json({ errorMessage: "Please select an option" });
 
 		//--------------------------------------------------------------------------------------------------------------------------------//
-		console.log("qui");
 		const productFound = await findById(id);
 		if (productFound) {
 			await prisma.product.update({
