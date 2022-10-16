@@ -1,19 +1,7 @@
 const prisma = require("../utils/prisma");
-const {
-	getAll,
-	findById,
-	createNewProduct,
-	verifyDataProduct,
-	verifyName,
-	verifyIngredients,
-	verifyCoffeBox,
-	verifyCoffePreparedAndBakery,
-	verifyCoffePreparedorBakery,
-	verifyCoffePreparedOrBakery,
-	verifyCategory
-} = require("../methods/products");
+const { getAll, findById, createNewProduct, verifyName } = require("../methods/products");
 
-const { createNewAttribute, verifyDataAttributes } = require("../methods/attributes");
+const { createNewAttribute } = require("../methods/attributes");
 const {
 	validateName,
 	validateDescription,
@@ -26,8 +14,15 @@ const {
 	validateStock,
 	validateIngredients,
 	validateOriginCountry,
-	validateIsPrepared
+	validateIsPrepared,
+	verifyDataProduct,
+	verifyIngredients,
+	verifyCoffeBox,
+	verifyCoffePreparedOrBakery,
+	verifyCategory
 } = require("../validations/products");
+
+const { verifyDataAttributes } = require("../validations/attributes");
 const { json } = require("body-parser");
 
 const getProducts = async (req, res, next) => {
@@ -129,7 +124,7 @@ const createProduct = async (req, res, next) => {
 			if (verifyIngredients(data))
 				return res.status(404).json({ errorMessage: "Missing data or datatype error on: ingredients" });
 		}
-		data.price = parseInt(data.price);
+		// data.price = parseInt(data.price);
 		// Verificacion especifica para Cafes
 		if (data.category === "coffee") {
 			if (data.isPrepared === true) {
@@ -162,11 +157,12 @@ const createProduct = async (req, res, next) => {
 			data.gluten = false;
 			data.alcohol = false;
 			data.originCountry = null;
-			data.isPrepared === true;
+			data.isPrepared = true;
 		}
 
 		if (data.category === "sweetBakery" || data.category === "saltyBakery") {
-			data.isPrepared === true;
+			data.isPrepared = true;
+			console.log(data);
 			if (verifyCoffePreparedOrBakery(data))
 				return res.status(404).json({
 					errorMessage: "Bakery registration attempt. Data missing or datatype error: lactose, gluten or alcohol"
