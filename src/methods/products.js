@@ -2,6 +2,9 @@ const prisma = require("../utils/prisma");
 
 const getAll = async () => {
 	const products = await prisma.product.findMany({
+		where: {
+			state: "active"
+		},
 		select: {
 			id: true,
 			name: true,
@@ -17,8 +20,7 @@ const getAll = async () => {
 			originCountry: true,
 			isPrepared: true,
 			idDiscount: true,
-			attribute: true, // preguntar a front si lo necesitan, sino, para eliminar este campo
-			state: true
+			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
 		}
 	});
 	return products;
@@ -43,7 +45,8 @@ const findById = async id => {
 			originCountry: true,
 			isPrepared: true,
 			idDiscount: true,
-			attribute: true
+			attribute: true,
+			state: true
 		}
 	});
 	return product;

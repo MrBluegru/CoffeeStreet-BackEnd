@@ -1,6 +1,5 @@
 const prisma = require("../utils/prisma");
 const { getAll, findById, createNewProduct, verifyName } = require("../methods/products");
-
 const { createNewAttribute } = require("../methods/attributes");
 const {
 	validateName,
@@ -15,15 +14,14 @@ const {
 	validateIngredients,
 	validateOriginCountry,
 	validateIsPrepared,
+	validateState,
 	verifyDataProduct,
 	verifyIngredients,
 	verifyCoffeBox,
 	verifyCoffePreparedOrBakery,
 	verifyCategory
 } = require("../validations/products");
-
 const { verifyDataAttributes } = require("../validations/attributes");
-const { json } = require("body-parser");
 
 const getProducts = async (req, res, next) => {
 	const { name } = req.query;
@@ -32,10 +30,17 @@ const getProducts = async (req, res, next) => {
 		if (name) {
 			const findProductName = await prisma.product.findMany({
 				where: {
-					name: {
-						contains: name,
-						mode: "insensitive"
-					}
+					AND: [
+						{
+							name: {
+								contains: name,
+								mode: "insensitive"
+							}
+						},
+						{
+							state: "active"
+						}
+					]
 				}
 			});
 
@@ -85,6 +90,7 @@ const createProduct = async (req, res, next) => {
 		roast,
 		color
 	} = req.body;
+
 	const data = {
 		name,
 		description,
@@ -105,6 +111,7 @@ const createProduct = async (req, res, next) => {
 		roast,
 		color
 	};
+
 	try {
 		// if (!data) return res.status(404).json({ errorMessage: "No data object given" });
 
@@ -206,42 +213,66 @@ const updateProduct = async (req, res) => {
 		stock,
 		ingredients,
 		originCountry,
-		isPrepared
+		isPrepared,
+		state
 	} = req.body;
 
 	try {
 		//---------------------------------------------------------- VALIDACIONES --------------------------------------------------------//
 
-		if (!validateName(name)) return res.status(400).json({ errorMessage: "Enter the name correctly" });
+		if (
+			!name &&
+			!description &&
+			!image &&
+			!price &&
+			!category &&
+			lactose === undefined &&
+			gluten === undefined &&
+			alcohol === undefined &&
+			stock === undefined &&
+			!ingredients &&
+			!originCountry &&
+			isPrepared === undefined &&
+			!state
+		) {
+			return res.status(400).json({ errorMessage: "There is nothing to update. Please change at least one field" });
+		}
 
-		if (!validateDescription(description))
+		if (name && !validateName(name)) return res.status(400).json({ errorMessage: "Enter the name correctly" });
+
+		if (description && !validateDescription(description))
 			return res.status(400).json({ errorMessage: "Enter the description correctly" });
 
-		if (!validateImg(image)) return res.status(400).json({ errorMessage: "Enter the image correctly" });
+		if (image && !validateImg(image)) return res.status(400).json({ errorMessage: "Enter the image correctly" });
 
-		if (!validatePrice(price)) return res.status(400).json({ errorMessage: "Enter the price correctly" });
+		if (price && !validatePrice(price)) return res.status(400).json({ errorMessage: "Enter the price correctly" });
 
-		if (!validateCategory(category)) return res.status(400).json({ errorMessage: "Enter the category correctly" });
+		if (category && !validateCategory(category))
+			return res.status(400).json({ errorMessage: "Enter the category correctly" });
 
-		if (!validateLactose(lactose))
-			return res.status(400).json({ errorMessage: "Please select an option in the field of Lactose" });
+		if (lactose && !validateLactose(lactose))
+			return res.status(400).json({ errorMessage: "Please select an option in the field of lactose" });
 
-		if (!validateGluten(gluten))
+		if (gluten && !validateGluten(gluten))
 			return res.status(400).json({ errorMessage: "Please select an option in the field of gluten" });
 
-		if (!validateAlcohol(alcohol))
+		if (alcohol && !validateAlcohol(alcohol))
 			return res.status(400).json({ errorMessage: "Please select an option in the field of alcohol" });
 
-		if (!validateStock(stock))
+		if (stock && !validateStock(stock))
 			return res.status(400).json({ errorMessage: "Please select an option in the field of stock" });
 
-		if (!validateIngredients(ingredients))
+		if (ingredients && !validateIngredients(ingredients))
 			return res.status(400).json({ errorMessage: "Enter the ingredients correctly" });
 
-		if (!validateOriginCountry(originCountry))
+		if (originCountry && !validateOriginCountry(originCountry))
 			return res.status(400).json({ errorMessage: "Enter the origin country correctly" });
 
-		if (!validateIsPrepared(isPrepared)) return res.status(400).json({ errorMessage: "Please select an option" });
+		if (isPrepared && !validateIsPrepared(isPrepared))
+			return res.status(400).json({ errorMessage: "Please select an option in the field of isPrepared" });
+
+		if (state && !validateState(state))
+			return res.status(400).json({ errorMessage: "Please select an option in the field of state" });
 
 		//--------------------------------------------------------------------------------------------------------------------------------//
 		const productFound = await findById(id);
@@ -262,7 +293,8 @@ const updateProduct = async (req, res) => {
 					stock,
 					ingredients,
 					originCountry,
-					isPrepared
+					isPrepared,
+					state
 				}
 			});
 
@@ -279,8 +311,13 @@ const deleteProduct = async (req, res, next) => {
 	try {
 		const doesProductExist = await findById(id);
 
+		if (doesProductExist.state === "inactive")
+			return res
+				.status(200)
+				.json({ errorMessage: `'${doesProductExist.name}' has already been deleted from the Products in DB` });
+
 		if (doesProductExist) {
-			const productToDelete = await prisma.product.update({
+			await prisma.product.update({
 				where: {
 					id
 				},
@@ -291,7 +328,7 @@ const deleteProduct = async (req, res, next) => {
 
 			return res
 				.status(200)
-				.json({ message: `'${productToDelete.name}' deleted successfully from the Products in DB` });
+				.json({ message: `'${doesProductExist.name}' deleted successfully from the Products in DB` });
 		} else return res.status(404).json({ errorMessage: "There is no product with that id" });
 	} catch (error) {
 		next(error);
