@@ -10,7 +10,7 @@ const getUsers = async (req, res, next) => {
 			if (!userEmail) return res.status(400).json({ errorMessage: "This email is not registered" });
 			else return res.status(200).json(user);
 		} else {
-			const users = await userMethods.findAll()
+			const users = await userMethods.findAll();
 			if (users) return res.status(200).json(users);
 			else return res.status(404).json({ errorMessage: "Users Not Found" });
 		}
@@ -40,4 +40,21 @@ const updateUser = async (req, res, next) => {
 	}
 };
 
-module.exports = { getUsers, updateUser };
+const deleteUser = async (req, res, next) => {
+	const { email } = req.body;
+
+	try {
+		const userFound = await authMethods.emailVerify(email);
+		if (userFound) {
+			const user = await userMethods.findByIdAuth(userFound.id);
+			const userToDelete = await userMethods.logicDeleteUser(user.id);
+			return res
+				.status(200)
+				.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
+		} else return res.status(404).json({ errorMessage: "There is not user with that email" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { getUsers, updateUser, deleteUser };
