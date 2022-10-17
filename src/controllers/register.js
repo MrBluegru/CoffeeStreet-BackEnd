@@ -24,6 +24,7 @@ const register = async (req, res, next) => {
 				name,
 				idAuth: userAuth.id
 			};
+			if (surname) data.surname = surname;
 			user = await prisma.user.create({ data });
 		} else {
 			if (verifySurname(surname)) return res.status(404).json({ errorMessage: "No surname given" });
