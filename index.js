@@ -1,6 +1,7 @@
 require("dotenv").config();
 const server = require("./src/app");
 const { PORT } = process.env;
+const cron = require("node-cron");
 
 const prisma = require("./src/utils/prisma");
 

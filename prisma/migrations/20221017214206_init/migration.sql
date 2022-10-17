@@ -48,8 +48,8 @@ CREATE TABLE "Auth" (
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" VARCHAR(50) NOT NULL,
-    "surname" VARCHAR(50) NOT NULL,
-    "role" "Role" NOT NULL,
+    "surname" VARCHAR(50),
+    "role" "Role" NOT NULL DEFAULT 'client',
     "idAuth" TEXT NOT NULL,
     "state" "State" NOT NULL DEFAULT 'active',
 
@@ -136,6 +136,16 @@ CREATE TABLE "Review" (
     "idUser" TEXT,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Refresh" (
+    "id" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Refresh_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
