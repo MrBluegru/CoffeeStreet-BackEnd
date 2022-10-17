@@ -49,6 +49,16 @@ const findById = async id => {
 	return product;
 };
 
+const verifyName = async data => {
+	const nameUnique = await prisma.product.findUnique({
+		// verifico que el producto nuevo a crear no tenga un nombre que ya está en la base de datos
+		where: {
+			name: data.name
+		}
+	});
+	return nameUnique;
+};
+
 const createNewProduct = async data => {
 	//se crea el nuevo producto
 	const {
@@ -83,52 +93,9 @@ const createNewProduct = async data => {
 	return await prisma.product.create({ data: newProduct });
 };
 
-const verifyName = async data => {
-	const nameUnique = await prisma.product.findUnique({
-		// verifico que el producto nuevo a crear no tenga un nombre que ya está en la base de datos
-		where: {
-			name: data.name
-		}
-	});
-	return nameUnique;
-};
-
-const verifyDataProduct = async data => {
-	////valido que la data enviada del product a crear exista y que su datatype sea el correcto, si hay un solo error la función retornará true
-	if (
-		!data.name ||
-		typeof data.name !== "string" ||
-		!data.description ||
-		typeof data.description !== "string" ||
-		!data.image ||
-		typeof data.image !== "string" ||
-		!data.price ||
-		typeof data.price !== "number" ||
-		!data.category ||
-		typeof data.category !== "string" ||
-		!(data.lactose === false || data.lactose === true) ||
-		!(data.gluten === false || data.gluten === true) ||
-		!(data.alcohol === false || data.alcohol === true) ||
-		!data.ingredients ||
-		typeof data.ingredients !== "object" ||
-		!data.ingredients.length ||
-		!data.originCountry ||
-		typeof data.originCountry !== "string" ||
-		!(data.isPrepared === false || data.isPrepared === true)
-	)
-		return true;
-};
-
-const verifyIngredients = async data => {
-	//verifico que todos los ingredientes sean de tipo string, si hay alguno que no lo es, ésta función retornará true
-	return data.ingredients.some(e => typeof e !== "string");
-};
-
 module.exports = {
 	findById,
 	createNewProduct,
-	verifyDataProduct,
-	verifyName,
-	verifyIngredients,
-	getAll
+	getAll,
+	verifyName
 };
