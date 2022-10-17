@@ -23,6 +23,9 @@ server.listen(PORT || 3002, () => {
 	PORT ? console.log(`Listening at port ${PORT}`) : console.log("Listening at port 3002");
 });
 
+//Se programó eliminar los refreshTokens almacenados que correspondan al mes anterior, comparado a la fecha
+//cuando se levante el servidor
+
 const clearRefreshTable = async () => {
 	const month = new Date().getMonth() + 1;
 	const allRefreshTokens = await prisma.refresh.findMany();
