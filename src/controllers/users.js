@@ -1,5 +1,5 @@
 const prisma = require("../utils/prisma");
-const authMethods = require("../methods/auth");
+const authMethod = require("../methods/auth");
 const usersMethod = require("../methods/users");
 const productsMethods = require("../methods/products");
 
@@ -8,11 +8,12 @@ const getUsers = async (req, res, next) => {
 
 	try {
 		if (email) {
-			const userEmail = await authMethods.emailVerify(email);
+			const userEmail = await authMethod.emailVerify(email);
 			if (!userEmail) return res.status(400).json({ errorMessage: "This email is not registered" });
 			else return res.status(200).json(userEmail);
 		} else {
 			const users = await usersMethod.findAll();
+
 			if (users) return res.status(200).json(users);
 			else return res.status(404).json({ errorMessage: "Users Not Found" });
 		}
@@ -103,7 +104,7 @@ const addUserFavourites = async (req, res, next) => {
 	}
 };
 
-const updateUser = async (req, res, next) => {
+const updateRole = async (req, res, next) => {
 	const { id } = req.params;
 	const { role } = req.body;
 
@@ -125,4 +126,25 @@ const updateUser = async (req, res, next) => {
 	}
 };
 
-module.exports = { getUsers, getUserFavourites, addUserFavourites, updateUser };
+const deleteUser = async (req, res, next) => {
+	const { email } = req.body;
+
+	try {
+		if (email) {
+			const userFound = await authMethod.emailVerify(email);
+			if (userFound) {
+				const user = await usersMethod.findByIdAuth(userFound.id);
+				if (user) {
+					const userToDelete = await usersMethod.logicDeleteUser(user.id);
+					return res
+						.status(200)
+						.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
+				} else return res.status(404).json({ errorMessage: "This user is not authenticated" });
+			} else return res.status(404).json({ errorMessage: "There is not a valid email" });
+		} else return res.status(400).json({ errorMessage: "Please enter an email" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { getUsers, getUserFavourites, addUserFavourites, updateRole, deleteUser };
