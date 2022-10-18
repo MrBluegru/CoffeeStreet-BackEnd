@@ -19,12 +19,12 @@ model Auth {
 }
 
 model User {
-  id                String              @id @default(uuid())
-  name              String              @db.VarChar(50)
-  surname           String              @db.VarChar(50)
-  role              Role
-  auth              Auth                @relation(fields: [idAuth], references: [id])
-  idAuth            String              @unique
+  id                String             @id @default(uuid())
+  name              String             @db.VarChar(50)
+  surname           String?            @db.VarChar(50)
+  role              Role               @default(client)
+  auth              Auth               @relation(fields: [idAuth], references: [id])
+  idAuth            String             @unique
   order             Order?
   review            Review[]
   favourite_product Favourite_Product[]
@@ -106,6 +106,13 @@ model Review {
   rating      Rating
   user        User?    @relation(fields: [idUser], references: [id])
   idUser      String?
+}
+
+model Refresh {
+  id        String   @id @default(uuid())
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
