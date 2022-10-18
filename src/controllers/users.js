@@ -19,7 +19,7 @@ const getUsers = async (req, res, next) => {
 	}
 };
 
-const updateUser = async (req, res, next) => {
+const updateRole = async (req, res, next) => {
 	const { id } = req.params;
 	const { role } = req.body;
 	try {
@@ -44,17 +44,21 @@ const deleteUser = async (req, res, next) => {
 	const { email } = req.body;
 
 	try {
-		const userFound = await authMethods.emailVerify(email);
-		if (userFound) {
-			const user = await userMethods.findByIdAuth(userFound.id);
-			const userToDelete = await userMethods.logicDeleteUser(user.id);
-			return res
-				.status(200)
-				.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
-		} else return res.status(404).json({ errorMessage: "There is not user with that email" });
+		if (email) {
+			const userFound = await authMethods.emailVerify(email);
+			if (userFound) {
+				const user = await userMethods.findByIdAuth(userFound.id);
+				if (user) {
+					const userToDelete = await userMethods.logicDeleteUser(user.id);
+					return res
+						.status(200)
+						.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
+				} else return res.status(404).json({ errorMessage: "This user is not authenticated" });
+			} else return res.status(404).json({ errorMessage: "There is not a valid email" });
+		} else return res.status(400).json({ errorMessage: "Please enter an email" });
 	} catch (error) {
 		next(error);
 	}
 };
 
-module.exports = { getUsers, updateUser, deleteUser };
+module.exports = { getUsers, updateRole, deleteUser };
