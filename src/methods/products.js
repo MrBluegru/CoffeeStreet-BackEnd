@@ -76,7 +76,8 @@ const createNewProduct = async data => {
 		ingredients,
 		originCountry,
 		isPrepared,
-		idAttribute
+		idAttribute,
+		// idDiscount // usado para probar rutas products/discount
 	} = data;
 	const newProduct = {
 		name,
@@ -90,7 +91,8 @@ const createNewProduct = async data => {
 		ingredients,
 		originCountry,
 		isPrepared,
-		idAttribute
+		idAttribute,
+		// idDiscount  // usado para probar rutas products/discount
 	};
 
 	return await prisma.product.create({ data: newProduct });

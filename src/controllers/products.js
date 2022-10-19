@@ -88,7 +88,8 @@ const createProduct = async (req, res, next) => {
 		acidity,
 		bitterness,
 		roast,
-		color
+		color,
+		// idDiscount  //para probar rutas products/discount
 	} = req.body;
 
 	const data = {
@@ -109,7 +110,8 @@ const createProduct = async (req, res, next) => {
 		acidity,
 		bitterness,
 		roast,
-		color
+		color,
+		// idDiscount  //para probar rutas products/discount
 	};
 
 	try {
@@ -335,10 +337,111 @@ const deleteProduct = async (req, res, next) => {
 	}
 };
 
+//  usado para probar rutas de products/discount  ////
+
+// const createDiscount = async (req, res, next) => {
+// 	const { percentage } = req.body;
+// 	try {
+// 		const discountCreated = await prisma.discount.create({
+// 			data: {
+// 				percentage: percentage
+// 			}
+// 		});
+// 		return res.status(200).json(discountCreated);
+// 	} catch (error) {
+// 		next(error);
+// 	}
+// };
+
+const getProductsWithDiscount = async (req, res, next) => {
+	try {
+		const products = await prisma.product.findMany({
+			where: {
+				state: "active",
+				discount: {
+					percentage: { in: ["five", "ten", "fifteen"] }
+				}
+			},
+			include: {
+				discount: {
+					select: {
+						percentage: true
+					}
+				}
+			}
+		});
+		if (products.length === 0) {
+			return res.status(200).json({ message: "There are no products with discount" });
+		} else return res.status(200).json(products);
+	} catch (error) {
+		next(error);
+	}
+};
+
+const updateDiscountProduct = async (req, res, next) => {
+	const { id } = req.params;
+	const { percentage } = req.body;
+	try {
+		if (percentage === "five" || percentage === "ten" || percentage === "fifteen" || percentage === null) {
+			const product = await prisma.product.findUnique({
+				where: {
+					id
+				},
+				include: {
+					discount: {
+						select: {
+							percentage: true
+						}
+					}
+				}
+			});
+			if (product.discount.percentage !== percentage) {
+				if (percentage === null) {
+					const updateDiscountToNull = await prisma.product.update({
+						where: {
+							id
+						},
+						data: {
+							discount: {
+								disconnect: true
+							}
+						}
+					});
+					console.log("updateDiscountToNull: ", updateDiscountToNull);
+					return res.status(200).json({ message: "Product discount has changed successfully" });
+				} else {
+					const updateDiscount = await prisma.product.update({
+						where: {
+							id
+						},
+						data: {
+							discount: {
+								update: {
+									percentage
+								}
+							}
+						}
+					});
+					console.log("UPDATED: ", updateDiscount);
+					if (updateDiscount) {
+						return res.status(200).json({ message: "Product discount has changed successfully" });
+					}
+				}
+			} else return res.status(400).json({ errorMessage: "Please enter a different percentage" });
+		} else return res.status(400).json({ errorMessage: "Please enter a valid percentage" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+
 module.exports = {
 	getProducts,
 	getProductById,
 	createProduct,
 	updateProduct,
-	deleteProduct
+	deleteProduct,
+	// createDiscount,  // para probar ruta products/discount
+	getProductsWithDiscount,
+	updateDiscountProduct
 };
