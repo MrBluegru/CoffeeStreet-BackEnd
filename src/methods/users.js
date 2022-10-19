@@ -45,4 +45,25 @@ const updateRole = async (id, role) => {
 	return user;
 };
 
-module.exports = { findAll, findById, updateRole };
+const findByIdAuth = async id => {
+	const user = await prisma.user.findUnique({
+		where: {
+			idAuth: id
+		}
+	});
+	return user;
+};
+
+const logicDeleteUser = async id => {
+	const user = await prisma.user.update({
+		where: {
+			id
+		},
+		data: {
+			state: "inactive"
+		}
+	});
+	return user;
+};
+
+module.exports = { findAll, findById, updateRole, findByIdAuth, logicDeleteUser };
