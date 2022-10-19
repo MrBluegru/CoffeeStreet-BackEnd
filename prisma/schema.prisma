@@ -19,12 +19,13 @@ model Auth {
 }
 
 model User {
-  id                String             @id @default(uuid())
-  name              String             @db.VarChar(50)
-  surname           String?            @db.VarChar(50)
-  role              Role               @default(client)
-  auth              Auth               @relation(fields: [idAuth], references: [id])
-  idAuth            String             @unique
+  id                String              @id @default(uuid())
+  name              String              @db.VarChar(50)
+  surname           String?             @db.VarChar(50)
+  image             String?
+  role              Role                @default(client)
+  auth              Auth                @relation(fields: [idAuth], references: [id])
+  idAuth            String              @unique
   order             Order?
   review            Review[]
   favourite_product Favourite_Product[]
@@ -32,9 +33,9 @@ model User {
 }
 
 model Product {
-  id                String             @id @default(uuid())
-  name              String             @unique @db.VarChar(50)
-  description       String             @db.Text
+  id                String              @id @default(uuid())
+  name              String              @unique @db.VarChar(50)
+  description       String              @db.Text
   image             String?
   price             Float
   category          Category
@@ -43,8 +44,8 @@ model Product {
   alcohol           Boolean
   stock             Boolean             @default(true)
   ingredients       Json
-  originCountry     String?            @db.VarChar(50)
-  isPrepared        Boolean            @default(true)
+  originCountry     String?             @db.VarChar(50)
+  isPrepared        Boolean             @default(true)
   order_product     Order_Product?
   discount          Discount?           @relation(fields: [idDiscount], references: [id])
   idDiscount        String?             @unique

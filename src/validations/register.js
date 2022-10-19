@@ -1,11 +1,19 @@
 const prisma = require("../utils/prisma");
 
 const verifyName = name => {
-	return !name || name.length < 3;
+	return !name || name.length < 3 || typeof name !== "string";
 };
 
 const verifySurname = surname => {
-	return !surname || surname.length < 3;
+	return !surname || surname.length < 3 || typeof surname !== "string";
+};
+
+const verifyImage = image => {
+	const imageExtension = image => {
+		const test = [".gif", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".psd", ".bmp", ".tif", ".jfif"];
+		return test.some(e => image.includes(e));
+	};
+	return typeof image !== "string" || !imageExtension(image);
 };
 
 const verifyValidEmail = email => {
@@ -28,5 +36,6 @@ module.exports = {
 	verifyName,
 	verifySurname,
 	verifyValidEmail,
-	verifyPassword
+	verifyPassword,
+	verifyImage
 };
