@@ -91,6 +91,8 @@ const forgotPassword = async (req, res, next) => {
 		const auth = await authMethods.emailVerify(email);
 		if (!auth) return res.status(404).json({ errorMessage: "This email is not registered" });
 		auth.password = undefined;
+		//expiracion sin confirmar en verificacion
+		//probablemente cuando se hagan las peubas con nodemailer se eliminara la expiracion, porque bloquea
 		const token = jwt.sign(auth, process.env.RESET_PASSWORD_KEY, {
 			expiresIn: "20m"
 		});
