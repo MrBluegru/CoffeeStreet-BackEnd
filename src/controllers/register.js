@@ -32,9 +32,15 @@ const register = async (req, res, next) => {
 				return res.status(404).json({ errorMessage: "No surname given, too short or not a string" });
 			if (!password) return res.status(404).json({ errorMessage: "No password given" });
 			//Aquí validé password
-			if (verifyPassword(password)) return res.status(404).json({ errorMessage: "Password invalid" });
+			if (verifyPassword(password)) {
+				const error = { errorMessage: "Password invalid" };
+				console.log(error);
+				return res.status(404).json(error);
+			}
 			if (image) {
-				if (verifyImage(image)) return res.status(404).json({ errorMessage: "No image given or invalid" });
+				const error = { errorMessage: "No image given or invalid, it has to be .jpg, .png, etc" };
+				console.log(error);
+				if (verifyImage(image)) return res.status(404).json(error);
 			}
 			//Aquí creé cuenta
 			const userAuth = await authMethods.createAuth({ email, password, isGoogle });
