@@ -1,5 +1,5 @@
 const prisma = require("../utils/prisma");
-const { getAll, findById, createNewProduct, verifyName } = require("../methods/products");
+const { getAll, findById, createNewProduct, verifyName, findByName } = require("../methods/products");
 const { createNewAttribute } = require("../methods/attributes");
 const {
 	validateName,
@@ -28,21 +28,7 @@ const getProducts = async (req, res, next) => {
 
 	try {
 		if (name) {
-			const findProductName = await prisma.product.findMany({
-				where: {
-					AND: [
-						{
-							name: {
-								contains: name,
-								mode: "insensitive"
-							}
-						},
-						{
-							state: "active"
-						}
-					]
-				}
-			});
+			const findProductName = await findByName(name);
 
 			findProductName.length
 				? res.status(200).json(findProductName)
@@ -62,7 +48,8 @@ const getProductById = async (req, res, next) => {
 
 	try {
 		const product = await findById(id);
-		if (!product) return res.status(404).json({ errorMessage: "There is no product with that id" });
+		if (!product || product.state === "inactive")
+			return res.status(404).json({ errorMessage: "There is no product with that id" });
 		else return res.status(200).json(product);
 	} catch (error) {
 		next(error);
@@ -311,20 +298,19 @@ const deleteProduct = async (req, res, next) => {
 	try {
 		const doesProductExist = await findById(id);
 
-		if (doesProductExist.state === "inactive")
-			return res
-				.status(200)
-				.json({ errorMessage: `'${doesProductExist.name}' has already been deleted from the Products in DB` });
-
 		if (doesProductExist) {
-			await prisma.product.update({
-				where: {
-					id
-				},
-				data: {
-					state: "inactive"
-				}
-			});
+			doesProductExist.state === "inactive"
+				? res
+						.status(200)
+						.json({ errorMessage: `'${doesProductExist.name}' has already been deleted from the Products in DB` })
+				: await prisma.product.update({
+						where: {
+							id
+						},
+						data: {
+							state: "inactive"
+						}
+				  });
 
 			return res
 				.status(200)
