@@ -27,7 +27,7 @@ const createAuth = async ({ email, password, isGoogle }) => {
 };
 
 const updatePassword = async ({ email, newPassword }) => {
-	const update = prisma.auth.update({
+	const update = await prisma.auth.update({
 		where: { email },
 		data: { password: await bcrypt.hash(newPassword, 10) }
 	});
