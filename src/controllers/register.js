@@ -1,9 +1,9 @@
 const prisma = require("../utils/prisma");
 const authMethods = require("../methods/auth");
-const { verifyName, verifySurname, verifyValidEmail, verifyPassword } = require("../validations/register");
+const { verifyName, verifySurname, verifyValidEmail, verifyPassword, verifyImage } = require("../validations/register");
 
 const register = async (req, res, next) => {
-	const { email, password, name, surname } = req.body;
+	const { email, password, name, surname, image } = req.body;
 	let { isGoogle } = req.body;
 
 	if (!isGoogle) {
@@ -14,7 +14,7 @@ const register = async (req, res, next) => {
 		let response = await authMethods.emailVerify(email);
 		if (response) return res.status(404).json({ errorMessage: "This email is already registered" });
 		if (verifyValidEmail(email)) return res.status(404).json({ errorMessage: "Email invalid" });
-		if (verifyName(name)) return res.status(404).json({ errorMessage: "No name given" });
+		if (verifyName(name)) return res.status(404).json({ errorMessage: "No name given, too short or not a string" });
 
 		let user;
 
@@ -25,18 +25,24 @@ const register = async (req, res, next) => {
 				idAuth: userAuth.id
 			};
 			if (surname) data.surname = surname;
+			if (image) data.image = image;
 			user = await prisma.user.create({ data });
 		} else {
-			if (verifySurname(surname)) return res.status(404).json({ errorMessage: "No surname given" });
+			if (verifySurname(surname))
+				return res.status(404).json({ errorMessage: "No surname given, too short or not a string" });
 			if (!password) return res.status(404).json({ errorMessage: "No password given" });
 			//Aquí validé password
 			if (verifyPassword(password)) return res.status(404).json({ errorMessage: "Password invalid" });
+			if (image) {
+				if (verifyImage(image)) return res.status(404).json({ errorMessage: "No image given or invalid" });
+			}
 			//Aquí creé cuenta
 			const userAuth = await authMethods.createAuth({ email, password, isGoogle });
 			const data = {
 				name,
 				surname,
-				idAuth: userAuth.id
+				idAuth: userAuth.id,
+				image: image ? image : null
 			};
 			user = await prisma.user.create({ data });
 		}
