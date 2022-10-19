@@ -103,7 +103,7 @@ const addUserFavourites = async (req, res, next) => {
 	}
 };
 
-const updateUser = async (req, res, next) => {
+const updateRole = async (req, res, next) => {
 	const { id } = req.params;
 	const { role } = req.body;
 
@@ -125,4 +125,25 @@ const updateUser = async (req, res, next) => {
 	}
 };
 
-module.exports = { getUsers, getUserFavourites, addUserFavourites, updateUser };
+const deleteUser = async (req, res, next) => {
+	const { email } = req.body;
+
+	try {
+		if (email) {
+			const userFound = await authMethod.emailVerify(email);
+			if (userFound) {
+				const user = await usersMethod.findByIdAuth(userFound.id);
+				if (user) {
+					const userToDelete = await usersMethod.logicDeleteUser(user.id);
+					return res
+						.status(200)
+						.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
+				} else return res.status(404).json({ errorMessage: "This user is not authenticated" });
+			} else return res.status(404).json({ errorMessage: "There is not a valid email" });
+		} else return res.status(400).json({ errorMessage: "Please enter an email" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { getUsers, getUserFavourites, addUserFavourites, updateRole, deleteUser };
