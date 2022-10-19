@@ -40,6 +40,7 @@ const register = async (req, res, next) => {
 			};
 			user = await prisma.user.create({ data });
 		}
+		//AQUI SE ENVIA CORREO DE REGISTRO ------> sendEmailRegister(email)
 		if (user) return res.status(200).json("Sucessfully user registered");
 		else return res.status(404).json({ errorMessage: "Error at registration" });
 	} catch (error) {

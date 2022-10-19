@@ -2,6 +2,7 @@ const prisma = require("../utils/prisma");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const authMethods = require("../methods/auth");
+const { verifyPassword } = require("../validations/register");
 
 const generateAccessToken = user => {
 	return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: "60m" });
@@ -83,4 +84,39 @@ const refresh = async (req, res, next) => {
 	}
 };
 
-module.exports = { login, logout, refresh };
+const forgotPassword = async (req, res, next) => {
+	const { email } = req.body;
+	if (!email) return res.status(404).json({ errorMessage: "Email not given" });
+	try {
+		const auth = await authMethods.emailVerify(email);
+		if (!auth) return res.status(404).json({ errorMessage: "This email is not registered" });
+		auth.password = undefined;
+		const token = jwt.sign(auth, process.env.RESET_PASSWORD_KEY, {
+			expiresIn: "20m"
+		});
+		//AQUI SE ENVIA CORREO DE FORGOT PASSWORD ----> sendEmailForgotPass(email, token)
+		return res.status(200).json({ errorMessage: "Mail sent", token });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const resetPassword = async (req, res, next) => {
+	const { token, newPassword } = req.body;
+	if (!token || !newPassword) return res.status(404).json({ errorMessage: "Token and newPassword are required" });
+	try {
+		jwt.verify(token, process.env.RESET_PASSWORD_KEY, async (err, user) => {
+			if (err) return res.status(404).send({ errorMessage: "Wrong token or expired" });
+			if (verifyPassword(newPassword)) return res.status(404).json({ errorMessage: "Invalid password" });
+			const { email } = user;
+
+			const authChanged = await authMethods.updatePassword({ email, newPassword });
+			if (authChanged) return res.status(200).json({ errorMessage: "Password changed" });
+			else return res.status(404).json({ errorMessage: "Error at updating password on db" });
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { login, logout, refresh, forgotPassword, resetPassword };

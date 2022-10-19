@@ -26,9 +26,18 @@ const createAuth = async ({ email, password, isGoogle }) => {
 	return user;
 };
 
+const updatePassword = async ({ email, newPassword }) => {
+	const update = prisma.auth.update({
+		where: { email },
+		data: { password: await bcrypt.hash(newPassword, 10) }
+	});
+	return update;
+};
+
 module.exports = {
 	emailVerify,
 	findAll,
 	findById,
-	createAuth
+	createAuth,
+	updatePassword
 };
