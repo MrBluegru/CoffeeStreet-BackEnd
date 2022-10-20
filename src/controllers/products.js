@@ -371,8 +371,8 @@ const getProductsWithDiscount = async (req, res, next) => {
 				}
 			}
 		});
-		if (!products) {
-			return res.status(404).json({ message: "There are no products with discount" });
+		if (products.length === 0) {
+			return res.status(200).json({ message: "There are no products with discount" });
 		} else return res.status(200).json(products);
 	} catch (error) {
 		next(error);
