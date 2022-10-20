@@ -1,0 +1,17 @@
+GET http://localhost:3001/users
+Envías:
+1. accessToken en header:
+
+Esta es sería la manera de mandar el header con el accessToken, para traer la info de usuario.
+La ruta de users ya está arreglada.
+
+const response = await axios.get(`${url}/users`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+          Accept: "aplication/json"
+        }
+      });
+
+Recibirás:
+1. data del user para guardar en redux
+
