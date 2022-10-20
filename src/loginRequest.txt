@@ -1,0 +1,29 @@
+POST http://localhost:3001/login
+
+Example
+
+{
+  "email": "admin@gmail.com",
+  "isGoogle": true,
+  "password": "admin67$M"
+
+}
+
+<-------------------------------------->
+
+POST http://localhost:3001/login/remove
+
+Example
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5OTE0NzRlLTJhNDYtNDhiZC1iOGI1LWZjNGYwODBmZWE4YSIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaXNHb29nbGUiOmZhbHNlLCJpYXQiOjE2NjYwNDMwNzZ9.dNJAUzfAa8lW19kwNn3eon3xfSawY4Il95myeyipzAg"
+}
+
+<-------------------------------------->
+
+POST http://localhost:3001/login/refresh
+
+Example
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5OTE0NzRlLTJhNDYtNDhiZC1iOGI1LWZjNGYwODBmZWE4YSIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaXNHb29nbGUiOmZhbHNlLCJpYXQiOjE2NjYwNDMwNzZ9.dNJAUzfAa8lW19kwNn3eon3xfSawY4Il95myeyipzAg"
+}
+

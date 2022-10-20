@@ -26,12 +26,49 @@ const getAll = async () => {
 	return products;
 };
 
+const findByName = async name => {
+	const products = await prisma.product.findMany({
+		where: {
+			AND: [
+				{
+					name: {
+						contains: name,
+						mode: "insensitive"
+					}
+				},
+				{
+					state: "active"
+				}
+			]
+		},
+		select: {
+			id: true,
+			name: true,
+			description: true,
+			image: true,
+			price: true,
+			category: true,
+			lactose: true,
+			gluten: true,
+			alcohol: true,
+			stock: true,
+			ingredients: true,
+			originCountry: true,
+			isPrepared: true,
+			idDiscount: true,
+			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
+		}
+	});
+	return products;
+};
+
 const findById = async id => {
 	const product = await prisma.product.findUnique({
 		where: {
 			id
 		},
 		select: {
+			id: true,
 			name: true,
 			description: true,
 			image: true,
@@ -79,6 +116,7 @@ const createNewProduct = async data => {
 		idAttribute,
 		// idDiscount  // usado para probar rutas products/discount
 	} = data;
+
 	const newProduct = {
 		name,
 		description,
@@ -102,5 +140,6 @@ module.exports = {
 	findById,
 	createNewProduct,
 	getAll,
-	verifyName
+	verifyName,
+	findByName
 };

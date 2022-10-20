@@ -1,0 +1,15 @@
+POST http://localhost:3001/register/
+
+Example (Esta varía porque no se que se mandará del front, pero si es Google account, se puede loguear
+aún cuando no mande surname ni password)
+
+{
+  "email": "google@gmail.com",
+  "name": "Melissa",
+  "isGoogle": true,
+  "surname": "Monet",
+  "password": "2334nnnM^"
+}
+
+<----------------------------------------->
+
