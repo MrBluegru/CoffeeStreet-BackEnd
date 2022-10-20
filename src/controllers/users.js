@@ -8,14 +8,16 @@ const getUsers = async (req, res, next) => {
 
 	try {
 		if (email) {
-			const userEmail = await authMethod.emailVerify(email);
-			if (!userEmail) return res.status(400).json({ errorMessage: "This email is not registered" });
-			else return res.status(200).json(userEmail);
-		} else {
-			const users = await usersMethod.findAll();
+			const auth = await authMethod.emailVerify(email);
+			if (!auth) return res.status(400).json({ errorMessage: "This email is not registered" });
+			const user = await usersMethod.findByIdAuth(auth.id);
+			if (!user) return res.status(404).json({ errorMessage: "No user found" });
+			else return res.status(200).json({ user });
+			// } else {
+			// 	const users = await usersMethod.findAll();
 
-			if (users) return res.status(200).json(users);
-			else return res.status(404).json({ errorMessage: "Users Not Found" });
+			// 	if (users) return res.status(200).json(users);
+			// 	else return res.status(404).json({ errorMessage: "Users Not Found" });
 		}
 	} catch (error) {
 		next(error);
@@ -67,11 +69,9 @@ const getUserFavourites = async (req, res, next) => {
 							errorMessage: `${doesUserExist.name} ${doesUserExist.surname} does not have favourites. There is nothing to show`
 					  });
 			} else
-				return res
-					.status(200)
-					.json({
-						errorMessage: `${doesUserExist.name} ${doesUserExist.surname} does not have favourites. There is nothing to show`
-					});
+				return res.status(200).json({
+					errorMessage: `${doesUserExist.name} ${doesUserExist.surname} does not have favourites. There is nothing to show`
+				});
 		} else return res.status(404).json({ errorMessage: "There is no user with that id" });
 	} catch (error) {
 		next(error);
@@ -227,11 +227,11 @@ const deleteUser = async (req, res, next) => {
 };
 
 module.exports = {
-  getUsers,
-   getUserById,
-   getUserFavourites,
-   addUserFavourites,
-   deleteUserFavourites,
-   updateRole,
-   deleteUser
+	getUsers,
+	getUserById,
+	getUserFavourites,
+	addUserFavourites,
+	deleteUserFavourites,
+	updateRole,
+	deleteUser
 };

@@ -18,7 +18,7 @@ const mainAuthToken = async (req, res, next) => {
 	}
 };
 
-const SecondAuthToken = async (req, res, next) => {
+const secondAuthToken = async (req, res, next) => {
 	try {
 		const { authorization } = req.headers;
 		const { refreshToken } = req.body;
@@ -57,4 +57,4 @@ const thirdAuthToken = async (req, res, next) => {
 	}
 };
 
-module.exports = { mainAuthToken, SecondAuthToken, thirdAuthToken };
+module.exports = { mainAuthToken, secondAuthToken, thirdAuthToken };
