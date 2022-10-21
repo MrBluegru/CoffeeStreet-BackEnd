@@ -109,6 +109,22 @@ model Review {
   idUser      String?
 }
 
+model Cart {
+  id     String   @id @default(uuid())
+  token  String
+  date   DateTime
+  total  Int
+  idUser String
+}
+
+model Cart_Product {
+  id        String @id @default(uuid())
+  qty       Int
+  price     Int
+  idProduct String
+  idCart    String
+}
+
 enum Role {
   admin
   employee

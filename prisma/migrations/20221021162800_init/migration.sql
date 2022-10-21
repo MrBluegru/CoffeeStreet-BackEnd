@@ -142,6 +142,28 @@ CREATE TABLE "Review" (
     CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Cart" (
+    "id" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "total" INTEGER NOT NULL,
+    "idUser" TEXT NOT NULL,
+
+    CONSTRAINT "Cart_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Cart_Product" (
+    "id" TEXT NOT NULL,
+    "qty" INTEGER NOT NULL,
+    "price" INTEGER NOT NULL,
+    "idProduct" TEXT NOT NULL,
+    "idCart" TEXT NOT NULL,
+
+    CONSTRAINT "Cart_Product_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Auth_email_key" ON "Auth"("email");
 
