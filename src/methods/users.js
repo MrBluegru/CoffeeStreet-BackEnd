@@ -49,6 +49,19 @@ const findByIdAuth = async id => {
 	const user = await prisma.user.findUnique({
 		where: {
 			idAuth: id
+		},
+		select: {
+			id: true,
+			name: true,
+			surname: true,
+			image: true,
+			role: true,
+			auth: {
+				select: {
+					email: true,
+					isGoogle: true
+				}
+			}
 		}
 	});
 	return user;
