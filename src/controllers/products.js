@@ -1,12 +1,11 @@
 const prisma = require("../utils/prisma");
 const { getAll, findById, createNewProduct, verifyName, findByName } = require("../methods/products");
-const { createNewAttribute } = require("../methods/attributes");
+const { createNewAttribute, updateAttribute } = require("../methods/attributes");
+
 const {
 	validateName,
 	validateDescription,
-	validateImg,
 	validatePrice,
-	validateCategory,
 	validateLactose,
 	validateGluten,
 	validateAlcohol,
@@ -22,6 +21,7 @@ const {
 	verifyCategory
 } = require("../validations/products");
 const { verifyDataAttributes } = require("../validations/attributes");
+const { verifyImage } = require("../validations/register");
 
 const getProducts = async (req, res, next) => {
 	const { name } = req.query;
@@ -69,6 +69,7 @@ const createProduct = async (req, res, next) => {
 		ingredients,
 		originCountry,
 		isPrepared,
+		stock,
 		cream,
 		texture,
 		body,
@@ -90,6 +91,7 @@ const createProduct = async (req, res, next) => {
 		ingredients,
 		originCountry,
 		isPrepared,
+		stock,
 		cream,
 		texture,
 		body,
@@ -109,9 +111,7 @@ const createProduct = async (req, res, next) => {
 				errorMessage:
 					"Basic product data missing, datatype error or not long enough on: name, description, image, price or isPrepared"
 			});
-		if (data.isPrepared !== false) {
-			data.originCountry = null;
-		}
+
 		if (await verifyName(data)) return res.status(404).json({ errorMessage: "Product name is already on database" });
 
 		if (data.isPrepared !== false) {
@@ -132,6 +132,7 @@ const createProduct = async (req, res, next) => {
 						errorMessage: "Coffee ready to eat registration attempt. Data missing or datatype error on: attributes"
 					});
 				const attributes = await createNewAttribute(data);
+				if (!attributes) return res.status(404).json({ errorMessage: "Error at creating Attributes on db" });
 				data.idAttribute = attributes.id; //se agrega el id recién creado en la tabla Attribute (attributes.newAttribute.id) a la data enviada del front
 			} else {
 				data.lactose = false;
@@ -147,16 +148,13 @@ const createProduct = async (req, res, next) => {
 		}
 		// Verificacion especifica para tes
 		if (data.category === "tea") {
-			data.lactose = false;
 			data.gluten = false;
-			data.alcohol = false;
 			data.originCountry = null;
-			data.isPrepared = true;
+			// data.isPrepared = true;
 		}
 
 		if (data.category === "sweetBakery" || data.category === "saltyBakery") {
-			data.isPrepared = true;
-			console.log(data);
+			// data.isPrepared = true;
 			if (verifyCoffePreparedOrBakery(data))
 				return res.status(404).json({
 					errorMessage: "Bakery registration attempt. Data missing or datatype error: lactose, gluten or alcohol"
@@ -188,7 +186,7 @@ const createProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res) => {
 	const { id } = req.params;
-	const {
+	let {
 		name,
 		description,
 		image,
@@ -201,92 +199,160 @@ const updateProduct = async (req, res) => {
 		ingredients,
 		originCountry,
 		isPrepared,
-		state
+		cream,
+		texture,
+		body,
+		acidity,
+		bitterness,
+		roast,
+		color
 	} = req.body;
 
+	const data = {
+		name,
+		description,
+		image,
+		price,
+		category,
+		lactose,
+		gluten,
+		alcohol,
+		stock,
+		ingredients,
+		originCountry,
+		isPrepared,
+		cream,
+		texture,
+		body,
+		acidity,
+		bitterness,
+		roast,
+		color
+	};
+
+	let att;
+
+	const exist = await prisma.product.findUnique({ where: { id } });
+	if (!exist) return res.status(404).json({ errorMessage: "The product you are trying to update doesn't exist" });
+	const hasAttributes = exist.idAttribute ? true : false;
+	att = exist.idAttribute;
+
+	const check = Object.values(data).every(e => e === undefined || e === null);
+	if (check) return res.status(400).json({ errorMessage: "Any information for update sent" });
+	if (await verifyName(data)) {
+		const sameName = await verifyName(data);
+		if (sameName.id !== id) return res.status(404).json({ errorMessage: "Another product has already that name" });
+	}
+
 	try {
-		//---------------------------------------------------------- VALIDACIONES --------------------------------------------------------//
-
-		if (
-			!name &&
-			!description &&
-			!image &&
-			!price &&
-			!category &&
-			lactose === undefined &&
-			gluten === undefined &&
-			alcohol === undefined &&
-			stock === undefined &&
-			!ingredients &&
-			!originCountry &&
-			isPrepared === undefined &&
-			!state
-		) {
-			return res.status(400).json({ errorMessage: "There is nothing to update. Please change at least one field" });
-		}
-
-		if (name && !validateName(name)) return res.status(400).json({ errorMessage: "Enter the name correctly" });
-
-		if (description && !validateDescription(description))
-			return res.status(400).json({ errorMessage: "Enter the description correctly" });
-
-		if (image && !validateImg(image)) return res.status(400).json({ errorMessage: "Enter the image correctly" });
-
-		if (price && !validatePrice(price)) return res.status(400).json({ errorMessage: "Enter the price correctly" });
-
-		if (category && !validateCategory(category))
-			return res.status(400).json({ errorMessage: "Enter the category correctly" });
-
-		if (lactose && !validateLactose(lactose))
-			return res.status(400).json({ errorMessage: "Please select an option in the field of lactose" });
-
-		if (gluten && !validateGluten(gluten))
-			return res.status(400).json({ errorMessage: "Please select an option in the field of gluten" });
-
-		if (alcohol && !validateAlcohol(alcohol))
-			return res.status(400).json({ errorMessage: "Please select an option in the field of alcohol" });
-
-		if (stock && !validateStock(stock))
-			return res.status(400).json({ errorMessage: "Please select an option in the field of stock" });
-
-		if (ingredients && !validateIngredients(ingredients))
-			return res.status(400).json({ errorMessage: "Enter the ingredients correctly" });
-
-		if (originCountry && !validateOriginCountry(originCountry))
-			return res.status(400).json({ errorMessage: "Enter the origin country correctly" });
-
-		if (isPrepared && !validateIsPrepared(isPrepared))
-			return res.status(400).json({ errorMessage: "Please select an option in the field of isPrepared" });
-
-		if (state && !validateState(state))
-			return res.status(400).json({ errorMessage: "Please select an option in the field of state" });
-
-		//--------------------------------------------------------------------------------------------------------------------------------//
-		const productFound = await findById(id);
-		if (productFound) {
-			await prisma.product.update({
-				where: {
-					id: id
-				},
-				data: {
-					name,
-					description,
-					image,
-					price,
-					category,
-					lactose,
-					gluten,
-					alcohol,
-					stock,
-					ingredients,
-					originCountry,
-					isPrepared,
-					state
-				}
+		if (typeof stock !== "boolean") return res.status(404).json({ errorMessage: "Error on stock" });
+		if (verifyCategory(data)) return res.status(404).json({ errorMessage: "Error on category type" });
+		if (verifyDataProduct(data))
+			return res.status(404).json({
+				errorMessage:
+					"Basic product data missing, datatype error or not long enough on: name, description, image, price or isPrepared"
 			});
 
-			return res.status(200).json({ message: `'${productFound.name}' updated successfully` });
-		} else return res.status(404).json({ errorMessage: "There is no product with that id" });
+		if (data.isPrepared !== false) {
+			// originCountry = null;
+			if (verifyIngredients(data))
+				return res.status(404).json({ errorMessage: "Missing data or datatype error on: ingredients" });
+		}
+
+		if (category !== "coffee" && exist.idAttribute) {
+			if (hasAttributes) {
+				await prisma.attribute.delete({ where: { id: exist.idAttribute } });
+				att = null;
+			}
+		}
+		if (category === "coffee") {
+			if (isPrepared === true) {
+				if (verifyCoffePreparedOrBakery(data))
+					return res.status(404).json({
+						errorMessage:
+							"Coffee change or update attempt. Data missing or datatype error on: lactose, gluten or alcohol"
+					});
+				if (verifyDataAttributes(data))
+					return res.status(404).json({
+						errorMessage: "Coffee change or update attempt .Data missing or datatype error on: attributes"
+					});
+
+				if (hasAttributes) {
+					const updateAtt = await updateAttribute(data, exist.idAttribute);
+					if (!updateAtt) return res.status(404).json({ errorMessage: "Error at updating attributes on db" });
+				} else {
+					const attributes = await createNewAttribute(data);
+					if (!attributes) return res.status(404).json({ errorMessage: "Error at creating Attributes on db" });
+					att = attributes.id;
+				}
+			} else {
+				lactose = false;
+				gluten = false;
+				alcohol = false;
+				ingredients = ["coffee"];
+				if (verifyCoffeBox(data))
+					return res.status(404).json({
+						errorMessage:
+							"Coffee Box change or update attempt. Data missing, datatype error, or not long enough: originCountry "
+					});
+				if (hasAttributes) {
+					await prisma.attribute.delete({ where: { id: exist.idAttribute } });
+					att = null;
+				}
+			}
+		}
+		if (category === "tea") {
+			gluten = false;
+			originCountry = null;
+			// isPrepared = true;
+		}
+
+		if (category === "sweetBakery" || data.category === "saltyBakery") {
+			// isPrepared = true;
+			originCountry = null;
+			if (verifyCoffePreparedOrBakery(data))
+				return res.status(404).json({
+					errorMessage: "Bakery change or update attempt. Data missing or datatype error: lactose, gluten or alcohol"
+				});
+		}
+
+		if (category === "other") {
+			originCountry = null;
+			idAttribute = null;
+			if (verifyIngredients(data))
+				return res.status(404).json({ errorMessage: "Missing data or datatype error on: ingredients" });
+			if (verifyCoffePreparedOrBakery(data))
+				return res.status(404).json({
+					errorMessage:
+						"Other-category product change or update attempt. Data missing or datatype error on: lactose, gluten or alcohol"
+				});
+		}
+
+		if (isPrepared === false && category === "coffee") {
+			att = null;
+		}
+
+		const updating = await prisma.product.update({
+			where: { id },
+			data: {
+				name,
+				description,
+				image,
+				price,
+				category,
+				lactose,
+				gluten,
+				alcohol,
+				ingredients,
+				originCountry,
+				isPrepared,
+				stock,
+				idAttribute: att
+			}
+		});
+
+		if (!updating) return res.status(404).json({ errorMessage: "Error at updating db" });
+		else return res.status(200).json({ errorMessage: "Success Update" });
 	} catch (err) {
 		console.log(err);
 	}

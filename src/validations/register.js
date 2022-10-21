@@ -13,7 +13,7 @@ const verifyImage = image => {
 		const test = [".gif", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".psd", ".bmp", ".tif", ".jfif"];
 		return test.some(e => image.includes(e));
 	};
-	return typeof image !== "string" || !imageExtension(image);
+	return image.length < 5 || typeof image !== "string" || !imageExtension(image);
 };
 
 const verifyValidEmail = email => {

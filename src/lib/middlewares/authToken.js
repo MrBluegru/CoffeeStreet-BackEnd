@@ -3,8 +3,9 @@ const jwt = require("jsonwebtoken");
 const mainAuthToken = async (req, res, next) => {
 	try {
 		const { authorization } = req.headers;
-		const token = authorization.split(" ")[1];
-		if (!token) return res.sendStatus(401).json({ errorMessage: "No authorization token given" });
+		const token = authorization ? authorization.split(" ")[1] : null;
+
+		if (!token) return res.status(401).json({ errorMessage: "No authorization token given" });
 
 		jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
 			console.log(err && { session: false });
@@ -14,7 +15,7 @@ const mainAuthToken = async (req, res, next) => {
 			next();
 		});
 	} catch (error) {
-		return res.status(400).send({ error });
+		next(error);
 	}
 };
 

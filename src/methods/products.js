@@ -20,6 +20,7 @@ const getAll = async () => {
 			originCountry: true,
 			isPrepared: true,
 			idDiscount: true,
+			state: true,
 			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
 		}
 	});
@@ -56,6 +57,7 @@ const findByName = async name => {
 			originCountry: true,
 			isPrepared: true,
 			idDiscount: true,
+			state: true,
 			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
 		}
 	});

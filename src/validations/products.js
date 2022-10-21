@@ -1,28 +1,24 @@
 const validateName = name => {
-	return typeof name !== "string" ? false : true;
+	return typeof name !== "string" || name.length < 5 ? false : true;
 };
 
 const validateDescription = description => {
-	return typeof description !== "string" ? false : true;
-};
-
-const validateImg = image => {
-	return typeof image !== "string" ? false : true;
+	return typeof description !== "string" || description.length < 20 ? false : true;
 };
 
 const validatePrice = price => {
 	return typeof price !== "number" ? false : true;
 };
 
-const validateCategory = category => {
-	return (typeof category === "string" && category === "coffee") ||
-		category === "tea" ||
-		category === "sweetBakery" ||
-		category === "saltyBakery" ||
-		category === "other"
-		? true
-		: false;
-};
+// const validateCategory = category => {
+// 	return (typeof category === "string" && category === "coffee") ||
+// 		category === "tea" ||
+// 		category === "sweetBakery" ||
+// 		category === "saltyBakery" ||
+// 		category === "other"
+// 		? true
+// 		: false;
+// };
 
 const validateLactose = lactose => {
 	return lactose === true || lactose === false ? true : false;
@@ -107,9 +103,7 @@ const verifyIngredients = data => {
 module.exports = {
 	validateName,
 	validateDescription,
-	validateImg,
 	validatePrice,
-	validateCategory,
 	validateLactose,
 	validateGluten,
 	validateAlcohol,

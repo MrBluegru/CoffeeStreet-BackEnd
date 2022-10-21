@@ -3,15 +3,16 @@ const authMethod = require("../methods/auth");
 const usersMethod = require("../methods/users");
 const productsMethods = require("../methods/products");
 
-const getUsers = async (req, res, next) => {
+const getUser = async (req, res, next) => {
 	const { email } = req.body;
+	if (!email) return res.status(404).json({ errorMessage: "Not email given" });
 
 	try {
 		if (email) {
 			const auth = await authMethod.emailVerify(email);
 			if (!auth) return res.status(400).json({ errorMessage: "This email is not registered" });
 			const user = await usersMethod.findByIdAuth(auth.id);
-			if (!user) return res.status(404).json({ errorMessage: "No user found" });
+			if (!user) return res.status(404).json({ errorMessage: "No user info found" });
 			else return res.status(200).json({ user });
 			// } else {
 			// 	const users = await usersMethod.findAll();
@@ -227,7 +228,7 @@ const deleteUser = async (req, res, next) => {
 };
 
 module.exports = {
-	getUsers,
+	getUser,
 	getUserById,
 	getUserFavourites,
 	addUserFavourites,
