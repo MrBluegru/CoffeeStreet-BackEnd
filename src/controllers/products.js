@@ -3,17 +3,6 @@ const { getAll, findById, createNewProduct, verifyName, findByName } = require("
 const { createNewAttribute, updateAttribute } = require("../methods/attributes");
 
 const {
-	validateName,
-	validateDescription,
-	validatePrice,
-	validateLactose,
-	validateGluten,
-	validateAlcohol,
-	validateStock,
-	validateIngredients,
-	validateOriginCountry,
-	validateIsPrepared,
-	validateState,
 	verifyDataProduct,
 	verifyIngredients,
 	verifyCoffeBox,
