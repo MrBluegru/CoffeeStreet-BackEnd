@@ -97,8 +97,7 @@ const createProduct = async (req, res, next) => {
 		acidity,
 		bitterness,
 		roast,
-		color,
-		idDiscount
+		color
 		// idDiscount  //para probar rutas
 	};
 
@@ -324,7 +323,7 @@ const deleteProduct = async (req, res, next) => {
 	}
 };
 
-//// creado usado para probar rutas de products/discount  ////
+//// lo usé para probar rutas de products/discount  ////
 
 // const createDiscount = async (req, res, next) => {
 // 	const { percentage } = req.body;
@@ -427,7 +426,7 @@ module.exports = {
 	createProduct,
 	updateProduct,
 	deleteProduct,
-	// createDiscount, // usado para probar en rutas
+	// createDiscount, // usado para probar en rutas products/discount
 	getProductsWithDiscount,
 	updateDiscountProduct
 };
