@@ -1,13 +1,31 @@
 const prisma = require("../utils/prisma");
 
-const createCart = async (req, res, next) => {
+const getOrCreateCart = async (req, res, next) => {
 	try {
-		return res.status(200).json("exito");
+		return res.status(200).json("carrito creado o conseguido");
+	} catch (error) {
+		next(error);
+	}
+};
+
+const updateCart = async (req, res, next) => {
+	try {
+		return res.status(200).json("carrito update");
+	} catch (error) {
+		next(error);
+	}
+};
+
+const deleteItem = async (req, res, next) => {
+	try {
+		return res.status(200).json("item eliminado");
 	} catch (error) {
 		next(error);
 	}
 };
 
 module.exports = {
-	createCart
+	getOrCreateCart,
+	updateCart,
+	deleteItem
 };
