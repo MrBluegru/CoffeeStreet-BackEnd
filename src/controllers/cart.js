@@ -154,7 +154,7 @@ const emptyCart = async (req, res, next) => {
 			if (done.length < 1) return res.status(404).json({ errorMessage: "Error at deleting items" });
 			else {
 				await prisma.cart.update({ where: { id: cart.id }, data: { total: 0 } });
-				return res.status(200).json({ errorMessage: "Cart is empty" });
+				return res.status(200).json({ errorMessage: "Success. Cart is empty" });
 			}
 		} else {
 			return res.status(200).json({ errorMessage: "Nothing to delete: cart is empty" });
