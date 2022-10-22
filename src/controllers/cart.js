@@ -136,7 +136,7 @@ const deleteItem = async (req, res, next) => {
 	}
 };
 
-const EmptyCart = async (req, res, next) => {
+const emptyCart = async (req, res, next) => {
 	const { idCart } = req.body;
 
 	try {
@@ -168,5 +168,5 @@ module.exports = {
 	GetOrCreateCart,
 	addItemCart,
 	deleteItem,
-	EmptyCart
+	emptyCart
 };
