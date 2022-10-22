@@ -30,6 +30,7 @@ model User {
   review            Review[]
   favourite_product Favourite_Product[]
   state             State               @default(active)
+  cart              Cart?
 }
 
 model Product {
@@ -53,6 +54,7 @@ model Product {
   idAttribute       String?             @unique //idAttribute es mejor tenerlo
   favourite_product Favourite_Product[]
   state             State               @default(active)
+  cart_Product      Cart_Product[]
 }
 
 model Attribute {
@@ -110,18 +112,22 @@ model Review {
 }
 
 model Cart {
-  id     String   @id @default(uuid())
-  token  String
-  date   DateTime
-  total  Int
-  idUser String
+  id           String         @id @default(uuid())
+  token        String
+  date         DateTime
+  total        Int
+  user         User           @relation(fields: [idUser], references: [id])
+  idUser       String         @unique
+  cart_Product Cart_Product[]
 }
 
 model Cart_Product {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   qty       Int
   price     Int
+  product   Product @relation(fields: [idProduct], references: [id])
   idProduct String
+  cart      Cart    @relation(fields: [idCart], references: [id])
   idCart    String
 }
 
