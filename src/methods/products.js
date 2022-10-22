@@ -19,7 +19,7 @@ const getAll = async () => {
 			ingredients: true,
 			originCountry: true,
 			isPrepared: true,
-			idDiscount: true,
+			discount: true,
 			state: true,
 			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
 		}
@@ -56,7 +56,7 @@ const findByName = async name => {
 			ingredients: true,
 			originCountry: true,
 			isPrepared: true,
-			idDiscount: true,
+			discount: true,
 			state: true,
 			attribute: true // preguntar a front si lo necesitan, sino, para eliminar este campo
 		}
@@ -83,7 +83,7 @@ const findById = async id => {
 			ingredients: true,
 			originCountry: true,
 			isPrepared: true,
-			idDiscount: true,
+			discount: true,
 			attribute: true,
 			state: true
 		}
