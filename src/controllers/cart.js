@@ -136,11 +136,37 @@ const deleteItem = async (req, res, next) => {
 	}
 };
 
-const deleteAllCart = async (req, res, next) => {};
+const EmptyCart = async (req, res, next) => {
+	const { idCart } = req.body;
+
+	try {
+		if (!idCart || typeof idCart !== "string") return res.status(404).json({ errorMessage: "Enter a correct idCart" });
+		const cart = await prisma.cart.findUnique({ where: { id: idCart } });
+		if (!cart) return res.status(404).json({ errorMessage: "Cart not found" });
+
+		const items = await prisma.cart_Product.findMany({ where: { idCart } });
+		if (items.length) {
+			const done = await Promise.all(
+				items.map(async e => {
+					return await prisma.cart_Product.delete({ where: { id: e.id } });
+				})
+			);
+			if (done.length < 1) return res.status(404).json({ errorMessage: "Error at deleting items" });
+			else {
+				await prisma.cart.update({ where: { id: cart.id }, data: { total: 0 } });
+				return res.status(200).json({ errorMessage: "Cart is empty" });
+			}
+		} else {
+			return res.status(200).json({ errorMessage: "Nothing to delete: cart is empty" });
+		}
+	} catch (error) {
+		next(error);
+	}
+};
 
 module.exports = {
 	GetOrCreateCart,
 	addItemCart,
 	deleteItem,
-	deleteAllCart
+	EmptyCart
 };
