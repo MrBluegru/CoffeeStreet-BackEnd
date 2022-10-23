@@ -16,7 +16,7 @@ const GetOrCreateCart = async (req, res, next) => {
 					total: 0
 				}
 			});
-			return res.status(200).json({ cartTotal: newCart.total, items: null });
+			return res.status(200).json({ cartId: newCart.id, cartTotal: newCart.total, items: null });
 		} else {
 			const cart_product = await prisma.cart_Product.findMany({ where: { idCart: cart.id } });
 			console.log(cart_product);
@@ -36,9 +36,9 @@ const GetOrCreateCart = async (req, res, next) => {
 					})
 				);
 
-				return res.status(200).json({ cartTotal: cart.total, items });
+				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total, items });
 			} else {
-				return res.status(200).json({ cartTotal: cart.total, items: [] });
+				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total, items: [] });
 			}
 		}
 	} catch (error) {
