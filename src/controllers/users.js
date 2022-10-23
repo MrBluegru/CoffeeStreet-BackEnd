@@ -2,6 +2,7 @@ const prisma = require("../utils/prisma");
 const authMethod = require("../methods/auth");
 const usersMethod = require("../methods/users");
 const productsMethods = require("../methods/products");
+const { verifyDataName, verifyName, verifyDatatype, verifySurname } = require("../validations/users");
 
 const getUser = async (req, res, next) => {
 	const { email } = req.body;
@@ -227,6 +228,60 @@ const deleteUser = async (req, res, next) => {
 	}
 };
 
+const updateUser = async (req, res, next) => {
+	const { id } = req.params;
+	const { name, surname, image, role } = req.body;
+	const data = { name, surname, image };
+
+	try {
+		//----------------------------VALIDATIONS------------------------------------------------------------------------//
+		//general validations
+		if (verifyDataName(data)) {
+			res.status(400).json({ errorMessage: "You need to modify some field to be able to update" });
+		}
+
+		if (verifyDatatype(data)) {
+			res.status(400).json({ errorMessage: "The entered fields must be text type" });
+		}
+
+		//name validations
+		// if (verifyName(data) === true) {
+		// 	res
+		// 		.status(400)
+		// 		.json({ errorMessage: "The name entered must be of type text and cannot exceed 8 characters in length" });
+		// }
+		//Este lo saco porque agrego una validacion general en la que checkea que los campos que se vayan a agregar sean de tipo texto
+
+		if (verifyName(data) === "namelength") {
+			res.status(400).json({ errorMessage: "Name cannot be more than 8 characters long" });
+		}
+
+		if (verifySurname(data)) {
+			res.status(400).json({ errorMessage: "Surname cannot be more than 10 characters long" });
+		}
+
+		const userFound = await usersMethod.findByIdWImg();
+		if (userFound) {
+			const userUpdate = await prisma.user.update({
+				where: {
+					id: id
+				},
+				data: {
+					name,
+					surname,
+					image
+				}
+			});
+			if (!userUpdate) return res.status(404).json({ errorMessage: "Error at updating user" });
+			else return res.status(200).json({ errorMessage: "Success Update" });
+		} else {
+			res.status(404).json({ errorMessage: "Username does not exist" });
+		}
+	} catch (err) {
+		next(500);
+	}
+};
+
 module.exports = {
 	getUser,
 	getUserById,
@@ -234,5 +289,6 @@ module.exports = {
 	addUserFavourites,
 	deleteUserFavourites,
 	updateRole,
-	deleteUser
+	deleteUser,
+	updateUser
 };
