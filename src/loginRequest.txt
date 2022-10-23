@@ -1,0 +1,52 @@
+POST http://localhost:3001/login
+
+Envías:
+1. Data como la siguiente
+Example
+{
+  "email": "admin@gmail.com",
+  "isGoogle": true,
+  "password": "admin67$M"
+}
+
+Recibes:
+1. accessToken
+2. refreshToken
+
+Ambos se guardarán en redux, indispensable.
+<-------------------------------------->
+
+POST http://localhost:3001/login/remove (LOG OUT)
+
+Envías:
+1. accessToken en header:
+
+Recibes:
+
+Solo un mensaje de logged out, acompanado de un objeto {session: false}
+Cada vez que se vea ese objeto, es porque no se debe seguir más con la session, por diferentes causas.
+Por lo tanto internamente cada vez que recibas ese objeto, se deberá provocar en el front el log out forzado.
+Es decir, eliminar la data del usuario en reduz.
+
+El objetivo de ese objeto es avisar al front que algo pasó, o incluso que el deslogueo fue exitoso, para provocar la eliminación
+de la sesión en el front también.
+
+
+<------------------------------------------------------------------------------------------------------->
+
+
+POST http://localhost:3001/login/refresh
+Envías:
+1. accessToken en header
+2. refreshToken por body
+
+Recibes:
+
+1. nuevo accessToken que reemplazará (guardarás) al accessToken anterior en redux
+
+***Ojo, por ejemplo, al hacer refresh a la página 5 veces seguidas, cada vez se envío un accessToken diferente.
+   A simple vista se ven iguales, pero por dentro, los diferencia es la duración. Indispensable guardar el nuevo que
+	 te llega en la respuesta de cada refresh, para usarlo inmediatamente en la ruta qu sea necesario enseguida (users, por ejemplo)
+	 y guardarlo también en redux
+
+<------------------------------------------------------------------------------------------------------------>

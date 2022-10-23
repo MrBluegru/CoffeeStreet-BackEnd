@@ -19,39 +19,41 @@ model Auth {
 }
 
 model User {
-  id                String             @id @default(uuid())
-  name              String             @db.VarChar(50)
-  surname           String             @db.VarChar(50)
-  role              Role
-  auth              Auth               @relation(fields: [idAuth], references: [id])
-  idAuth            String             @unique
+  id                String              @id @default(uuid())
+  name              String              @db.VarChar(50)
+  surname           String?             @db.VarChar(50)
+  image             String?
+  role              Role                @default(client)
+  auth              Auth                @relation(fields: [idAuth], references: [id])
+  idAuth            String              @unique
   order             Order?
   review            Review[]
-  favourite_product Favourite_Product?
-  state             State              @default(active)
+  favourite_product Favourite_Product[]
+  state             State               @default(active)
+  cart              Cart?
 }
 
 model Product {
-  id                String             @id @default(uuid())
-  name              String             @unique @db.VarChar(50)
-  description       String             @db.Text
+  id                String              @id @default(uuid())
+  name              String              @unique @db.VarChar(50)
+  description       String              @db.Text
   image             String?
-  price             Float
+  price             Float               @db.Real
   category          Category
   lactose           Boolean
   gluten            Boolean
   alcohol           Boolean
-  stock             Boolean            @default(true)
+  stock             Boolean             @default(true)
   ingredients       Json
-  originCountry     String?            @db.VarChar(50)
-  isPrepared        Boolean            @default(true)
+  originCountry     String?             @db.VarChar(50)
+  isPrepared        Boolean             @default(true)
   order_product     Order_Product?
-  discount          Discount?          @relation(fields: [idDiscount], references: [id])
-  idDiscount        String?            @unique
-  attribute         Attribute?         @relation(fields: [idAttribute], references: [id])
-  idAttribute       String?            @unique //idAttribute es mejor tenerlo
-  favourite_product Favourite_Product?
-  state             State              @default(active)
+  discount          Int?
+  attribute         Attribute?          @relation(fields: [idAttribute], references: [id])
+  idAttribute       String?             @unique //idAttribute es mejor tenerlo
+  favourite_product Favourite_Product[]
+  state             State               @default(active)
+  cart_Product      Cart_Product[]
 }
 
 model Attribute {
@@ -66,12 +68,6 @@ model Attribute {
   product    Product? // se eliminó idProduct, para mejor crear idAttributes en la tabla de Products (todo para que al hacer que la info sea más fácil manipularla)
 }
 
-model Discount {
-  id         String     @id @default(uuid())
-  percentage Percentage
-  product    Product?
-}
-
 model Order {
   id            String         @id @default(uuid())
   status        Status
@@ -84,7 +80,7 @@ model Order {
 model Order_Product {
   id        String  @id @default(uuid())
   quantity  Int
-  total     Float
+  total     Float   @db.Real
   product   Product @relation(fields: [idProduct], references: [id])
   idProduct String  @unique
   order     Order   @relation(fields: [idOrder], references: [id])
@@ -92,10 +88,11 @@ model Order_Product {
 }
 
 model Favourite_Product {
+  id        String  @id @default(uuid())
   user      User    @relation(fields: [idUser], references: [id])
-  idUser    String  @unique
+  idUser    String
   product   Product @relation(fields: [idProduct], references: [id])
-  idProduct String  @unique
+  idProduct String
 }
 
 model Review {
@@ -105,6 +102,26 @@ model Review {
   rating      Rating
   user        User?    @relation(fields: [idUser], references: [id])
   idUser      String?
+}
+
+model Cart {
+  id           String         @id @default(uuid())
+  token        String?
+  date         DateTime?
+  total        Float?         @db.Real
+  user         User           @relation(fields: [idUser], references: [id])
+  idUser       String         @unique
+  cart_Product Cart_Product[]
+}
+
+model Cart_Product {
+  id        String  @id @default(uuid())
+  qty       Int
+  price     Float   @db.Real
+  product   Product @relation(fields: [idProduct], references: [id])
+  idProduct String
+  cart      Cart    @relation(fields: [idCart], references: [id])
+  idCart    String
 }
 
 enum Role {
