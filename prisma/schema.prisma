@@ -71,6 +71,7 @@ model Attribute {
 model Order {
   id            String         @id @default(uuid())
   status        Status
+  total         Float          @db.Real
   date          DateTime
   user          User           @relation(fields: [idUser], references: [id])
   idUser        String         @unique

@@ -1,5 +1,7 @@
 const prisma = require("../utils/prisma");
 
+//NOTA******** Hubo un cambio en la tabla de Order, aagregué total, lo puedes ver en Miro también
+
 const createOrder = async (req, res, next) => {
 	//Del front mandarán:
 	//{status, idUser, total, ordersByProduct(Array)}
