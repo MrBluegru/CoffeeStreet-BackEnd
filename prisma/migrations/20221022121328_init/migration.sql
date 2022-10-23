@@ -63,7 +63,7 @@ CREATE TABLE "Product" (
     "name" VARCHAR(50) NOT NULL,
     "description" TEXT NOT NULL,
     "image" TEXT,
-    "price" DOUBLE PRECISION NOT NULL,
+    "price" REAL NOT NULL,
     "category" "Category" NOT NULL,
     "lactose" BOOLEAN NOT NULL,
     "gluten" BOOLEAN NOT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE "Product" (
     "ingredients" JSONB NOT NULL,
     "originCountry" VARCHAR(50),
     "isPrepared" BOOLEAN NOT NULL DEFAULT true,
-    "idDiscount" TEXT,
+    "discount" INTEGER,
     "idAttribute" TEXT,
     "state" "State" NOT NULL DEFAULT 'active',
 
@@ -94,14 +94,6 @@ CREATE TABLE "Attribute" (
 );
 
 -- CreateTable
-CREATE TABLE "Discount" (
-    "id" TEXT NOT NULL,
-    "percentage" "Percentage" NOT NULL,
-
-    CONSTRAINT "Discount_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
     "status" "Status" NOT NULL,
@@ -115,7 +107,7 @@ CREATE TABLE "Order" (
 CREATE TABLE "Order_Product" (
     "id" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
-    "total" DOUBLE PRECISION NOT NULL,
+    "total" REAL NOT NULL,
     "idProduct" TEXT NOT NULL,
     "idOrder" TEXT NOT NULL,
 
@@ -142,6 +134,28 @@ CREATE TABLE "Review" (
     CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Cart" (
+    "id" TEXT NOT NULL,
+    "token" TEXT,
+    "date" TIMESTAMP(3),
+    "total" REAL,
+    "idUser" TEXT NOT NULL,
+
+    CONSTRAINT "Cart_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Cart_Product" (
+    "id" TEXT NOT NULL,
+    "qty" INTEGER NOT NULL,
+    "price" REAL NOT NULL,
+    "idProduct" TEXT NOT NULL,
+    "idCart" TEXT NOT NULL,
+
+    CONSTRAINT "Cart_Product_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Auth_email_key" ON "Auth"("email");
 
@@ -150,9 +164,6 @@ CREATE UNIQUE INDEX "User_idAuth_key" ON "User"("idAuth");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Product_idDiscount_key" ON "Product"("idDiscount");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Product_idAttribute_key" ON "Product"("idAttribute");
@@ -166,11 +177,11 @@ CREATE UNIQUE INDEX "Order_Product_idProduct_key" ON "Order_Product"("idProduct"
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_Product_idOrder_key" ON "Order_Product"("idOrder");
 
--- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_idAuth_fkey" FOREIGN KEY ("idAuth") REFERENCES "Auth"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "Cart_idUser_key" ON "Cart"("idUser");
 
 -- AddForeignKey
-ALTER TABLE "Product" ADD CONSTRAINT "Product_idDiscount_fkey" FOREIGN KEY ("idDiscount") REFERENCES "Discount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_idAuth_fkey" FOREIGN KEY ("idAuth") REFERENCES "Auth"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_idAttribute_fkey" FOREIGN KEY ("idAttribute") REFERENCES "Attribute"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -192,3 +203,12 @@ ALTER TABLE "Favourite_Product" ADD CONSTRAINT "Favourite_Product_idProduct_fkey
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Cart" ADD CONSTRAINT "Cart_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Cart_Product" ADD CONSTRAINT "Cart_Product_idProduct_fkey" FOREIGN KEY ("idProduct") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Cart_Product" ADD CONSTRAINT "Cart_Product_idCart_fkey" FOREIGN KEY ("idCart") REFERENCES "Cart"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
