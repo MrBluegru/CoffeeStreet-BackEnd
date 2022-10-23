@@ -3,29 +3,31 @@ const prisma = require("../utils/prisma");
 const createOrder = async (req, res, next) => {
 	let { status, date, idUser } = req.body;
 
-	// date = new Date("2021-03-19T14:21:00+0200");
+	// date = new Date("2021-03-19T14:21:00+0200"); para probar post
 
 	try {
-		const orderExist = await prisma.order.findFirst({
-			where: {
-				status,
-				date,
-				idUser
-			}
-		});
-		if (orderExist === null) {
-			const createdOrder = await prisma.order.create({
-				data: {
+		if (status && date && idUser) {
+			const orderExist = await prisma.order.findFirst({
+				where: {
 					status,
 					date,
 					idUser
 				}
 			});
+			if (orderExist === null) {
+				const createdOrder = await prisma.order.create({
+					data: {
+						status,
+						date,
+						idUser
+					}
+				});
 
-			res.status(200).json({ msg: "Order created succesfully", order: createdOrder });
-		} else {
-			res.status(200).json({ msg: "The order already exists" });
-		}
+				res.status(200).json({ msg: "Order created succesfully", order: createdOrder });
+			} else {
+				res.status(200).json({ msg: "The order already exists" });
+			}
+		} else return res.status(400).json({ errorMessage: "Please enter the required data " });
 	} catch (error) {
 		next(error);
 	}
