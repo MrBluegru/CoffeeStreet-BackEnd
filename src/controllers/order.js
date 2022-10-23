@@ -24,6 +24,14 @@ const createOrder = async (req, res, next) => {
 	// Echar un vistazo a Miro:
 	// Con ese array <ordersByProduct> se llenará la tabla Order_Product, claro, primero se tendrá que crear la Order
 	// para conseguir el idOrder, así solo faltaría mapear <ordersByProduct> para crear Order_Product por cada uno
+	//
+	// NOTA ******* Agruegué tu controllador de updateStockOfProduct aquí en esta rama, para que sean tres rutas confirmadas en este pr:
+	// 1. createOrder --> order route
+	// 2.	changeStatus --> order route
+	// 3. updateStockOfProduct --> products route
+	//
+	// Las de discount las vemos después
+	//
 	let { status, date, idUser } = req.body;
 
 	// date = new Date("2021-03-19T14:21:00+0200"); para probar post
