@@ -58,6 +58,7 @@ const findByIdAuth = async id => {
 			role: true,
 			auth: {
 				select: {
+					id: true,
 					email: true,
 					isGoogle: true
 				}
