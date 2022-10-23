@@ -32,32 +32,30 @@ const createOrder = async (req, res, next) => {
 	//
 	// Solo confirmar que todas corran bien. Las de discount las vemos después.
 	//
-	let { status, date, idUser } = req.body;
-
-	// date = new Date("2021-03-19T14:21:00+0200"); para probar post
+	let { status, idUser, total, ordersByProduct, date } = req.body;
+	date = new Date("2021-03-19T14:21:00+0200"); // para probar post
 
 	try {
-		if (status && date && idUser) {
-			const orderExist = await prisma.order.findFirst({
-				where: {
-					status,
-					date,
-					idUser
-				}
+		if (status && idUser && total && ordersByProduct && date) {
+			const createdOrder = await prisma.order.create({
+				data: { status, total, date, idUser }
 			});
-			if (orderExist === null) {
-				const createdOrder = await prisma.order.create({
+
+			const createdOrderProduct = ordersByProduct.forEach(async el => {
+				const orders = await prisma.order_Product.create({
 					data: {
-						status,
-						date,
-						idUser
+						quantity: el.quantity,
+						total: el.total,
+						idProduct: el.idProduct,
+						idOrder: createdOrder.id  // Unique constraint failed on the fields: (`idOrder`) imaginaba que las tablas order_product podían pertenecer a una misma orden, pudiendo tener id´s repetidos
 					}
 				});
+				return orders;
+			});
 
-				res.status(200).json({ msg: "Order created succesfully", order: createdOrder });
-			} else {
-				res.status(200).json({ msg: "The order already exists" });
-			}
+			res
+				.status(200)
+				.json({ msg: "Order and Order_Product created succesfully", order: createdOrder, tables_order_Product: createdOrderProduct });
 		} else return res.status(400).json({ errorMessage: "Please enter the required data " });
 	} catch (error) {
 		next(error);
