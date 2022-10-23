@@ -30,7 +30,7 @@ const createOrder = async (req, res, next) => {
 	// 2.	changeStatus --> order route
 	// 3. updateStockOfProduct --> products route
 	//
-	// Las de discount las vemos después
+	// Solo confirmar que todas corran bien. Las de discount las vemos después.
 	//
 	let { status, date, idUser } = req.body;
 
