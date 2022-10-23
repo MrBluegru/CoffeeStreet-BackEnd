@@ -407,9 +407,14 @@ const updateStockOfProduct = async (req, res, next) => {
 							stock
 						}
 					});
-					return res.status(200).json({
-						errorMessage: "The stock of the product was changed successfully"
-					});
+					if (updatedStock)
+						return res.status(200).json({
+							errorMessage: "The stock of the product was changed successfully"
+						});
+					else
+						return res.status(200).json({
+							errorMessage: "Error at updating stock"
+						});
 				}
 				return res.status(400).json({
 					errorMessage: "Please enter a different value"
