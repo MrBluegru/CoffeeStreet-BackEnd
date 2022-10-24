@@ -2,10 +2,25 @@ const { user } = require("../utils/prisma");
 const prisma = require("../utils/prisma");
 
 //NOTA******** Hubo un cambio en la tabla de Order, aagregué total, lo puedes ver en Miro también
-
 const createOrder = async (req, res, next) => {
+	//Del front mandarán:
+	//{status, idUser, total, ordersByProduct(Array)}
+	//Ejemplo de:
+	// ordersByProduct: [
+	//	{
+	//		quantity: 1,
+	//		total: 3.5,
+	//		idProduct: 450060hnknd978
+	//	},
+	//	{
+	//		quantity: 3,
+	//		total: 12,
+	//		idProduct: 450060hnknd978
+	//	}
+	//]
+
 	let { status, idUser, total, ordersByProduct, date } = req.body;
-	date = new Date("2021-03-19T14:21:00+0200"); // para probar post
+	date = new Date("2021-03-19T14:21:00+0200"); // para probar post, lo dejé porque es requerido
 
 	try {
 		if (status && idUser && total && ordersByProduct && date) {
@@ -24,13 +39,13 @@ const createOrder = async (req, res, next) => {
 						}
 					})
 			);
-			const ordersProducts = await prisma.order_Product.findMany({
+			const createdOrderProducts = await prisma.order_Product.findMany({
 				where: { idOrder: createdOrder.id }
 			});
 
 			res.status(200).json({
 				msg: "Order and Order_Product created succesfully",
-				order_Product: ordersProducts,
+				order_Product: createdOrderProducts,
 				order: createdOrder
 			});
 		} else return res.status(400).json({ errorMessage: "Please enter the required data " });
