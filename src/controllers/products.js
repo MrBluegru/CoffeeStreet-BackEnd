@@ -352,7 +352,7 @@ const updateProduct = async (req, res) => {
 		});
 
 		if (!updating) return res.status(404).json({ errorMessage: "Error at updating db" });
-		else return res.status(200).json({ errorMessage: "Success Update" });
+		else return res.status(200).json({ message: "Success Update" });
 	} catch (err) {
 		console.log(err);
 	}
