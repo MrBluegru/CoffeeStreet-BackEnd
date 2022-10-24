@@ -352,7 +352,7 @@ const updateProduct = async (req, res) => {
 		});
 
 		if (!updating) return res.status(404).json({ errorMessage: "Error at updating db" });
-		else return res.status(200).json({ errorMessage: "Success Update" });
+		else return res.status(200).json({ message: "Success Update" });
 	} catch (err) {
 		console.log(err);
 	}
@@ -387,10 +387,56 @@ const deleteProduct = async (req, res, next) => {
 	}
 };
 
+const updateStockOfProduct = async (req, res, next) => {
+	const { id } = req.params;
+	const { stock } = req.body;
+	try {
+		const product = await prisma.product.findUnique({
+			where: {
+				id
+			}
+		});
+		if (product) {
+			if (stock === true || stock === false) {
+				if (product.stock !== stock) {
+					const updatedStock = await prisma.product.update({
+						where: {
+							id
+						},
+						data: {
+							stock
+						}
+					});
+					if (updatedStock)
+						return res.status(200).json({
+							errorMessage: "The stock of the product was changed successfully"
+						});
+					else
+						return res.status(200).json({
+							errorMessage: "Error at updating stock"
+						});
+				}
+				return res.status(400).json({
+					errorMessage: "Please enter a different value"
+				});
+			}
+			return res.status(400).json({
+				errorMessage: "Please enter a valid value"
+			});
+		}
+		return res.status(404).json({
+			errorMessage: "The product does not exist"
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
 module.exports = {
 	getProducts,
 	getProductById,
 	createProduct,
 	updateProduct,
-	deleteProduct
+	deleteProduct,
+	updateStockOfProduct
 };
