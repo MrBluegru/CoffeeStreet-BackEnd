@@ -72,6 +72,7 @@ CREATE TABLE "Product" (
     "ingredients" JSONB NOT NULL,
     "originCountry" VARCHAR(50),
     "isPrepared" BOOLEAN NOT NULL DEFAULT true,
+    "order_ProductId" TEXT,
     "discount" INTEGER,
     "idAttribute" TEXT,
     "state" "State" NOT NULL DEFAULT 'active',
@@ -100,6 +101,7 @@ CREATE TABLE "Order" (
     "total" REAL NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "idUser" TEXT NOT NULL,
+    "order_ProductId" TEXT,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
@@ -173,16 +175,13 @@ CREATE UNIQUE INDEX "Product_idAttribute_key" ON "Product"("idAttribute");
 CREATE UNIQUE INDEX "Order_idUser_key" ON "Order"("idUser");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Order_Product_idProduct_key" ON "Order_Product"("idProduct");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Order_Product_idOrder_key" ON "Order_Product"("idOrder");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Cart_idUser_key" ON "Cart"("idUser");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_idAuth_fkey" FOREIGN KEY ("idAuth") REFERENCES "Auth"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_order_ProductId_fkey" FOREIGN KEY ("order_ProductId") REFERENCES "Order_Product"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_idAttribute_fkey" FOREIGN KEY ("idAttribute") REFERENCES "Attribute"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -191,10 +190,7 @@ ALTER TABLE "Product" ADD CONSTRAINT "Product_idAttribute_fkey" FOREIGN KEY ("id
 ALTER TABLE "Order" ADD CONSTRAINT "Order_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order_Product" ADD CONSTRAINT "Order_Product_idProduct_fkey" FOREIGN KEY ("idProduct") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Order_Product" ADD CONSTRAINT "Order_Product_idOrder_fkey" FOREIGN KEY ("idOrder") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_order_ProductId_fkey" FOREIGN KEY ("order_ProductId") REFERENCES "Order_Product"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Favourite_Product" ADD CONSTRAINT "Favourite_Product_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
