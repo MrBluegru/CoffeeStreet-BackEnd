@@ -134,6 +134,10 @@ const deleteItem = async (req, res, next) => {
 	}
 };
 
+const deleteByProduct = async (req, res, next) => {
+	const { idCart, idProduct } = req.body;
+};
+
 const emptyCart = async (req, res, next) => {
 	const { idCart } = req.body;
 
@@ -166,5 +170,6 @@ module.exports = {
 	GetOrCreateCart,
 	addItemCart,
 	deleteItem,
+	deleteByProduct,
 	emptyCart
 };
