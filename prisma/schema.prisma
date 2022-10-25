@@ -26,7 +26,7 @@ model User {
   role              Role                @default(client)
   auth              Auth                @relation(fields: [idAuth], references: [id])
   idAuth            String              @unique
-  order             Order?
+  order             Order[]
   review            Review[]
   favourite_product Favourite_Product[]
   state             State               @default(active)
@@ -47,10 +47,10 @@ model Product {
   ingredients       Json
   originCountry     String?             @db.VarChar(50)
   isPrepared        Boolean             @default(true)
-  order_product     Order_Product?
+  order_product     Order_Product[]
   discount          Int?
   attribute         Attribute?          @relation(fields: [idAttribute], references: [id])
-  idAttribute       String?             @unique //idAttribute es mejor tenerlo
+  idAttribute       String?             @unique
   favourite_product Favourite_Product[]
   state             State               @default(active)
   cart_Product      Cart_Product[]
@@ -69,22 +69,24 @@ model Attribute {
 }
 
 model Order {
-  id            String         @id @default(uuid())
+  id            String          @id @default(uuid())
   status        Status
+  total         Float           @db.Real
   date          DateTime
-  user          User           @relation(fields: [idUser], references: [id])
-  idUser        String         @unique
-  order_product Order_Product?
+  user          User            @relation(fields: [idUser], references: [id])
+  idUser        String
+  order_product Order_Product[]
 }
 
 model Order_Product {
-  id        String  @id @default(uuid())
   quantity  Int
   total     Float   @db.Real
   product   Product @relation(fields: [idProduct], references: [id])
-  idProduct String  @unique
+  idProduct String
   order     Order   @relation(fields: [idOrder], references: [id])
-  idOrder   String  @unique
+  idOrder   String
+
+  @@id([idProduct, idOrder])
 }
 
 model Favourite_Product {
