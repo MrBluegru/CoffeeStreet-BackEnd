@@ -136,6 +136,36 @@ const deleteItem = async (req, res, next) => {
 
 const deleteByProduct = async (req, res, next) => {
 	const { idCart, idProduct } = req.body;
+	try {
+		if (!idCart || typeof idCart !== "string") return res.status(404).json({ errorMessage: "Enter a correct idCart" });
+		const cart = await prisma.cart.findUnique({ where: { id: idCart } });
+		if (!cart) return res.status(404).json({ errorMessage: "Cart not found" });
+
+		if (!idProduct || typeof idProduct !== "string")
+			return res.status(404).json({ errorMessage: "Enter a correct idProduct" });
+		const product = await prisma.product.findUnique({ where: { id: idProduct } });
+		if (!product) return res.status(404).json({ errorMessage: "Product not found" });
+
+		const items = await prisma.cart_Product.findMany({ where: { idProduct } });
+		console.log(items);
+
+		if (items.length) {
+			const done = await Promise.all(
+				items.map(async e => {
+					return await prisma.cart_Product.delete({ where: { id: e.id } });
+				})
+			);
+			if (done.length < 1) return res.status(404).json({ errorMessage: "Error at deleting Product" });
+			else {
+				await prisma.cart.update({ where: { id: cart.id }, data: { total: 0 } });
+				return res.status(200).json({ errorMessage: "Success. Product is deleted" });
+			}
+		} else {
+			return res.status(200).json({ errorMessage: "Nothing to delete: product is already deleted" });
+		}
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 const emptyCart = async (req, res, next) => {
