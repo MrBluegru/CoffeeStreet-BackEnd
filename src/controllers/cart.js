@@ -27,8 +27,6 @@ const GetOrCreateCart = async (req, res, next) => {
 						e.name = y.name;
 						e.image = y.image;
 						e.discount = y.discount;
-						delete e.idProduct;
-						delete e.idCart;
 						delete e.id;
 						if (e.discount !== null) e.discountedPrice = (e.price * (1 - e.discount)).toFixed(3);
 						else e.discountedPrice = null;
