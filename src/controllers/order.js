@@ -50,8 +50,6 @@ const createOrder = async (req, res, next) => {
 					return e;
 			})
 		);
-		console.log(errors);
-		console.log(!(errors.some(e => e === undefined) || errors.every(e => e === undefined)));
 
 		if (errors.every(e => e === undefined)) {
 			const date = new Date();
