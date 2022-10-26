@@ -398,27 +398,22 @@ const updateStockOfProduct = async (req, res, next) => {
 		});
 		if (product) {
 			if (stock === true || stock === false) {
-				if (product.stock !== stock) {
-					const updatedStock = await prisma.product.update({
-						where: {
-							id
-						},
-						data: {
-							stock
-						}
-					});
-					if (updatedStock)
-						return res.status(200).json({
-							errorMessage: "The stock of the product was changed successfully"
-						});
-					else
-						return res.status(200).json({
-							errorMessage: "Error at updating stock"
-						});
-				}
-				return res.status(400).json({
-					errorMessage: "Please enter a different value"
+				const updatedStock = await prisma.product.update({
+					where: {
+						id
+					},
+					data: {
+						stock
+					}
 				});
+				if (updatedStock)
+					return res.status(200).json({
+						errorMessage: "The stock of the product was changed successfully"
+					});
+				else
+					return res.status(200).json({
+						errorMessage: "Error at updating stock"
+					});
 			}
 			return res.status(400).json({
 				errorMessage: "Please enter a valid value"
