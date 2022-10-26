@@ -1,6 +1,7 @@
 const prisma = require("../utils/prisma");
 const usersMethod = require("../methods/users");
 const productsMethods = require("../methods/products");
+const { sendEmailOrderInfo } = require("../lib/emails/orderInfoEmail");
 
 const createOrder = async (req, res, next) => {
 	//Del front mandará:
@@ -56,6 +57,29 @@ const createOrder = async (req, res, next) => {
 			const createdOrder = await prisma.order.create({
 				data: { status, total, date, idUser }
 			});
+
+			const userOrderInfo = await prisma.order.findUnique({
+				where: {
+					id: createdOrder.id
+				},
+				select: {
+					user: {
+						select: {
+							auth: {
+								select: {
+									email: true
+								}
+							},
+							name: true,
+							surname: true
+						}
+					},
+					status: true,
+					total: true,
+					date: true
+				}
+			});
+
 			ordersByProduct.forEach(
 				async el =>
 					await prisma.order_Product.create({
@@ -67,13 +91,26 @@ const createOrder = async (req, res, next) => {
 						}
 					})
 			);
+
 			const createdOrderProducts = await prisma.order_Product.findMany({
 				where: { idOrder: createdOrder.id }
 			});
+
+			const orderToSend = {
+				name: userOrderInfo.user.name,
+				surname: userOrderInfo.user.surname,
+				email: userOrderInfo.user.auth.email,
+				status: userOrderInfo.status,
+				total: userOrderInfo.total,
+				date: userOrderInfo.date
+			};
+
+			sendEmailOrderInfo(orderToSend.email, orderToSend);
+
 			res.status(200).json({
 				msg: "Order and Order_Product created succesfully",
 				order_Product: createdOrderProducts,
-				order: createdOrder
+				order: userOrderInfo
 			});
 		} else return res.status(400).json({ errorMessage: "Missing or wrong datatype on array ordersByProduct" });
 	} catch (error) {

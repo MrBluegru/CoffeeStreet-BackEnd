@@ -1,9 +1,10 @@
 const prisma = require("../utils/prisma");
 const authMethods = require("../methods/auth");
 const { verifyName, verifySurname, verifyValidEmail, verifyPassword, verifyImage } = require("../validations/register");
+const { sendEmailRegister } = require("../lib/emails/registerEmail");
 
 const register = async (req, res, next) => {
-	const { email, password, name, surname, image } = req.body;
+	const { email, password, name, surname, image, role } = req.body;
 	let { isGoogle } = req.body;
 
 	if (!isGoogle) {
@@ -26,17 +27,18 @@ const register = async (req, res, next) => {
 			};
 			if (surname) data.surname = surname;
 			if (image) data.image = image;
+			if (role) data.role = role;
 			user = await prisma.user.create({ data });
 		} else {
 			if (verifySurname(surname))
 				return res.status(404).json({ errorMessage: "No surname given, too short or not a string" });
 			if (!password) return res.status(404).json({ errorMessage: "No password given" });
 			//Aquí validé password
-			// if (verifyPassword(password)) {
-			// 	const error = { errorMessage: "Password invalid" };
-			// 	console.log(error);
-			// 	return res.status(404).json(error);
-			// }
+			if (verifyPassword(password)) {
+				const error = { errorMessage: "Password invalid" };
+				console.log(error);
+				return res.status(404).json(error);
+			}
 			if (image) {
 				const error = { errorMessage: "No image given or invalid, it has to be .jpg, .png, etc" };
 				console.log(error);
@@ -52,7 +54,9 @@ const register = async (req, res, next) => {
 			};
 			user = await prisma.user.create({ data });
 		}
-		//AQUI SE ENVIA CORREO DE REGISTRO ------> sendEmailRegister(email)
+		// AQUI SE ENVIA CORREO DE REGISTRO
+		sendEmailRegister(email, name, surname);
+
 		if (user) return res.status(200).json("Sucessfully user registered");
 		else return res.status(404).json({ errorMessage: "Error at registration" });
 	} catch (error) {
