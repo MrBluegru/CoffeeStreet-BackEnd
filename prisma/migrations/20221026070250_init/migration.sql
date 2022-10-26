@@ -72,7 +72,7 @@ CREATE TABLE "Product" (
     "ingredients" JSONB NOT NULL,
     "originCountry" VARCHAR(50),
     "isPrepared" BOOLEAN NOT NULL DEFAULT true,
-    "discount" INTEGER,
+    "discount" REAL,
     "idAttribute" TEXT,
     "state" "State" NOT NULL DEFAULT 'active',
 

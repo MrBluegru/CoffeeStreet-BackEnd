@@ -428,82 +428,44 @@ const updateStockOfProduct = async (req, res, next) => {
 };
 
 const getProductsWithDiscount = async (req, res, next) => {
+	console.log(typeof 0.5);
 	try {
 		const products = await prisma.product.findMany({
 			where: {
-				state: "active",
-				discount: {
-					percentage: { in: ["five", "ten", "fifteen"] }
-				}
-			},
-			include: {
-				discount: {
-					select: {
-						percentage: true
-					}
-				}
+				state: "active"
 			}
 		});
-		if (products.length === 0) {
-			return res.status(200).json({ message: "There are no products with discount" });
-		} else return res.status(200).json(products);
+		const discountedProducts = products.filter(e => typeof e.discount === "number");
+		if (discountedProducts.length === 0) {
+			return res.status(200).json({ message: "There are not discounted products" });
+		} else return res.status(200).json(discountedProducts);
 	} catch (error) {
 		next(error);
 	}
 };
 
 const updateDiscountOfProduct = async (req, res, next) => {
-	const { id } = req.params;
-	const { percentage } = req.body;
+	let { percentage, idProduct } = req.body;
+	//Nota para el front, los productos precargados tienen discount como null, pero todos los update de discount que haga el admin serán decimal, 0 o 1
+	//solo tener en cuenta que null existe en algunos productos
 	try {
-		if (id) {
-			if (percentage === "five" || percentage === "ten" || percentage === "fifteen" || percentage === null) {
-				const product = await prisma.product.findUnique({
-					where: {
-						id
-					},
-					include: {
-						discount: {
-							select: {
-								percentage: true
-							}
+		if (idProduct) {
+			percentage = parseFloat(percentage);
+			if (typeof percentage === "number" && percentage <= 1) {
+				const product = await prisma.product.findUnique({ where: { id: idProduct } });
+				if (product) {
+					const discount = await prisma.product.update({
+						where: {
+							id: idProduct
+						},
+						data: {
+							discount: percentage
 						}
-					}
-				});
-				if (product.discount.percentage !== percentage) {
-					if (percentage === null) {
-						const updateDiscountToNull = await prisma.product.update({
-							where: {
-								id
-							},
-							data: {
-								discount: {
-									disconnect: true
-								}
-							}
-						});
-						console.log("updateDiscountToNull: ", updateDiscountToNull);
-						return res.status(200).json({ message: "Product discount has changed successfully" });
-					} else {
-						const updateDiscount = await prisma.product.update({
-							where: {
-								id
-							},
-							data: {
-								discount: {
-									update: {
-										percentage
-									}
-								}
-							}
-						});
-						console.log("UPDATED: ", updateDiscount);
-						if (updateDiscount) {
-							return res.status(200).json({ message: "Product discount has changed successfully" });
-						}
-					}
-				} else return res.status(400).json({ errorMessage: "Please enter a different percentage" });
-			} else return res.status(400).json({ errorMessage: "Please enter a valid percentage" });
+					});
+					return res.status(200).json({ message: "Product discount has changed successfully", discount });
+				} else return res.status(400).json({ errorMessage: "Product not found" });
+			} else
+				return res.status(400).json({ errorMessage: "Please enter a valid percentage, must be a 0, decimal or 1" });
 		} else return res.status(400).json({ errorMessage: "Please enter an id" });
 	} catch (error) {
 		next(error);
