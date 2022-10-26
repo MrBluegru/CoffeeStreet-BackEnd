@@ -1,46 +1,72 @@
 const mercadopago = require("mercadopago");
 const usersMethod = require("../methods/users");
 const authMethods = require("../methods/auth");
+const axios = require("axios");
 
 mercadopago.configure({
-	access_token:
-		process.env.ACCESS_TOKEN || "APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906"
+	access_token: "APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906"
+});
+
+const cart = {
+	idUser: "31j43532sadstyeuva221afgkak36714",
+	products: [
+		{
+			id: "342kaqcvfmdpfryoqkfp355sdada2456",
+			name: "Irish",
+			price: 1800,
+			quantity: 1
+		},
+		{
+			id: "342kaqcvfmdpfryoqkfsda2567134333",
+			name: "Macchiato",
+			price: 1200,
+			quantity: 1
+		}
+	]
+};
+
+const productsArray = cart.products.map(product => {
+	return {
+		id: product.id, // id
+		title: product.name, // name
+		unit_price: product.price, // price
+		quantity: product.quantity, // quantity
+		currency_id: "ARS"
+	};
 });
 
 async function check(req, res, next) {
-	const { idUser } = req.body;
+	// const { idUser } = req.body;
 
-	if (!idUser) return res.status(404).json({ errorMessage: "No user id given" });
+	// if (!idUser) return res.status(404).json({ errorMessage: "No user id given" });
 	try {
-		const user = await usersMethod(idUser);
-		if (!user) return res.status(404).json({ error: "There is no user with this id" });
+		// const user = await usersMethod.findById(idUser);
+		// if (!user) return res.status(404).json({ error: "There is no user with this id" });
 
 		const preference = {
-			items: req.body.items,
+			items: productsArray,
 			back_urls: {
 				success: "http://localhost:3000" + "/pay/", // modificar por rutas del front
 				failure: "http://localhost:3000" + "/pay/",
 				pending: "http://localhost:3000" + "/pay/"
 			},
-			auto_return: "approved",
-			statement_descriptor: "Coffee Street",
-			payer: {
-				name: user.firstName,
-				surname: user.lastName,
-				email: user.email
-			},
-			notification_url: "http://localhost:3001/pay/mercadopago/notification",
-			payment_methods: {
-				installments: 3
-			},
-			metadata: { note: req.body.note }
+			// auto_return: "approved",
+			// statement_descriptor: "Coffee Street",
+			// payer: {
+			// 	name: user.firstName,
+			// 	surname: user.lastName,
+			// 	email: user.email
+			// },
+			notification_url: "http://localhost:3001/pay/mercadopago/notification"
+			// payment_methods: {
+			// 	installments: 3
+			// },
+			// metadata: { note: req.body.note }
 		};
 
-		const mp = await mercadopago.preferences.create(preference);
-		return res.status(200).json({
-			id: mp.body.id,
-			coupons: req.body.coupons,
-			items: req.body.items
+		await mercadopago.preferences.create(preference).then(function (response) {
+			console.log("idPreference: ", response.body.id);
+			res.send(`<a href="${response.body.init_point}">IR A PAGAR</a>`);
 		});
 	} catch (error) {
 		next(error);
@@ -70,19 +96,18 @@ async function notification(req, res, next) {
 				merchantOrder = await mercadopago.merchant_orders.findById(payment.body.order.id);
 				const info = await axios.get(
 					`https://api.mercadopago.com/checkout/preferences/${merchantOrder.body.preference_id}`,
-					{ headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` } }
+					{
+						headers: {
+							Authorization: `Bearer APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906`
+						}
+					}
 				);
 
 				const auth = await authMethods.emailVerify(info.payer.email);
 				if (payment.body.status === "approved") {
 					console.log("estoy approved");
 					console.log(auth);
-					// await orderRepositories.create(
-					// 	{
-					// 		purchaseId: paymentId
-					// 	},
-					// 	user
-					// );
+					//CREAR ORDEN
 				}
 				break;
 
