@@ -428,7 +428,6 @@ const updateStockOfProduct = async (req, res, next) => {
 };
 
 const getProductsWithDiscount = async (req, res, next) => {
-	console.log(typeof 0.5);
 	try {
 		const products = await prisma.product.findMany({
 			where: {
