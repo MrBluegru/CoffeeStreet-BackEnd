@@ -5,7 +5,6 @@ const registerRoute = require("./register");
 const loginRoute = require("./login");
 const cartRoute = require("./cart");
 const orderRoute = require("./order");
-const reviewRoute = require("./review");
 
 const router = Router();
 
@@ -15,6 +14,5 @@ router.use("/register", registerRoute);
 router.use("/login", loginRoute);
 router.use("/cart", cartRoute);
 router.use("/order", orderRoute);
-router.use("/review", reviewRoute);
 
 module.exports = router;
