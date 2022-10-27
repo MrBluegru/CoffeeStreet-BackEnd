@@ -133,7 +133,7 @@ async function notification(req, res, next) {
 					}
 				);
 
-				console.log(info);
+				return res.status(200).json(info);
 				// const auth = await authMethods.emailVerify(info.payer.email);
 				// if (payment.body.status === "approved") {
 				// 	console.log("estoy approved");
@@ -145,8 +145,7 @@ async function notification(req, res, next) {
 			default:
 				break;
 		}
-
-		res.sendStatus(200).json(info);
+		return res.status(200).send("Holi");
 	} catch (error) {
 		console.log("catch: ", error);
 	}
