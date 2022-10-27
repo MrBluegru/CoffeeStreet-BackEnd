@@ -2,7 +2,7 @@ const prisma = require("../utils/prisma");
 const authMethod = require("../methods/auth");
 const usersMethod = require("../methods/users");
 const productsMethods = require("../methods/products");
-const { verifyData, verifyDatatypes, verifyNameLength, verifySurnameLength } = require("../validations/users");
+const { verifyDataName, verifyName, verifyDatatype, verifySurname } = require("../validations/users");
 
 const getUser = async (req, res, next) => {
 	const { email } = req.body;
@@ -228,62 +228,57 @@ const deleteUser = async (req, res, next) => {
 	}
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
 	const { id } = req.params;
-	const { name, surname, image } = req.body;
+	const { name, surname, image, role } = req.body;
 	const data = { name, surname, image };
 
 	try {
 		//----------------------------VALIDATIONS------------------------------------------------------------------------//
-
-		//validaciones generales
-		if (verifyData(data)) {
-			return res.status(400).json({ errorMessage: "You need to modify some field to be able to update" });
+		//general validations
+		if (verifyDataName(data)) {
+			res.status(400).json({ errorMessage: "You need to modify some field to be able to update" });
 		}
 
-		if (verifyDatatypes(data)) {
-			return res.status(400).json({ errorMessage: "The entered fields must be text type" });
+		if (verifyDatatype(data)) {
+			res.status(400).json({ errorMessage: "The entered fields must be text type" });
 		}
 
-		// validaciones especificas (que no excedan un limite de caracteres)
-		if (name) {
-			if (verifyNameLength(data)) {
-				res.status(400).json({ errorMessage: "Name cannot be more than 12 characters long" });
-			}
-			if (surname) {
-				if (verifySurnameLength(data)) {
-					res.status(400).json({ errorMessage: "Surname cannot be more than 15 characters long" });
-				}
-			}
+		//name validations
+		// if (verifyName(data) === true) {
+		// 	res
+		// 		.status(400)
+		// 		.json({ errorMessage: "The name entered must be of type text and cannot exceed 8 characters in length" });
+		// }
+		//Este lo saco porque agrego una validacion general en la que checkea que los campos que se vayan a agregar sean de tipo texto
 
-			if (id) {
-				//SI SE ENCUENTRA EL ID DE PARAMS REALIZA LO SIGUIENTE
-				if (id && typeof id !== "string") {
-					res.status(400).json({ messageError: "An error occurred with the id" });
-				} // ?
-				const userFound = await usersMethod.findById(id);
-				if (userFound) {
-					const userUpdate = await prisma.user.update({
-						where: {
-							id: id
-						},
-						data: {
-							name,
-							surname,
-							image
-						}
-					});
-					if (!userUpdate) return res.status(404).json({ errorMessage: "Error at updating user" });
-					else return res.status(200).json(userUpdate);
-				} else {
-					res.status(404).json({ errorMessage: "Username does not exist" });
+		if (verifyName(data) === "namelength") {
+			res.status(400).json({ errorMessage: "Name cannot be more than 8 characters long" });
+		}
+
+		if (verifySurname(data)) {
+			res.status(400).json({ errorMessage: "Surname cannot be more than 10 characters long" });
+		}
+
+		const userFound = await usersMethod.findByIdWImg();
+		if (userFound) {
+			const userUpdate = await prisma.user.update({
+				where: {
+					id: id
+				},
+				data: {
+					name,
+					surname,
+					image
 				}
-			} else {
-				res.status(400).json({ errorMessage: "An error ocurred. An id must come" });
-			}
+			});
+			if (!userUpdate) return res.status(404).json({ errorMessage: "Error at updating user" });
+			else return res.status(200).json({ errorMessage: "Success Update" });
+		} else {
+			res.status(404).json({ errorMessage: "Username does not exist" });
 		}
 	} catch (err) {
-		throw new Error(err.message);
+		next(500);
 	}
 };
 
