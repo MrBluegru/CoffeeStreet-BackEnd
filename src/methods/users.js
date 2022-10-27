@@ -25,23 +25,6 @@ const findById = async id => {
 			id: true,
 			name: true,
 			surname: true,
-			role: true,
-			idAuth: true,
-			state: true
-		}
-	});
-	return user;
-};
-
-const findByIdWImg = async id => {
-	const user = await prisma.user.findUnique({
-		where: {
-			id
-		},
-		select: {
-			id: true,
-			name: true,
-			surname: true,
 			image: true,
 			role: true,
 			idAuth: true,
@@ -97,4 +80,4 @@ const logicDeleteUser = async id => {
 	return user;
 };
 
-module.exports = { findAll, findById, findByIdWImg, updateRole, findByIdAuth, logicDeleteUser };
+module.exports = { findAll, findById, updateRole, findByIdAuth, logicDeleteUser };
