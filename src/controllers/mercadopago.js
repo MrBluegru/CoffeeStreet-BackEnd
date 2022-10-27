@@ -86,6 +86,7 @@ async function check(req, res, next) {
 
 async function feedback(req, res, next) {
 	const { payment_id, status, merchant_order_id } = req.query;
+	console.log("holita");
 
 	return res.status(200).json({
 		Payment: payment_id,
