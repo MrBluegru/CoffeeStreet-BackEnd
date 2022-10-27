@@ -1,7 +1,8 @@
 const prisma = require("../utils/prisma");
-const authMethod = require("../methods/auth");
-const usersMethod = require("../methods/users");
+const authMethods = require("../methods/auth");
+const usersMethods = require("../methods/users");
 const productsMethods = require("../methods/products");
+const { verifyData, verifyDatatypes, verifyNameLength, verifySurnameLength } = require("../validations/users");
 
 const getUser = async (req, res, next) => {
 	const { email } = req.body;
@@ -9,13 +10,13 @@ const getUser = async (req, res, next) => {
 
 	try {
 		if (email) {
-			const auth = await authMethod.emailVerify(email);
+			const auth = await authMethods.emailVerify(email);
 			if (!auth) return res.status(400).json({ errorMessage: "This email is not registered" });
-			const user = await usersMethod.findByIdAuth(auth.id);
+			const user = await usersMethods.findByIdAuth(auth.id);
 			if (!user) return res.status(404).json({ errorMessage: "No user info found" });
 			else return res.status(200).json({ user });
 			// } else {
-			// 	const users = await usersMethod.findAll();
+			// 	const users = await usersMethods.findAll();
 
 			// 	if (users) return res.status(200).json(users);
 			// 	else return res.status(404).json({ errorMessage: "Users Not Found" });
@@ -29,7 +30,7 @@ const getUserById = async (req, res, next) => {
 	const { id } = req.params;
 
 	try {
-		const user = await usersMethod.findById(id);
+		const user = await usersMethods.findById(id);
 		if (!user || user.state === "inactive")
 			return res.status(404).json({ errorMessage: "There is no user with that id" });
 		else return res.status(200).json(user);
@@ -42,7 +43,7 @@ const getUserFavourites = async (req, res, next) => {
 	const { id } = req.params;
 
 	try {
-		const doesUserExist = await usersMethod.findById(id);
+		const doesUserExist = await usersMethods.findById(id);
 
 		if (doesUserExist) {
 			const favouritesProductsByUser = await prisma.favourite_Product.findMany({
@@ -84,7 +85,7 @@ const addUserFavourites = async (req, res, next) => {
 	const { idProduct } = req.body;
 
 	try {
-		const doesUserExist = await usersMethod.findById(id);
+		const doesUserExist = await usersMethods.findById(id);
 
 		if (doesUserExist) {
 			if (!idProduct) return res.status(404).json({ errorMessage: "No idProduct was given" });
@@ -133,7 +134,7 @@ const deleteUserFavourites = async (req, res, next) => {
 	const { idProduct } = req.body;
 
 	try {
-		const doesUserExist = await usersMethod.findById(id);
+		const doesUserExist = await usersMethods.findById(id);
 
 		if (doesUserExist) {
 			if (!idProduct) return res.status(404).json({ errorMessage: "No idProduct was given" });
@@ -189,16 +190,16 @@ const updateRole = async (req, res, next) => {
 	const { role } = req.body;
 
 	try {
-		const userFound = await usersMethod.findById(id);
+		const userFound = await usersMethods.findById(id);
 		if (!userFound) return res.status(400).json({ errorMessage: "This user doesn't exist" });
 		if (role === "admin" || role === "employee" || role === "client") {
-			const all = await usersMethod.findAll();
+			const all = await usersMethods.findAll();
 			const isAdmin = all.filter(el => el.role === "admin");
 			if (isAdmin.length === 1) {
 				const isOk = all.find(el => el.id === id && el.role !== "admin");
 				if (!isOk) return res.status(400).json({ errorMessage: "There must be at least one Admin" });
 			}
-			const updated = await usersMethod.updateRole(id, role);
+			const updated = await usersMethods.updateRole(id, role);
 			return res.status(200).json(updated);
 		} else return res.status(400).json({ errorMessage: "The role must be admin, employee or client" });
 	} catch (error) {
@@ -211,11 +212,11 @@ const deleteUser = async (req, res, next) => {
 
 	try {
 		if (email) {
-			const userFound = await authMethod.emailVerify(email);
+			const userFound = await authMethods.emailVerify(email);
 			if (userFound) {
-				const user = await usersMethod.findByIdAuth(userFound.id);
+				const user = await usersMethods.findByIdAuth(userFound.id);
 				if (user) {
-					const userToDelete = await usersMethod.logicDeleteUser(user.id);
+					const userToDelete = await usersMethods.logicDeleteUser(user.id);
 					return res
 						.status(200)
 						.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
@@ -227,6 +228,66 @@ const deleteUser = async (req, res, next) => {
 	}
 };
 
+const updateUser = async (req, res) => {
+	const { id } = req.params;
+	const { name, surname, image } = req.body;
+	const data = { name, surname, image };
+
+	try {
+		//----------------------------VALIDATIONS------------------------------------------------------------------------//
+
+		//validaciones generales
+		if (verifyData(data)) {
+			return res.status(400).json({ errorMessage: "You need to modify some field to be able to update" });
+		}
+
+		if (verifyDatatypes(data)) {
+			return res.status(400).json({ errorMessage: "The entered fields must be text type" });
+		}
+
+		// validaciones especificas (que no excedan un limite de caracteres)
+		if (name) {
+			if (verifyNameLength(data)) {
+				res.status(400).json({ errorMessage: "Name cannot be more than 12 characters long" });
+			}
+		}
+
+		if (surname) {
+			if (verifySurnameLength(data)) {
+				res.status(400).json({ errorMessage: "Surname cannot be more than 15 characters long" });
+			}
+		}
+
+		if (id) {
+			//SI SE ENCUENTRA EL ID DE PARAMS REALIZA LO SIGUIENTE
+			if (id && typeof id !== "string") {
+				res.status(400).json({ messageError: "An error occurred with the id" });
+			} // ?
+			const userFound = await usersMethod.findById(id);
+			if (userFound) {
+				const userUpdate = await prisma.user.update({
+					where: {
+						id: id
+					},
+					data: {
+						name,
+						surname,
+						image
+					}
+				});
+				if (!userUpdate) return res.status(404).json({ errorMessage: "Error at updating user" });
+				else return res.status(200).json(userUpdate);
+			} else {
+				res.status(404).json({ errorMessage: "Username does not exist" });
+			}
+		} else {
+			res.status(400).json({ errorMessage: "An error ocurred. An id must come" });
+		}
+	} catch (err) {
+		throw new Error(err.message);
+	}
+};
+
 module.exports = {
 	getUser,
 	getUserById,
@@ -234,5 +295,6 @@ module.exports = {
 	addUserFavourites,
 	deleteUserFavourites,
 	updateRole,
-	deleteUser
+	deleteUser,
+	updateUser
 };
