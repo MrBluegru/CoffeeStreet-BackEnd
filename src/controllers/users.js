@@ -250,37 +250,38 @@ const updateUser = async (req, res) => {
 			if (verifyNameLength(data)) {
 				res.status(400).json({ errorMessage: "Name cannot be more than 12 characters long" });
 			}
-			if (surname) {
-				if (verifySurnameLength(data)) {
-					res.status(400).json({ errorMessage: "Surname cannot be more than 15 characters long" });
-				}
-			}
+		}
 
-			if (id) {
-				//SI SE ENCUENTRA EL ID DE PARAMS REALIZA LO SIGUIENTE
-				if (id && typeof id !== "string") {
-					res.status(400).json({ messageError: "An error occurred with the id" });
-				} // ?
-				const userFound = await usersMethod.findById(id);
-				if (userFound) {
-					const userUpdate = await prisma.user.update({
-						where: {
-							id: id
-						},
-						data: {
-							name,
-							surname,
-							image
-						}
-					});
-					if (!userUpdate) return res.status(404).json({ errorMessage: "Error at updating user" });
-					else return res.status(200).json(userUpdate);
-				} else {
-					res.status(404).json({ errorMessage: "Username does not exist" });
-				}
-			} else {
-				res.status(400).json({ errorMessage: "An error ocurred. An id must come" });
+		if (surname) {
+			if (verifySurnameLength(data)) {
+				res.status(400).json({ errorMessage: "Surname cannot be more than 15 characters long" });
 			}
+		}
+
+		if (id) {
+			//SI SE ENCUENTRA EL ID DE PARAMS REALIZA LO SIGUIENTE
+			if (id && typeof id !== "string") {
+				res.status(400).json({ messageError: "An error occurred with the id" });
+			} // ?
+			const userFound = await usersMethod.findById(id);
+			if (userFound) {
+				const userUpdate = await prisma.user.update({
+					where: {
+						id: id
+					},
+					data: {
+						name,
+						surname,
+						image
+					}
+				});
+				if (!userUpdate) return res.status(404).json({ errorMessage: "Error at updating user" });
+				else return res.status(200).json(userUpdate);
+			} else {
+				res.status(404).json({ errorMessage: "Username does not exist" });
+			}
+		} else {
+			res.status(400).json({ errorMessage: "An error ocurred. An id must come" });
 		}
 	} catch (err) {
 		throw new Error(err.message);
