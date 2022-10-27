@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const authMethods = require("../methods/auth");
 const { verifyPassword } = require("../validations/register");
+const { sendEmailForgotPassword } = require("../lib/emails/forgotPasswordEmail");
 
 const generateAccessToken = user => {
 	return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
@@ -92,7 +93,15 @@ const forgotPassword = async (req, res, next) => {
 		const token = jwt.sign(auth, process.env.RESET_PASSWORD_KEY, {
 			expiresIn: "20m"
 		});
-		//AQUI SE ENVIA CORREO DE FORGOT PASSWORD ----> sendEmailForgotPass(email, token)
+
+		// AQUI SE ENVIA CORREO DE FORGOT PASSWORD ---->
+		sendEmailForgotPassword(email, token);
+
+		await prisma.auth.update({
+			where: { email },
+			data: { password: token }
+		});
+
 		return res.status(200).json({ errorMessage: "Mail sent", token });
 	} catch (error) {
 		next(error);
