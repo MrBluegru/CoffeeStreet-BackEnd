@@ -4,8 +4,8 @@ const authMethods = require("../methods/auth");
 const axios = require("axios");
 
 mercadopago.configure({
-	access_token: "APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906"
-	// "TEST-1535470802582594-101916-99d0eeef457302b38e5901b98f6443b2-1221092906"
+	// access_token: "APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906"
+	access_token: "TEST-1535470802582594-101916-99d0eeef457302b38e5901b98f6443b2-1221092906"
 });
 
 const cart = {
@@ -57,14 +57,19 @@ async function check(req, res, next) {
 
 		const preference = {
 			items: itemsArray,
+			// back_urls: {
+			// 	success: process.env.HOST + "/pay/", // COMO DEBE DE SER (FRONT)
+			// 	failure: process.env.HOST + "/pay/",
+			// 	pending: process.env.HOST + "/pay/"
+			// },
 			back_urls: {
-				success: "http://localhost:3000" + "/pay/", // modificar por rutas del front
-				failure: "http://localhost:3000" + "/pay/",
-				pending: "http://localhost:3000" + "/pay/"
+				success: "https://coffeestreet-backend-production.up.railway.app" + "/pay/mercadopago/feedback/", // modificar por rutas del front
+				failure: "https://coffeestreet-backend-production.up.railway.app" + "/pay/mercadopago/feedback/",
+				pending: "https://coffeestreet-backend-production.up.railway.app" + "/pay/mercadopago/feedback/"
 			},
-			notification_url: "https://coffeestreet-backend-production.up.railway.app/pay/mercadopago/notification"
-			// auto_return: "approved",
-			// statement_descriptor: "Coffee Street",
+			notification_url: "https://coffeestreet-backend-production.up.railway.app/pay/mercadopago/notification",
+			auto_return: "approved",
+			statement_descriptor: "Coffee Street"
 			// payment_methods: {
 			// 	installments: 3
 			// }
@@ -77,6 +82,16 @@ async function check(req, res, next) {
 	} catch (error) {
 		next(error);
 	}
+}
+
+async function feedback(req, res, next) {
+	const { payment_id, status, merchant_order_id } = req.query;
+
+	res.status({
+		Payment: payment_id,
+		Status: status,
+		MerchantOrder: merchant_order_id
+	});
 }
 
 async function getPaymentById(req, res, next) {
@@ -137,4 +152,4 @@ async function notification(req, res, next) {
 	}
 }
 
-module.exports = { check, getPaymentById, notification };
+module.exports = { check, getPaymentById, notification, feedback };
