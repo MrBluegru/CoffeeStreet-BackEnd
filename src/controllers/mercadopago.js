@@ -124,17 +124,18 @@ async function notification(req, res, next) {
 				const paymentId = req.query.id || req.query["data.id"];
 				const payment = await mercadopago.payment.findById(paymentId);
 				merchantOrder = await mercadopago.merchant_orders.findById(payment.body.order.id);
-				const info = await axios.get(
-					`https://api.mercadopago.com/checkout/preferences/${merchantOrder.body.preference_id}`,
-					{
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
-						}
-					}
-				);
+				console.log(merchantOrder);
+				// const info = await axios.get(
+				// 	`https://api.mercadopago.com/checkout/preferences/${merchantOrder.body.preference_id}`,
+				// 	{
+				// 		headers: {
+				// 			"Content-Type": "application/json",
+				// 			Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
+				// 		}
+				// 	}
+				// );
 
-				return res.status(200).json(info);
+				return res.status(200).json(merchantOrder);
 				// const auth = await authMethods.emailVerify(info.payer.email);
 				// if (payment.body.status === "approved") {
 				// 	console.log("estoy approved");
