@@ -7,51 +7,51 @@ mercadopago.configure({
 	access_token: process.env.MP_ACCESS_TOKEN
 });
 
-// const cart = {
-// 	idUser: "31j43532sadstyeuva221afgkak36714",
-// 	items: [
-// 		{
-// 			id: "342kaqcvfmdpfryoqkfp355sdada2456",
-// 			name: "Irish",
-// 			price: 1800,
-// 			quantity: 1
-// 		},
-// 		{
-// 			id: "342kaqcvfmdpfryoqkfsda2567134333",
-// 			name: "Macchiato",
-// 			price: 1200,
-// 			quantity: 1
-// 		}
-// 	]
-// };
+const cart = {
+	idUser: "31j43532sadstyeuva221afgkak36714",
+	items: [
+		{
+			id: "342kaqcvfmdpfryoqkfp355sdada2456",
+			name: "Irish",
+			price: 1800,
+			quantity: 1
+		},
+		{
+			id: "342kaqcvfmdpfryoqkfsda2567134333",
+			name: "Macchiato",
+			price: 1200,
+			quantity: 1
+		}
+	]
+};
 
-// const itemsArray = cart.items.map(item => {
-// 	return {
-// 		id: item.id, // id
-// 		title: item.name, // name
-// 		unit_price: item.price, // price
-// 		quantity: item.quantity, // quantity
-// 		currency_id: "ARS"
-// 	};
-// });
+const itemsArray = cart.items.map(item => {
+	return {
+		id: item.id, // id
+		title: item.name, // name
+		unit_price: item.price, // price
+		quantity: item.quantity, // quantity
+		currency_id: "ARS"
+	};
+});
 
 async function check(req, res, next) {
-	const { idUser, items } = req.body;
+	// const { idUser, items } = req.body;
 
 	try {
-		if (!idUser) return res.status(404).json({ errorMessage: "No user id given" });
-		const user = await usersMethods.findById(idUser);
-		if (!user) return res.status(404).json({ error: "There is no user with this id" });
+		// if (!idUser) return res.status(404).json({ errorMessage: "No user id given" });
+		// const user = await usersMethods.findById(idUser);
+		// if (!user) return res.status(404).json({ error: "There is no user with this id" });
 
-		const itemsArray = items.map(item => {
-			return {
-				id: item.id,
-				title: item.name,
-				unit_price: item.price,
-				quantity: item.quantity,
-				currency_id: "ARS"
-			};
-		});
+		// const itemsArray = items.map(item => {
+		// 	return {
+		// 		id: item.id,
+		// 		title: item.name,
+		// 		unit_price: item.price,
+		// 		quantity: item.quantity,
+		// 		currency_id: "ARS"
+		// 	};
+		// });
 
 		const preference = {
 			items: itemsArray,
@@ -60,7 +60,7 @@ async function check(req, res, next) {
 				failure: "http://localhost:3000" + "/pay/",
 				pending: "http://localhost:3000" + "/pay/"
 			},
-			notification_url: "https://61cb-2803-c080-b-69b8-dd91-e28b-afc6-cabf.sa.ngrok.io/pay/mercadopago/notification"
+			notification_url: "https://coffeestreet-backend-production.up.railway.app/pay/mercadopago/notification"
 			// auto_return: "approved",
 			// statement_descriptor: "Coffee Street",
 			// payment_methods: {
