@@ -6,15 +6,16 @@ const { sendEmailRegister } = require("../lib/emails/registerEmail");
 const register = async (req, res, next) => {
 	const { email, password, name, surname, image, role } = req.body;
 	let { isGoogle } = req.body;
+	console.log({ email, password, name, surname, image, isGoogle });
 
 	if (!isGoogle) {
 		isGoogle = false;
 	}
 	try {
-		if (!email) return res.status(404).json({ errorMessage: "No email given" });
+		if (!email) return res.status(400).json({ errorMessage: "No email given" });
 		let response = await authMethods.emailVerify(email);
 		if (response) return res.status(404).json({ errorMessage: "This email is already registered" });
-		if (verifyValidEmail(email)) return res.status(404).json({ errorMessage: "Email invalid" });
+		// if (verifyValidEmail(email)) return res.status(403).json({ errorMessage: "Email invalid" });
 		if (verifyName(name)) return res.status(404).json({ errorMessage: "No name given, too short or not a string" });
 
 		let user;
@@ -54,10 +55,13 @@ const register = async (req, res, next) => {
 			};
 			user = await prisma.user.create({ data });
 		}
+
 		// AQUI SE ENVIA CORREO DE REGISTRO
 		sendEmailRegister(email, name, surname);
 
-		if (user) return res.status(200).json("Sucessfully user registered");
+		const data = await prisma.auth.findUnique({ where: { email } });
+		//AQUI SE ENVIA CORREO DE REGISTRO ------> sendEmailRegister(email)
+		if (user) return res.status(200).json({ message: "Sucessfully user registered", data });
 		else return res.status(404).json({ errorMessage: "Error at registration" });
 	} catch (error) {
 		next(error);

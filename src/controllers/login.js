@@ -14,7 +14,8 @@ const generateRefreshToken = user => {
 };
 
 const login = async (req, res, next) => {
-	const { password, email } = req.body;
+	const { password, email, reg } = req.body;
+	console.log({ password, email });
 	if (!email) return res.status(404).json({ errorMessage: "Email required" });
 	try {
 		const auth = await authMethods.emailVerify(email);
@@ -22,7 +23,9 @@ const login = async (req, res, next) => {
 		if (!auth.isGoogle) {
 			if (!password) return res.status(404).json({ errorMessage: "Password required" });
 			const pass_compare = await bcrypt.compare(password, auth.password);
-			if (!pass_compare) return res.status(404).json({ errorMessage: "Invalid Password" });
+			const pass = await prisma.auth.findFirst({ where: { password } });
+			if (!reg && !pass_compare) return res.status(404).json({ errorMessage: "Invalid Password" });
+			if (reg && !pass) return res.status(404).json({ errorMessage: "Invalid Password" });
 		}
 		const userData = {
 			id: auth.id,
