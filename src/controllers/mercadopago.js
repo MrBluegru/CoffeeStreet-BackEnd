@@ -4,8 +4,8 @@ const authMethods = require("../methods/auth");
 const axios = require("axios");
 
 mercadopago.configure({
-	// access_token: "APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906"
-	access_token: "TEST-1535470802582594-101916-99d0eeef457302b38e5901b98f6443b2-1221092906"
+	access_token:
+		process.env.MP_ACCESS_TOKEN || "APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906"
 });
 
 const cart = {
