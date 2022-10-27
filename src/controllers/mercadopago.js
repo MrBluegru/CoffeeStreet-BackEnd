@@ -1,67 +1,71 @@
 const mercadopago = require("mercadopago");
-const usersMethod = require("../methods/users");
+const usersMethods = require("../methods/users");
 const authMethods = require("../methods/auth");
 const axios = require("axios");
 
 mercadopago.configure({
-	access_token: "APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906"
+	access_token: process.env.MP_ACCESS_TOKEN
 });
 
-const cart = {
-	idUser: "31j43532sadstyeuva221afgkak36714",
-	products: [
-		{
-			id: "342kaqcvfmdpfryoqkfp355sdada2456",
-			name: "Irish",
-			price: 1800,
-			quantity: 1
-		},
-		{
-			id: "342kaqcvfmdpfryoqkfsda2567134333",
-			name: "Macchiato",
-			price: 1200,
-			quantity: 1
-		}
-	]
-};
+// const cart = {
+// 	idUser: "31j43532sadstyeuva221afgkak36714",
+// 	items: [
+// 		{
+// 			id: "342kaqcvfmdpfryoqkfp355sdada2456",
+// 			name: "Irish",
+// 			price: 1800,
+// 			quantity: 1
+// 		},
+// 		{
+// 			id: "342kaqcvfmdpfryoqkfsda2567134333",
+// 			name: "Macchiato",
+// 			price: 1200,
+// 			quantity: 1
+// 		}
+// 	]
+// };
 
-const productsArray = cart.products.map(product => {
-	return {
-		id: product.id, // id
-		title: product.name, // name
-		unit_price: product.price, // price
-		quantity: product.quantity, // quantity
-		currency_id: "ARS"
-	};
-});
+// const itemsArray = cart.items.map(item => {
+// 	return {
+// 		id: item.id, // id
+// 		title: item.name, // name
+// 		unit_price: item.price, // price
+// 		quantity: item.quantity, // quantity
+// 		currency_id: "ARS"
+// 	};
+// });
 
 async function check(req, res, next) {
-	// const { idUser } = req.body;
+	const { idUser, items } = req.body;
 
-	// if (!idUser) return res.status(404).json({ errorMessage: "No user id given" });
 	try {
-		// const user = await usersMethod.findById(idUser);
-		// if (!user) return res.status(404).json({ error: "There is no user with this id" });
+		if (!idUser) return res.status(404).json({ errorMessage: "No user id given" });
+		const user = await usersMethods.findById(idUser);
+		if (!user) return res.status(404).json({ error: "There is no user with this id" });
+
+		const itemsArray = items.map(item => {
+			return {
+				id: item.id,
+				title: item.name,
+				unit_price: item.price,
+				quantity: item.quantity,
+				currency_id: "ARS"
+			};
+		});
 
 		const preference = {
-			items: productsArray,
+			items: itemsArray,
 			back_urls: {
 				success: "http://localhost:3000" + "/pay/", // modificar por rutas del front
 				failure: "http://localhost:3000" + "/pay/",
 				pending: "http://localhost:3000" + "/pay/"
 			},
+			notification_url: "https://61cb-2803-c080-b-69b8-dd91-e28b-afc6-cabf.sa.ngrok.io/pay/mercadopago/notification"
 			// auto_return: "approved",
 			// statement_descriptor: "Coffee Street",
-			// payer: {
-			// 	name: user.firstName,
-			// 	surname: user.lastName,
-			// 	email: user.email
-			// },
-			notification_url: "http://localhost:3001/pay/mercadopago/notification"
 			// payment_methods: {
 			// 	installments: 3
-			// },
-			// metadata: { note: req.body.note }
+			// }
 		};
 
 		await mercadopago.preferences.create(preference).then(function (response) {
@@ -74,10 +78,14 @@ async function check(req, res, next) {
 }
 
 async function getPaymentById(req, res, next) {
+	const { id } = req.params;
+
 	try {
-		const { id } = req.params;
 		const payment = await axios.get(`https://api.mercadopago.com/v1/payments/${id}`, {
-			headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` }
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
+			}
 		});
 		res.status(200).json(payment.data);
 	} catch (error) {
@@ -86,8 +94,12 @@ async function getPaymentById(req, res, next) {
 }
 
 async function notification(req, res, next) {
+	const topic = req.query.topic || req.query.type;
+	const { query, body } = req;
+	console.log(query);
+	console.log(body);
+
 	try {
-		const topic = req.query.topic || req.query.type;
 		let merchantOrder;
 		switch (topic) {
 			case "payment":
@@ -98,17 +110,19 @@ async function notification(req, res, next) {
 					`https://api.mercadopago.com/checkout/preferences/${merchantOrder.body.preference_id}`,
 					{
 						headers: {
-							Authorization: `Bearer APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906`
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
 						}
 					}
 				);
 
-				const auth = await authMethods.emailVerify(info.payer.email);
-				if (payment.body.status === "approved") {
-					console.log("estoy approved");
-					console.log(auth);
-					//CREAR ORDEN
-				}
+				console.log(info);
+				// const auth = await authMethods.emailVerify(info.payer.email);
+				// if (payment.body.status === "approved") {
+				// 	console.log("estoy approved");
+				// 	console.log(auth);
+				// 	//CREAR ORDEN
+				// }
 				break;
 
 			default:
@@ -117,7 +131,7 @@ async function notification(req, res, next) {
 
 		res.sendStatus(200);
 	} catch (error) {
-		next(error);
+		console.log("catch: ", error);
 	}
 }
 

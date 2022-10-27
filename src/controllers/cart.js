@@ -1,4 +1,3 @@
-const e = require("express");
 const prisma = require("../utils/prisma");
 
 const GetOrCreateCart = async (req, res, next) => {

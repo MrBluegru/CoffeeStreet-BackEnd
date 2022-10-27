@@ -1,5 +1,5 @@
 const prisma = require("../utils/prisma");
-const usersMethod = require("../methods/users");
+const usersMethods = require("../methods/users");
 const productsMethods = require("../methods/products");
 
 const createOrder = async (req, res, next) => {
@@ -32,7 +32,7 @@ const createOrder = async (req, res, next) => {
 		if (!ordersByProduct || typeof ordersByProduct !== "object")
 			return res.status(404).json({ errorMessage: "ordersByProduct must be an array of objects" });
 
-		const user = await usersMethod.findById(idUser);
+		const user = await usersMethods.findById(idUser);
 		if (!user) return res.status(404).json({ errorMessage: "User not found" });
 		if (!status || !(status === "pending" || status === "complete"))
 			return res.status(404).json({ errorMessage: "Enter a valid status" });
