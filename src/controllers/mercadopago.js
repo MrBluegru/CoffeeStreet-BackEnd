@@ -4,7 +4,8 @@ const authMethods = require("../methods/auth");
 const axios = require("axios");
 
 mercadopago.configure({
-	access_token: process.env.MP_ACCESS_TOKEN
+	access_token: "APP_USR-1535470802582594-101916-60fddc1d0efdb4740fd2813798b0886f-1221092906"
+	// "TEST-1535470802582594-101916-99d0eeef457302b38e5901b98f6443b2-1221092906"
 });
 
 const cart = {
@@ -13,13 +14,13 @@ const cart = {
 		{
 			id: "342kaqcvfmdpfryoqkfp355sdada2456",
 			name: "Irish",
-			price: 1800,
+			price: 14,
 			quantity: 1
 		},
 		{
 			id: "342kaqcvfmdpfryoqkfsda2567134333",
 			name: "Macchiato",
-			price: 1200,
+			price: 10,
 			quantity: 1
 		}
 	]
@@ -52,6 +53,7 @@ async function check(req, res, next) {
 		// 		currency_id: "ARS"
 		// 	};
 		// });
+		console.log(itemsArray);
 
 		const preference = {
 			items: itemsArray,
@@ -129,7 +131,7 @@ async function notification(req, res, next) {
 				break;
 		}
 
-		res.sendStatus(200);
+		res.sendStatus(200).json(info);
 	} catch (error) {
 		console.log("catch: ", error);
 	}
