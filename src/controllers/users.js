@@ -2,6 +2,7 @@ const prisma = require("../utils/prisma");
 const authMethod = require("../methods/auth");
 const usersMethod = require("../methods/users");
 const productsMethods = require("../methods/products");
+const { verifyData, verifyDatatypes, verifyNameLength, verifySurnameLength } = require("../validations/users");
 
 const getUser = async (req, res, next) => {
 	const { email } = req.body;
@@ -227,6 +228,66 @@ const deleteUser = async (req, res, next) => {
 	}
 };
 
+const updateUser = async (req, res) => {
+	const { id } = req.params;
+	const { name, surname, image } = req.body;
+	const data = { name, surname, image };
+
+	try {
+		//----------------------------VALIDATIONS------------------------------------------------------------------------//
+
+		//validaciones generales
+		if (verifyData(data)) {
+			return res.status(400).json({ errorMessage: "You need to modify some field to be able to update" });
+		}
+
+		if (verifyDatatypes(data)) {
+			return res.status(400).json({ errorMessage: "The entered fields must be text type" });
+		}
+
+		// validaciones especificas (que no excedan un limite de caracteres)
+		if (name) {
+			if (verifyNameLength(data)) {
+				res.status(400).json({ errorMessage: "Name cannot be more than 12 characters long" });
+			}
+		}
+
+		if (surname) {
+			if (verifySurnameLength(data)) {
+				res.status(400).json({ errorMessage: "Surname cannot be more than 15 characters long" });
+			}
+		}
+
+		if (id) {
+			//SI SE ENCUENTRA EL ID DE PARAMS REALIZA LO SIGUIENTE
+			if (id && typeof id !== "string") {
+				res.status(400).json({ messageError: "An error occurred with the id" });
+			} // ?
+			const userFound = await usersMethod.findById(id);
+			if (userFound) {
+				const userUpdate = await prisma.user.update({
+					where: {
+						id: id
+					},
+					data: {
+						name,
+						surname,
+						image
+					}
+				});
+				if (!userUpdate) return res.status(404).json({ errorMessage: "Error at updating user" });
+				else return res.status(200).json(userUpdate);
+			} else {
+				res.status(404).json({ errorMessage: "Username does not exist" });
+			}
+		} else {
+			res.status(400).json({ errorMessage: "An error ocurred. An id must come" });
+		}
+	} catch (err) {
+		throw new Error(err.message);
+	}
+};
+
 module.exports = {
 	getUser,
 	getUserById,
@@ -234,5 +295,6 @@ module.exports = {
 	addUserFavourites,
 	deleteUserFavourites,
 	updateRole,
-	deleteUser
+	deleteUser,
+	updateUser
 };

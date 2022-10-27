@@ -25,6 +25,7 @@ const findById = async id => {
 			id: true,
 			name: true,
 			surname: true,
+			image: true,
 			role: true,
 			idAuth: true,
 			state: true

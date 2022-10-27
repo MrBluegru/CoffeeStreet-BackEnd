@@ -6,7 +6,8 @@ const {
 	addUserFavourites,
 	deleteUserFavourites,
 	updateRole,
-	deleteUser
+	deleteUser,
+	updateUser
 } = require("../controllers/users");
 const { mainAuthToken } = require("../lib/middlewares/authToken");
 
@@ -19,5 +20,6 @@ router.post("/:id/favourites", addUserFavourites);
 router.delete("/:id/favourites", deleteUserFavourites);
 router.put("/:id", updateRole);
 router.delete("/delete", deleteUser);
+router.put("/update/:id", updateUser);
 
 module.exports = router;
