@@ -101,7 +101,7 @@ model Review {
   id          String   @id @default(uuid())
   description String
   date        DateTime
-  rating      Rating
+  rating      Int
   user        User?    @relation(fields: [idUser], references: [id])
   idUser      String?
 }
@@ -207,10 +207,3 @@ enum Status {
   complete
 }
 
-enum Rating {
-  one
-  two
-  three
-  four
-  five
-}
