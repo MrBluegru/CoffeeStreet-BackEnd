@@ -72,7 +72,7 @@ CREATE TABLE "Product" (
     "ingredients" JSONB NOT NULL,
     "originCountry" VARCHAR(50),
     "isPrepared" BOOLEAN NOT NULL DEFAULT true,
-    "discount" INTEGER,
+    "discount" REAL,
     "idAttribute" TEXT,
     "state" "State" NOT NULL DEFAULT 'active',
 
@@ -97,6 +97,7 @@ CREATE TABLE "Attribute" (
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
     "status" "Status" NOT NULL,
+    "total" REAL NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "idUser" TEXT NOT NULL,
 
@@ -105,13 +106,12 @@ CREATE TABLE "Order" (
 
 -- CreateTable
 CREATE TABLE "Order_Product" (
-    "id" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "total" REAL NOT NULL,
     "idProduct" TEXT NOT NULL,
     "idOrder" TEXT NOT NULL,
 
-    CONSTRAINT "Order_Product_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Order_Product_pkey" PRIMARY KEY ("idProduct","idOrder")
 );
 
 -- CreateTable
@@ -156,6 +156,14 @@ CREATE TABLE "Cart_Product" (
     CONSTRAINT "Cart_Product_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Newsletter" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+
+    CONSTRAINT "Newsletter_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Auth_email_key" ON "Auth"("email");
 
@@ -169,16 +177,10 @@ CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 CREATE UNIQUE INDEX "Product_idAttribute_key" ON "Product"("idAttribute");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Order_idUser_key" ON "Order"("idUser");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Order_Product_idProduct_key" ON "Order_Product"("idProduct");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Order_Product_idOrder_key" ON "Order_Product"("idOrder");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Cart_idUser_key" ON "Cart"("idUser");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Newsletter_email_key" ON "Newsletter"("email");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_idAuth_fkey" FOREIGN KEY ("idAuth") REFERENCES "Auth"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -126,6 +126,11 @@ model Cart_Product {
   idCart    String
 }
 
+model Newsletter {
+  id    String @id @default(uuid())
+  email String @unique
+}
+
 enum Role {
   admin
   employee

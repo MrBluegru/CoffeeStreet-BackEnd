@@ -1,5 +1,4 @@
 const prisma = require("../utils/prisma");
-const authMethods = require("../methods/auth");
 
 const saveEmailOnNewsletter = async (req, res, next) => {
 	let { email } = req.body;
@@ -7,10 +6,10 @@ const saveEmailOnNewsletter = async (req, res, next) => {
 	try {
 		if (!email) return res.status(404).json({ errorMessage: "Not email given" });
 
-		const exist = await authMethods.emailVerify(email);
+		const exist = await prisma.newsletter.findUnique({ where: { email } });
 		if (exist) return res.status(404).json({ errorMessage: "Email is already on our newsletter" });
 
-		const added = await prisma.newsletter.create({ data: email });
+		const added = await prisma.newsletter.create({ data: { email } });
 		if (added) return res.status(200).json({ errorMessage: "Email added successfully on our newsletter" });
 		else return res.status(400).json({ errorMessage: "Error on adding email on newsletter db" });
 	} catch (error) {
@@ -19,52 +18,33 @@ const saveEmailOnNewsletter = async (req, res, next) => {
 };
 
 const createNewsletter = async (req, res, next) => {
-	const { description, rating } = req.body;
+	const { description, title, image } = req.body;
 	try {
-		if (!description || typeof description !== "string") {
-			if (!rating || typeof rating !== "number" || (rating <= 5 && rating >= 1)) {
-				if (status !== foundOrder.status) {
-					const updatedStatus = await prisma.order.update({
-						where: {
-							id
-						},
-						data: {
-							status
-						}
-					});
-					return res.status(200).json({ message: `The status was changed successfully to ${status}`, updatedStatus });
-				} else return res.status(400).json({ errorMessage: "Please enter a different status" });
-			} else return res.status(404).json({ errorMessage: "Please enter a valid rating" });
-		} else return res.status(400).json({ errorMessage: "Please enter a valid description" });
+		if (!description || typeof description !== "string" || !title || typeof title !== "string") {
+			if (!image || typeof image !== "string") {
+				// nodemailer a todos los emails de newsletter table
+				// todavía no está finalizada
+
+				return res.status(200).json({ message: `The newsletter was successfully sent` });
+			} else return res.status(404).json({ errorMessage: "Please enter a valid image" });
+		} else return res.status(400).json({ errorMessage: "Please enter a valid description or title" });
 	} catch (error) {
 		next(error);
 	}
 };
 
 const removeEmailFromNewsletter = async (req, res, next) => {
-	const { id } = req.params;
-	const { status } = req.body;
+	let { email } = req.body;
+
 	try {
-		if (status === "pending" || status === "complete") {
-			const foundOrder = await prisma.order.findUnique({
-				where: {
-					id
-				}
-			});
-			if (foundOrder) {
-				if (status !== foundOrder.status) {
-					const updatedStatus = await prisma.order.update({
-						where: {
-							id
-						},
-						data: {
-							status
-						}
-					});
-					return res.status(200).json({ message: `The status was changed successfully to ${status}`, updatedStatus });
-				} else return res.status(400).json({ errorMessage: "Please enter a different status" });
-			} else return res.status(404).json({ errorMessage: "The order is not exist" });
-		} else return res.status(400).json({ errorMessage: "Please enter a valid status" });
+		if (!email) return res.status(404).json({ errorMessage: "Not email given" });
+
+		const exist = await prisma.newsletter.findUnique({ where: { email } });
+		if (!exist) return res.status(404).json({ errorMessage: "Email doesn't exist on our newsletter" });
+
+		const added = await prisma.newsletter.delete({ where: { id: exist.id } });
+		if (added) return res.status(200).json({ errorMessage: "Email deleted successfully from our newsletter" });
+		else return res.status(400).json({ errorMessage: "Error on deleting email on newsletter db" });
 	} catch (error) {
 		next(error);
 	}
