@@ -27,19 +27,14 @@ async function check(req, res, next) {
 
 		const preference = {
 			items: itemsArray,
-			// back_urls: {
-			// 	success: process.env.HOST + "/pay/", // COMO DEBE DE SER (FRONT)
-			// 	failure: process.env.HOST + "/pay/",
-			// 	pending: process.env.HOST + "/pay/"
-			// },
 			back_urls: {
-				success: "http://localhost:3001/pay/mercadopago/feedback",
-				failure: "http://localhost:3001/pay/mercadopago/feedback",
-				pending: "http://localhost:3001/pay/mercadopago/feedback"
+				success: "http://localhost:3001/pay/mercadopago/feedback", // debe cambiarse por ruta deployada
+				failure: "http://localhost:3001/pay/mercadopago/feedback", // debe cambiarse por ruta deployada
+				pending: "http://localhost:3001/pay/mercadopago/feedback" // debe cambiarse por ruta deployada
 			},
-			notification_url: "https://66c9-2803-c080-b-69b8-fccc-79af-472a-751c.sa.ngrok.io/pay/mercadopago/notification"
-			// auto_return: "approved",
-			// statement_descriptor: "Coffee Street",
+			notification_url: "https://df73-2803-c080-b-69b8-fccc-79af-472a-751c.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
+			auto_return: "approved",
+			statement_descriptor: "Coffee Street"
 			// payment_methods: {
 			// 	installments: 3
 			// }
