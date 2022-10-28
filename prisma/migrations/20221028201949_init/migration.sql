@@ -31,9 +31,6 @@ CREATE TYPE "Percentage" AS ENUM ('five', 'ten', 'fifteen');
 -- CreateEnum
 CREATE TYPE "Status" AS ENUM ('pending', 'complete');
 
--- CreateEnum
-CREATE TYPE "Rating" AS ENUM ('one', 'two', 'three', 'four', 'five');
-
 -- CreateTable
 CREATE TABLE "Auth" (
     "id" TEXT NOT NULL,
@@ -128,7 +125,7 @@ CREATE TABLE "Review" (
     "id" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "rating" "Rating" NOT NULL,
+    "rating" INTEGER NOT NULL,
     "idUser" TEXT,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
