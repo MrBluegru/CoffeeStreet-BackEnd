@@ -13,7 +13,7 @@ const { mainAuthToken } = require("../lib/middlewares/authToken");
 
 const router = Router();
 
-router.get("/", [mainAuthToken], getUsers);
+router.get("/", getUsers);
 router.get("/:id", getUserById);
 router.get("/:id/favourites", getUserFavourites);
 router.post("/:id/favourites", addUserFavourites);
