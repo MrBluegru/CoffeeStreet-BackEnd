@@ -6,7 +6,11 @@ const loginRoute = require("./login");
 const cartRoute = require("./cart");
 const orderRoute = require("./order");
 const mercadopago = require("./mercadopago");
+
 const newsletter = require("./newsletter");
+
+const reviewRoute = require("./review");
+
 
 const router = Router();
 
@@ -18,5 +22,7 @@ router.use("/cart", cartRoute);
 router.use("/order", orderRoute);
 router.use("/pay", mercadopago);
 router.use("/newsletter", newsletter);
+router.use("/review", reviewRoute);
+
 
 module.exports = router;

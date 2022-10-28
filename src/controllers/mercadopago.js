@@ -13,7 +13,9 @@ async function check(req, res, next) {
 	try {
 		if (!idUser) return res.status(404).json({ errorMessage: "No user id given" });
 		const user = await usersMethods.findById(idUser);
-		if (!user) return res.status(404).json({ error: "There is no user with this id" });
+		if (!user) return res.status(404).json({ errorMessage: "There is no user with this id" });
+		const authUser = await authMethods.findById(user.idAuth);
+		if (!authUser) return res.status(404).json({ errorMessage: "User not authenticated" });
 
 		const itemsArray = items.map(item => {
 			return {
@@ -27,21 +29,40 @@ async function check(req, res, next) {
 
 		const preference = {
 			items: itemsArray,
+			payer: {
+				name: user.name,
+				surname: user.surname,
+				email: authUser.email,
+				identification: {
+					type: "id",
+					number: user.id
+				}
+			},
 			back_urls: {
 				success: "http://localhost:3001/pay/mercadopago/feedback", // debe cambiarse por ruta deployada
 				failure: "http://localhost:3001/pay/mercadopago/feedback", // debe cambiarse por ruta deployada
 				pending: "http://localhost:3001/pay/mercadopago/feedback" // debe cambiarse por ruta deployada
 			},
-			notification_url: "https://df73-2803-c080-b-69b8-fccc-79af-472a-751c.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
 			auto_return: "approved",
+			payment_methods: {
+				excluded_payment_methods: [
+					{
+						id: "master"
+					}
+				],
+				excluded_payment_types: [
+					{
+						id: "ticket"
+					}
+				],
+				installments: 6
+			},
+			notification_url: "https://4f4a-2803-c080-b-69b8-e9c5-2135-b0d4-4b79.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
 			statement_descriptor: "Coffee Street"
-			// payment_methods: {
-			// 	installments: 3
-			// }
 		};
 
 		await mercadopago.preferences.create(preference).then(function (response) {
-			console.log("idPreference: ", response.body.id);
+			console.log("response.body: ", response.body);
 			res.send(`<a href="${response.body.init_point}">IR A PAGAR</a>`);
 		});
 	} catch (error) {
