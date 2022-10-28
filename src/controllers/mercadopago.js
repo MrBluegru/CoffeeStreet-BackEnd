@@ -55,6 +55,11 @@ async function check(req, res, next) {
 
 		const preference = {
 			items: itemsArray,
+			// back_urls: {
+			// 	success: process.env.HOST + "/pay/", // COMO DEBE DE SER (FRONT)
+			// 	failure: process.env.HOST + "/pay/",
+			// 	pending: process.env.HOST + "/pay/"
+			// },
 			back_urls: {
 				success: "http://localhost:3001/pay/mercadopago/feedback",
 				failure: "http://localhost:3001/pay/mercadopago/feedback",
@@ -161,7 +166,7 @@ async function notification(req, res, next) {
 function feedback(req, res) {
 	const { payment_id, status, merchant_order_id } = req.query;
 
-	res.json({
+	res.status(200).json({
 		Payment: payment_id,
 		Status: status,
 		MerchantOrder: merchant_order_id
