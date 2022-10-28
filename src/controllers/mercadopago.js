@@ -7,34 +7,6 @@ mercadopago.configure({
 	access_token: process.env.MP_ACCESS_TOKEN
 });
 
-// const cart = {
-// 	idUser: "31j43532sadstyeuva221afgkak36714",
-// 	items: [
-// 		{
-// 			id: "342kaqcvfmdpfryoqkfp355sdada2456",
-// 			name: "Irish",
-// 			price: 14,
-// 			quantity: 1
-// 		},
-// 		{
-// 			id: "342kaqcvfmdpfryoqkfsda2567134333",
-// 			name: "Macchiato",
-// 			price: 10,
-// 			quantity: 1
-// 		}
-// 	]
-// };
-
-// const itemsArray = cart.items.map(item => {
-// 	return {
-// 		id: item.id, // id
-// 		title: item.name, // name
-// 		unit_price: item.price, // price
-// 		quantity: item.quantity, // quantity
-// 		currency_id: "ARS"
-// 	};
-// });
-
 async function check(req, res, next) {
 	const { idUser, items } = req.body;
 
