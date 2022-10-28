@@ -4,7 +4,7 @@ const { check, getPaymentById, notification, feedback } = require("../controller
 const router = express.Router();
 
 router.post("/mercadopago/notification", notification);
-router.get("/mercadopago", check);
+router.post("/mercadopago", check);
 // router.get("/mercadopago/:id", getPaymentById);
 router.get("/mercadopago/feedback", feedback);
 

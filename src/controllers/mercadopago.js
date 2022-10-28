@@ -20,7 +20,7 @@ async function check(req, res, next) {
 				id: item.id,
 				title: item.name,
 				unit_price: item.price,
-				quantity: item.quantity,
+				quantity: item.qty,
 				currency_id: "ARS"
 			};
 		});

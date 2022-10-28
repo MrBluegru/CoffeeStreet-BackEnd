@@ -42,8 +42,8 @@ const removeEmailFromNewsletter = async (req, res, next) => {
 		const exist = await prisma.newsletter.findUnique({ where: { email } });
 		if (!exist) return res.status(404).json({ errorMessage: "Email doesn't exist on our newsletter" });
 
-		const added = await prisma.newsletter.delete({ where: { id: exist.id } });
-		if (added) return res.status(200).json({ errorMessage: "Email deleted successfully from our newsletter" });
+		const deleted = await prisma.newsletter.delete({ where: { id: exist.id } });
+		if (deleted) return res.status(200).json({ errorMessage: "Email deleted successfully from our newsletter" });
 		else return res.status(400).json({ errorMessage: "Error on deleting email on newsletter db" });
 	} catch (error) {
 		next(error);
