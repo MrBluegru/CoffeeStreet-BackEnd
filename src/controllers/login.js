@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const prisma = require("../utils/prisma");
 const authMethods = require("../methods/auth");
 const { verifyPassword } = require("../validations/register");
 const { sendEmailForgotPassword } = require("../lib/emails/forgotPasswordEmail");
