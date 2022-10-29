@@ -93,7 +93,8 @@ CREATE TABLE "Attribute" (
 -- CreateTable
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
-    "status" "Status" NOT NULL,
+    "statusDelivery" "Status" NOT NULL,
+    "statusMP" "Status" NOT NULL,
     "total" REAL NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "idUser" TEXT NOT NULL,

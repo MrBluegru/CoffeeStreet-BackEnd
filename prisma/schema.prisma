@@ -69,13 +69,14 @@ model Attribute {
 }
 
 model Order {
-  id            String          @id @default(uuid())
-  status        Status
-  total         Float           @db.Real
-  date          DateTime
-  user          User            @relation(fields: [idUser], references: [id])
-  idUser        String
-  order_product Order_Product[]
+  id             String          @id @default(uuid())
+  statusDelivery Status
+  statusMP       Status
+  total          Float           @db.Real
+  date           DateTime
+  user           User            @relation(fields: [idUser], references: [id])
+  idUser         String
+  order_product  Order_Product[]
 }
 
 model Order_Product {
@@ -211,4 +212,3 @@ enum Status {
   pending
   complete
 }
-
