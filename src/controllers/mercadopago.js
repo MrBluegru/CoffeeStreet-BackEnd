@@ -2,6 +2,7 @@ const mercadopago = require("mercadopago");
 const usersMethods = require("../methods/users");
 const authMethods = require("../methods/auth");
 const axios = require("axios");
+const prisma = require("../utils/prisma");
 
 mercadopago.configure({
 	access_token: process.env.MP_ACCESS_TOKEN
@@ -45,11 +46,11 @@ async function check(req, res, next) {
 			},
 			auto_return: "approved",
 			payment_methods: {
-				excluded_payment_methods: [
-					{
-						id: "master"
-					}
-				],
+				// excluded_payment_methods: [
+				// 	{
+				// 		id: "master"
+				// 	}
+				// ],
 				excluded_payment_types: [
 					{
 						id: "ticket"
@@ -57,12 +58,29 @@ async function check(req, res, next) {
 				],
 				installments: 6
 			},
-			notification_url: "https://4f4a-2803-c080-b-69b8-e9c5-2135-b0d4-4b79.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
+			notification_url: "https://e0a0-2803-c080-b-69b8-cca8-63be-9284-6a94.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
 			statement_descriptor: "Coffee Street"
 		};
 
-		await mercadopago.preferences.create(preference).then(function (response) {
-			console.log("response.body: ", response.body);
+		await mercadopago.preferences.create(preference).then(async function (response) {
+			// console.log("response.body: ", response.body);
+			const pricesArray = response.body?.items.map(item => {
+				return item.quantity * item.unit_price;
+			});
+			let total = 0;
+			for (const element of pricesArray) {
+				total = total + element;
+			}
+			const newOrder = await prisma.order.create({
+				data: {
+					statusDelivery: "pending",
+					statusMP: "pending",
+					total,
+					date: response.body?.date_created,
+					idUser
+				}
+			});
+			console.log(newOrder);
 			res.send(`<a href="${response.body.init_point}">IR A PAGAR</a>`);
 		});
 	} catch (error) {
@@ -110,6 +128,19 @@ async function notification(req, res, next) {
 		}
 
 		console.log("merchantOrder: ", merchantOrder?.body.payments);
+
+		let paidAmount = 0;
+		merchantOrder?.body.payments.forEach(payment => {
+			if (payment.status === "approved") {
+				paidAmount = payment.total_paid_amount;
+			}
+		});
+
+		if (paidAmount >= merchantOrder?.body.total_amount) {
+			console.log("El pago se completó!");
+		} else {
+			console.log("El pago NO se completó!");
+		}
 
 		/*
 	const topic = req.query.topic || req.query.type;
