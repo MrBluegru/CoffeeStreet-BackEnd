@@ -14,12 +14,12 @@ const getUsers = async (req, res, next) => {
 			const user = await usersMethods.findByIdAuth(auth.id);
 			if (!user) return res.status(404).json({ errorMessage: "No user info found" });
 			else return res.status(200).json({ user });
-		} else {
-			const users = await usersMethods.findAll();
-
-			if (users) return res.status(200).json(users);
-			else return res.status(404).json({ errorMessage: "Users Not Found" });
 		}
+		// } else {
+		// 	const users = await usersMethods.findAll();
+
+		// if (users) return res.status(200).json(users);
+		// else return res.status(404).json({ errorMessage: "Users Not Found" });
 	} catch (error) {
 		next(error);
 	}
