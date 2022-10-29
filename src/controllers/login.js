@@ -96,16 +96,17 @@ const forgotPassword = async (req, res, next) => {
 		const token = jwt.sign(auth, process.env.RESET_PASSWORD_KEY, {
 			expiresIn: "20m"
 		});
-
+		console.log(email);
+		console.log(token);
 		// AQUI SE ENVIA CORREO DE FORGOT PASSWORD ---->
-		sendEmailForgotPassword(email, token);
+		sendEmailForgotPassword(token, email);
 
-		await prisma.auth.update({
-			where: { email },
-			data: { password: token }
-		});
+		// await prisma.auth.update({
+		// 	where: { email },
+		// 	data: { password: token }
+		// });
 
-		return res.status(200).json({ error: "Mail sent", token });
+		return res.status(200).json({ message: "Mail sent", token });
 	} catch (error) {
 		next(error);
 	}
