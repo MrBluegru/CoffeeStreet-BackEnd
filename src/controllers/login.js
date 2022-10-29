@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const prisma = require("../utils/prisma");
 const authMethods = require("../methods/auth");
 const { verifyPassword } = require("../validations/register");
 const { sendEmailForgotPassword } = require("../lib/emails/forgotPasswordEmail");
@@ -116,7 +117,7 @@ const resetPassword = async (req, res, next) => {
 	try {
 		jwt.verify(token, process.env.RESET_PASSWORD_KEY, async (err, user) => {
 			if (err) return res.status(404).send({ errorMessage: "Wrong token or expired" });
-			if (verifyPassword(newPassword)) return res.status(404).json({ errorMessage: "Invalid password" });
+			// if (verifyPassword(newPassword)) return res.status(404).json({ errorMessage: "Invalid password" });
 			const { email } = user;
 
 			const authChanged = await authMethods.updatePassword({ email, newPassword });

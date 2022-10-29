@@ -39,9 +39,9 @@ async function check(req, res, next) {
 				}
 			},
 			back_urls: {
-				success: "http://localhost:3001/pay/mercadopago/feedback", // debe cambiarse por ruta deployada
-				failure: "http://localhost:3001/pay/mercadopago/feedback", // debe cambiarse por ruta deployada
-				pending: "http://localhost:3001/pay/mercadopago/feedback" // debe cambiarse por ruta deployada
+				success: "http://localhost:3000/menu", // debe cambiarse por ruta deployada
+				failure: "http://localhost:3000/menu", // debe cambiarse por ruta deployada
+				pending: "http://localhost:3000/menu" // debe cambiarse por ruta deployada
 			},
 			auto_return: "approved",
 			payment_methods: {

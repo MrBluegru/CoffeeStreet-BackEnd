@@ -38,7 +38,6 @@ const createReview = async (req, res, next) => {
 	}
 };
 
-
 const updateDescription = async (req, res, next) => {
 	const { id } = req.params; //id de la review
 	const { description } = req.body;
@@ -50,8 +49,8 @@ const updateDescription = async (req, res, next) => {
 		if (!description || typeof description !== "string")
 			return res.status(400).json({ errorMessage: "Please enter a valid description" });
 
-		if (review.description === description)
-			return res.status(400).json({ errorMessage: "Please enter a different description" });
+		// if (review.description === description)
+		// 	return res.status(400).json({ errorMessage: "Please enter a different description" });
 
 		const date = new Date();
 		const updatedDescription = await prisma.review.update({
@@ -65,7 +64,6 @@ const updateDescription = async (req, res, next) => {
 		});
 
 		return res.json({ msg: "The description has changed succesfully", updatedDescription });
-
 	} catch (error) {
 		next(error);
 	}
@@ -83,7 +81,7 @@ const updateRating = async (req, res, next) => {
 		if (typeof rating !== "number" || !(rating > 0 && rating < 6))
 			return res.status(400).json({ errorMessage: "Please enter a valid rating" });
 
-		if (review.rating === rating) return res.status(400).json({ errorMessage: "Please enter a different rating" });
+		// if (review.rating === rating) return res.status(400).json({ errorMessage: "Please enter a different rating" });
 
 		const date = new Date();
 		const updatedRating = await prisma.review.update({
@@ -113,10 +111,9 @@ const removeReview = async (req, res, next) => {
 			where: {
 				id
 			}
-		})
+		});
 
 		return res.json({ msg: "The review has deleted succesfully", deletedReview });
-
 	} catch (error) {
 		next(error);
 	}
