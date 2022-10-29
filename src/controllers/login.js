@@ -105,7 +105,7 @@ const forgotPassword = async (req, res, next) => {
 			data: { password: token }
 		});
 
-		return res.status(200).json({ errorMessage: "Mail sent", token });
+		return res.status(200).json({ error: "Mail sent", token });
 	} catch (error) {
 		next(error);
 	}
