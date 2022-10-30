@@ -35,8 +35,8 @@ const createOrder = async (statusMP, statusDelivery, idUser, total, ordersByProd
 			await prisma.order_Product.create({
 				data: {
 					quantity: el.quantity,
-					total: el.total,
-					idProduct: el.idProduct,
+					total: el.quantity * el.unit_price,
+					idProduct: el.id,
 					idOrder: createdOrder.id
 				}
 			})
@@ -47,6 +47,7 @@ const createOrder = async (statusMP, statusDelivery, idUser, total, ordersByProd
 	});
 
 	const orderToSend = {
+		id: createdOrder.id,
 		name: userOrderInfo.user.name,
 		surname: userOrderInfo.user.surname,
 		email: userOrderInfo.user.auth.email,
@@ -58,12 +59,12 @@ const createOrder = async (statusMP, statusDelivery, idUser, total, ordersByProd
 
 	sendEmailOrderInfo(orderToSend.email, orderToSend);
 
-	const infoOrder = {
+	const orderInfo = {
 		order: orderToSend,
 		orderProducts: createdOrderProducts
 	};
 
-	return infoOrder;
+	return orderInfo;
 };
 
 module.exports = { createOrder };

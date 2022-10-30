@@ -80,14 +80,13 @@ model Order {
 }
 
 model Order_Product {
+  id        String  @id @default(uuid())
   quantity  Int
   total     Float   @db.Real
   product   Product @relation(fields: [idProduct], references: [id])
   idProduct String
   order     Order   @relation(fields: [idOrder], references: [id])
   idOrder   String
-
-  @@id([idProduct, idOrder])
 }
 
 model Favourite_Product {

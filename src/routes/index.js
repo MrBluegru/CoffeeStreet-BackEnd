@@ -6,16 +6,16 @@ const loginRoute = require("./login");
 const cartRoute = require("./cart");
 const orderRoute = require("./order");
 const mercadopago = require("./mercadopago");
-const adminRoute = require("./admin");
-
 const newsletter = require("./newsletter");
-
 const reviewRoute = require("./review");
+const adminRoute = require("./admin");
+const discountRoute = require("./discounts");
 
 const router = Router();
 
 router.use("/users", usersRoute);
 router.use("/products", productsRoute);
+router.use("/discount", discountRoute);
 router.use("/register", registerRoute);
 router.use("/login", loginRoute);
 router.use("/cart", cartRoute);

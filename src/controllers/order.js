@@ -99,28 +99,30 @@ const prisma = require("../utils/prisma");
 
 const changeStatus = async (req, res, next) => {
 	const { id } = req.params;
-	const { status } = req.body;
+	const { statusDelivery } = req.body;
+
 	try {
-		if (status === "pending" || status === "complete") {
-			const foundOrder = await prisma.order.findUnique({
-				where: {
-					id
-				}
-			});
-			if (foundOrder) {
-				if (status !== foundOrder.status) {
-					const updatedStatus = await prisma.order.update({
-						where: {
-							id
-						},
-						data: {
-							status
-						}
-					});
-					return res.status(200).json({ message: `The status was changed successfully to ${status}`, updatedStatus });
-				} else return res.status(400).json({ errorMessage: "Please enter a different status" });
-			} else return res.status(404).json({ errorMessage: "The order is not exist" });
-		} else return res.status(400).json({ errorMessage: "Please enter a valid status" });
+		const foundOrder = await prisma.order.findUnique({
+			where: {
+				id
+			}
+		});
+		if (!foundOrder) return res.status(404).json({ errorMessage: "There is no order with that id" });
+		if (statusDelivery !== "pending" && statusDelivery !== "complete")
+			return res.status(400).json({ errorMessage: "Please enter a valid statusDelivery" });
+		if (statusDelivery === foundOrder.statusDelivery)
+			return res.status(400).json({ errorMessage: "Please enter a different statusDelivery" });
+		const updatedStatus = await prisma.order.update({
+			where: {
+				id
+			},
+			data: {
+				statusDelivery
+			}
+		});
+		return res
+			.status(200)
+			.json({ message: `The statusDelivery has been updated successfully to '${statusDelivery}'`, updatedStatus });
 	} catch (error) {
 		next(error);
 	}
