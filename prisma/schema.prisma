@@ -69,24 +69,24 @@ model Attribute {
 }
 
 model Order {
-  id            String          @id @default(uuid())
-  status        Status
-  total         Float           @db.Real
-  date          DateTime
-  user          User            @relation(fields: [idUser], references: [id])
-  idUser        String
-  order_product Order_Product[]
+  id             String          @id @default(uuid())
+  statusDelivery Status
+  statusMP       Status
+  total          Float           @db.Real
+  date           DateTime
+  user           User            @relation(fields: [idUser], references: [id])
+  idUser         String
+  order_product  Order_Product[]
 }
 
 model Order_Product {
+  id        String  @id @default(uuid())
   quantity  Int
   total     Float   @db.Real
   product   Product @relation(fields: [idProduct], references: [id])
   idProduct String
   order     Order   @relation(fields: [idOrder], references: [id])
   idOrder   String
-
-  @@id([idProduct, idOrder])
 }
 
 model Favourite_Product {
@@ -101,7 +101,7 @@ model Review {
   id          String   @id @default(uuid())
   description String
   date        DateTime
-  rating      Rating
+  rating      Int
   user        User?    @relation(fields: [idUser], references: [id])
   idUser      String?
 }
@@ -124,6 +124,11 @@ model Cart_Product {
   idProduct String
   cart      Cart    @relation(fields: [idCart], references: [id])
   idCart    String
+}
+
+model Newsletter {
+  id    String @id @default(uuid())
+  email String @unique
 }
 
 enum Role {
@@ -205,12 +210,4 @@ enum Percentage {
 enum Status {
   pending
   complete
-}
-
-enum Rating {
-  one
-  two
-  three
-  four
-  five
 }

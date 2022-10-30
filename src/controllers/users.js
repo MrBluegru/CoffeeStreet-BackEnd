@@ -4,9 +4,8 @@ const usersMethods = require("../methods/users");
 const productsMethods = require("../methods/products");
 const { verifyData, verifyDatatypes, verifyNameLength, verifySurnameLength } = require("../validations/users");
 
-const getUser = async (req, res, next) => {
+const getUsers = async (req, res, next) => {
 	const { email } = req.body;
-	if (!email) return res.status(404).json({ errorMessage: "Not email given" });
 
 	try {
 		if (email) {
@@ -15,12 +14,12 @@ const getUser = async (req, res, next) => {
 			const user = await usersMethods.findByIdAuth(auth.id);
 			if (!user) return res.status(404).json({ errorMessage: "No user info found" });
 			else return res.status(200).json({ user });
-			// } else {
-			// 	const users = await usersMethods.findAll();
-
-			// 	if (users) return res.status(200).json(users);
-			// 	else return res.status(404).json({ errorMessage: "Users Not Found" });
 		}
+		// } else {
+		// 	const users = await usersMethods.findAll();
+
+		// if (users) return res.status(200).json(users);
+		// else return res.status(404).json({ errorMessage: "Users Not Found" });
 	} catch (error) {
 		next(error);
 	}
@@ -289,7 +288,7 @@ const updateUser = async (req, res) => {
 };
 
 module.exports = {
-	getUser,
+	getUsers,
 	getUserById,
 	getUserFavourites,
 	addUserFavourites,
