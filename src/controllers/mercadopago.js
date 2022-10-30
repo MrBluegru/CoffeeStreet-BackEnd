@@ -3,6 +3,7 @@ const usersMethods = require("../methods/users");
 const authMethods = require("../methods/auth");
 const axios = require("axios");
 const prisma = require("../utils/prisma");
+const { createOrder } = require("../methods/order");
 
 mercadopago.configure({
 	access_token: process.env.MP_ACCESS_TOKEN
@@ -28,6 +29,16 @@ async function check(req, res, next) {
 			};
 		});
 
+		const pricesArray = itemsArray.map(item => {
+			return item.quantity * item.unit_price;
+		});
+		let total = 0;
+		for (const element of pricesArray) {
+			total = total + element;
+		}
+
+		const { order } = await createOrder("pending", "pending", idUser, total, itemsArray);
+
 		const preference = {
 			items: itemsArray,
 			payer: {
@@ -46,11 +57,6 @@ async function check(req, res, next) {
 			},
 			auto_return: "approved",
 			payment_methods: {
-				// excluded_payment_methods: [
-				// 	{
-				// 		id: "master"
-				// 	}
-				// ],
 				excluded_payment_types: [
 					{
 						id: "ticket"
@@ -59,29 +65,12 @@ async function check(req, res, next) {
 				installments: 6
 			},
 			notification_url: "https://e0a0-2803-c080-b-69b8-cca8-63be-9284-6a94.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
-			statement_descriptor: "Coffee Street"
+			statement_descriptor: "Coffee Street",
+			external_reference: order.id
 		};
 
 		await mercadopago.preferences.create(preference).then(async function (response) {
-			// console.log("response.body: ", response.body);
-			const pricesArray = response.body?.items.map(item => {
-				return item.quantity * item.unit_price;
-			});
-			let total = 0;
-			for (const element of pricesArray) {
-				total = total + element;
-			}
-			const newOrder = await prisma.order.create({
-				data: {
-					statusDelivery: "pending",
-					statusMP: "pending",
-					total,
-					date: response.body?.date_created,
-					idUser
-				}
-			});
-			console.log(newOrder);
-			res.send(`<a href="${response.body.init_point}">IR A PAGAR</a>`);
+			return res.status(200).json({ initPointMP: response.body.init_point });
 		});
 	} catch (error) {
 		next(error);
@@ -105,29 +94,29 @@ async function check(req, res, next) {
 // }
 
 async function notification(req, res, next) {
-	const { query } = req;
-	console.log({ query });
+	const { query, body } = req;
 	const topic = query.topic;
+	console.log({ body: body });
 
 	try {
 		let merchantOrder;
 		switch (topic) {
 			case "payment":
 				const paymentId = query.id;
-				console.log(topic, "getting payment", paymentId);
+				// console.log(topic, "getting payment", paymentId);
 				const payment = await mercadopago.payment.findById(paymentId);
 				// console.log("payment.body: ", payment.body);
 				merchantOrder = await mercadopago.merchant_orders.findById(payment.body.order.id);
 				break;
 			case "merchant_order":
 				const orderId = query.id;
-				console.log(topic, "getting merchant order", orderId);
+				// console.log(topic, "getting merchant order", orderId);
 				merchantOrder = await mercadopago.merchant_orders.findById(orderId);
 			default:
 				break;
 		}
 
-		console.log("merchantOrder: ", merchantOrder?.body.payments);
+		console.log("merchantOrder: ", merchantOrder?.body);
 
 		let paidAmount = 0;
 		merchantOrder?.body.payments.forEach(payment => {
@@ -138,58 +127,31 @@ async function notification(req, res, next) {
 
 		if (paidAmount >= merchantOrder?.body.total_amount) {
 			console.log("El pago se completó!");
+			await prisma.order.update({
+				where: {
+					id: merchantOrder.body?.external_reference
+				},
+				data: {
+					statusMP: "complete"
+				}
+			});
 		} else {
 			console.log("El pago NO se completó!");
+			return res.status(200).json({ errorMessage: "The payment has not been completed" });
 		}
-
-		/*
-	const topic = req.query.topic || req.query.type;
-
-	try {
-		let merchantOrder;
-		switch (topic) {
-			case "payment":
-				const paymentId = req.query.id || req.query["data.id"];
-				const payment = await mercadopago.payment.findById(paymentId);
-				merchantOrder = await mercadopago.merchant_orders.findById(payment.body.order.id);
-				const info = await axios.get(
-					`https://api.mercadopago.com/checkout/preferences/${merchantOrder.body.preference_id}`,
-					{
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
-						}
-					}
-				);
-
-				console.log(info);
-				// const auth = await authMethods.emailVerify(info.payer.email);
-				// if (payment.body.status === "approved") {
-				// 	console.log("estoy approved");
-				// 	console.log(auth);
-				// 	//CREAR ORDEN
-				// }
-				break;
-
-			default:
-				break;
-		}
-		*/
-
-		res.status(200).send();
 	} catch (error) {
-		console.log("catch: ", error);
+		next(error);
 	}
 }
 
-function feedback(req, res) {
-	const { payment_id, status, merchant_order_id } = req.query;
+// function feedback(req, res) {
+// 	const { payment_id, status, merchant_order_id } = req.query;
 
-	res.status(200).json({
-		Payment: payment_id,
-		Status: status,
-		MerchantOrder: merchant_order_id
-	});
-}
+// 	return res.status(200).json({
+// 		Payment: payment_id,
+// 		Status: status,
+// 		MerchantOrder: merchant_order_id
+// 	});
+// }
 
-module.exports = { check, notification, feedback };
+module.exports = { check, notification };

@@ -19,9 +19,10 @@ const saveEmailOnNewsletter = async (req, res, next) => {
 
 const createNewsletter = async (req, res, next) => {
 	const { description, title, image } = req.body;
+	console.log({ description, title, image });
 	try {
-		if (!description || typeof description !== "string" || !title || typeof title !== "string") {
-			if (!image || typeof image !== "string") {
+		if (description || typeof description === "string" || title || typeof title === "string") {
+			if (image || typeof image === "string") {
 				// nodemailer a todos los emails de newsletter table
 				// todavía no está finalizada
 
