@@ -104,12 +104,13 @@ CREATE TABLE "Order" (
 
 -- CreateTable
 CREATE TABLE "Order_Product" (
+    "id" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "total" REAL NOT NULL,
     "idProduct" TEXT NOT NULL,
     "idOrder" TEXT NOT NULL,
 
-    CONSTRAINT "Order_Product_pkey" PRIMARY KEY ("idProduct","idOrder")
+    CONSTRAINT "Order_Product_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
