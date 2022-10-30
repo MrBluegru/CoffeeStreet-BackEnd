@@ -3,6 +3,7 @@ const usersMethods = require("../methods/users");
 const authMethods = require("../methods/auth");
 const axios = require("axios");
 const prisma = require("../utils/prisma");
+const { createOrder } = require("../methods/order");
 
 mercadopago.configure({
 	access_token: process.env.MP_ACCESS_TOKEN
@@ -46,11 +47,6 @@ async function check(req, res, next) {
 			},
 			auto_return: "approved",
 			payment_methods: {
-				// excluded_payment_methods: [
-				// 	{
-				// 		id: "master"
-				// 	}
-				// ],
 				excluded_payment_types: [
 					{
 						id: "ticket"
@@ -71,17 +67,8 @@ async function check(req, res, next) {
 			for (const element of pricesArray) {
 				total = total + element;
 			}
-			const newOrder = await prisma.order.create({
-				data: {
-					statusDelivery: "pending",
-					statusMP: "pending",
-					total,
-					date: response.body?.date_created,
-					idUser
-				}
-			});
-			console.log(newOrder);
-			res.send(`<a href="${response.body.init_point}">IR A PAGAR</a>`);
+			createOrder("pending", "pending", idUser, total, response.body?.items);
+			return res.status(200).json({ initPointMP: response.body.init_point });
 		});
 	} catch (error) {
 		next(error);
@@ -176,7 +163,7 @@ async function notification(req, res, next) {
 		}
 		*/
 
-		res.status(200).send();
+		return res.status(200).send();
 	} catch (error) {
 		console.log("catch: ", error);
 	}
@@ -185,7 +172,7 @@ async function notification(req, res, next) {
 function feedback(req, res) {
 	const { payment_id, status, merchant_order_id } = req.query;
 
-	res.status(200).json({
+	return res.status(200).json({
 		Payment: payment_id,
 		Status: status,
 		MerchantOrder: merchant_order_id

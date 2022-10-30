@@ -19,7 +19,5 @@ router.post("/", createProduct);
 router.put("/:id", updateProduct);
 router.delete("/:id", deleteProduct);
 router.put("/:id/stock", updateStockOfProduct);
-router.post("/discount", getProductsWithDiscount);
-router.post("/update-discount", updateDiscountOfProduct);
 
 module.exports = router;

@@ -4,7 +4,19 @@ const getReviews = async (req, res, next) => {
 	try {
 		const reviews = await prisma.review.findMany();
 		if (!reviews) return res.status(200).json({ msg: "No reviews" });
-		res.status(200).json(reviews);
+		const data = await Promise.all(
+			reviews.map(async e => {
+				const dataUser = await prisma.user.findFirst({ where: { id: e.idUser } });
+				return {
+					id: e.id,
+					description: e.description,
+					date: e.date,
+					rating: e.rating,
+					fullname: dataUser.name + " " + dataUser.surname
+				};
+			})
+		);
+		res.status(200).json(data);
 	} catch (error) {
 		next(error);
 	}
