@@ -21,8 +21,8 @@ const findAllOrders = async () => {
 	return orders;
 };
 
-const findOrderById = id => {
-	const orderId = prisma.order.findUnique({
+const findOrderById = async id => {
+	const orderId = await prisma.order.findUnique({
 		where: {
 			id: id
 		},
@@ -44,8 +44,8 @@ const findOrderById = id => {
 	return orderId;
 };
 
-const findOrdersByUser = id => {
-	const userOrders = prisma.order.findMany({
+const findOrdersByUser = async id => {
+	const userOrders = await prisma.order.findMany({
 		where: {
 			idUser: id
 		},
