@@ -47,6 +47,7 @@ const createOrder = async (statusMP, statusDelivery, idUser, total, ordersByProd
 	});
 
 	const orderToSend = {
+		id: createdOrder.id,
 		name: userOrderInfo.user.name,
 		surname: userOrderInfo.user.surname,
 		email: userOrderInfo.user.auth.email,
