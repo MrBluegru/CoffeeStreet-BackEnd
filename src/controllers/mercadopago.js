@@ -140,7 +140,7 @@ async function notification(req, res, next) {
 			return res.status(200).json({ errorMessage: "The payment has not been completed" });
 		}
 	} catch (error) {
-		console.log("catch: ", error);
+		next(error);
 	}
 }
 
