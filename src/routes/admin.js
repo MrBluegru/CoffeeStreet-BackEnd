@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const router = Router();
-const { getUserNameQuery } = require("../controllers/admin");
+const { getUsers } = require("../controllers/admin");
 
-router.get("/users/", getUserNameQuery);
+router.get("/users/", getUsers);
 
 module.exports = router;

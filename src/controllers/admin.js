@@ -1,7 +1,7 @@
 const prisma = require("../utils/prisma");
 const usersMethods = require("../methods/users");
 
-const getUserNameQuery = async (req, res) => {
+const getUsers = async (req, res) => {
 	const { name } = req.query;
 	try {
 		if (name) {
@@ -26,4 +26,4 @@ const getUserNameQuery = async (req, res) => {
 	}
 };
 
-module.exports = { getUserNameQuery };
+module.exports = { getUsers };
