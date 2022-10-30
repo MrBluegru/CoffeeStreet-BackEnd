@@ -3,7 +3,7 @@ const usersMethods = require("../methods/users");
 const authMethods = require("../methods/auth");
 const axios = require("axios");
 const prisma = require("../utils/prisma");
-const { createOrder } = require("../methods/order");
+const { createOrder } = require("../methods/orders");
 
 mercadopago.configure({
 	access_token: process.env.MP_ACCESS_TOKEN
@@ -21,7 +21,7 @@ async function check(req, res, next) {
 
 		const itemsArray = items.map(item => {
 			return {
-				id: item.id,
+				id: item.idProduct,
 				title: item.name,
 				unit_price: item.price,
 				quantity: item.qty,
@@ -64,7 +64,7 @@ async function check(req, res, next) {
 				],
 				installments: 6
 			},
-			notification_url: "https://e0a0-2803-c080-b-69b8-cca8-63be-9284-6a94.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
+			notification_url: "https://a385-2803-c080-b-69b8-44a-6feb-557e-41f5.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
 			statement_descriptor: "Coffee Street",
 			external_reference: order.id
 		};
@@ -77,39 +77,25 @@ async function check(req, res, next) {
 	}
 }
 
+// async function getPaymentById(req, res, next) {
+// 	const { id } = req.params;
 
-async function feedback(req, res, next) {
-	const { payment_id, status, merchant_order_id } = req.query;
-	console.log("holita");
-
-	return res.status(200).json({
-		Payment: payment_id,
-		Status: status,
-		MerchantOrder: merchant_order_id
-	});
-}
-
-async function getPaymentById(req, res, next) {
-	const { id } = req.params;
-
-	try {
-		const payment = await axios.get(`https://api.mercadopago.com/v1/payments/${id}`, {
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
-			}
-		});
-		res.status(200).json(payment.data);
-	} catch (error) {
-		next(error);
-	}
-}
-
+// 	try {
+// 		const payment = await axios.get(`https://api.mercadopago.com/v1/payments/${id}`, {
+// 			headers: {
+// 				"Content-Type": "application/json",
+// 				Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
+// 			}
+// 		});
+// 		res.status(200).json(payment.data);
+// 	} catch (error) {
+// 		next(error);
+// 	}
+// }
 
 async function notification(req, res, next) {
-	const { query, body } = req;
+	const { query } = req;
 	const topic = query.topic;
-	console.log({ body: body });
 
 	try {
 		let merchantOrder;
@@ -120,26 +106,6 @@ async function notification(req, res, next) {
 				const payment = await mercadopago.payment.findById(paymentId);
 				// console.log("payment.body: ", payment.body);
 				merchantOrder = await mercadopago.merchant_orders.findById(payment.body.order.id);
-
-				console.log(merchantOrder);
-				// const info = await axios.get(
-				// 	`https://api.mercadopago.com/checkout/preferences/${merchantOrder.body.preference_id}`,
-				// 	{
-				// 		headers: {
-				// 			"Content-Type": "application/json",
-				// 			Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
-				// 		}
-				// 	}
-				// );
-
-				return res.status(200).json(merchantOrder);
-				// const auth = await authMethods.emailVerify(info.payer.email);
-				// if (payment.body.status === "approved") {
-				// 	console.log("estoy approved");
-				// 	console.log(auth);
-				// 	//CREAR ORDEN
-				// }
-
 				break;
 			case "merchant_order":
 				const orderId = query.id;
@@ -148,8 +114,6 @@ async function notification(req, res, next) {
 			default:
 				break;
 		}
-
-		console.log("merchantOrder: ", merchantOrder?.body);
 
 		let paidAmount = 0;
 		merchantOrder?.body.payments.forEach(payment => {
@@ -168,13 +132,11 @@ async function notification(req, res, next) {
 					statusMP: "complete"
 				}
 			});
+			return res.status(200).json({ message: "The payment has been completed successfully" });
 		} else {
 			console.log("El pago NO se completó!");
 			return res.status(200).json({ errorMessage: "The payment has not been completed" });
 		}
-
-		return res.status(200).send("Holi");
-
 	} catch (error) {
 		next(error);
 	}
