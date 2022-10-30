@@ -1,5 +1,6 @@
 const prisma = require("../utils/prisma");
 const authMethods = require("../methods/auth");
+const bcrypt = require("bcrypt");
 const { verifyName, verifySurname, verifyValidEmail, verifyPassword, verifyImage } = require("../validations/register");
 const { sendEmailRegister } = require("../lib/emails/registerEmail");
 
@@ -88,4 +89,22 @@ const checkEmail = async (req, res, next) => {
 	}
 };
 
-module.exports = { register, checkEmail };
+const checkPassword = async (req, res, next) => {
+	const { password } = req.query;
+
+	if (!password) return res.status(404).json({ errorMessage: "No password sent" });
+
+	try {
+		const auth = await prisma.auth.findFirst({ where: { password } });
+		const pass_compare = await bcrypt.compare(password, auth.password);
+		if (pass_compare) {
+			return res.status(200).send({ password: true });
+		}
+
+		return res.status(200).send({ password: false });
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { register, checkEmail, checkPassword };
