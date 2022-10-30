@@ -1,5 +1,4 @@
 const { Router } = require("express");
-
 const {
 	getProducts,
 	getProductById,
@@ -10,7 +9,6 @@ const {
 	getProductsWithDiscount,
 	updateDiscountOfProduct
 } = require("../controllers/products");
-
 const router = Router();
 
 router.get("/", getProducts);
