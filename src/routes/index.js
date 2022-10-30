@@ -8,6 +8,7 @@ const orderRoute = require("./order");
 const mercadopago = require("./mercadopago");
 const newsletter = require("./newsletter");
 const reviewRoute = require("./review");
+const adminRoute = require("./admin");
 const discountRoute = require("./discounts");
 
 const router = Router();
@@ -22,5 +23,6 @@ router.use("/order", orderRoute);
 router.use("/pay", mercadopago);
 router.use("/newsletter", newsletter);
 router.use("/review", reviewRoute);
+router.use("/admin", adminRoute);
 
 module.exports = router;
