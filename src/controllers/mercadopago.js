@@ -21,7 +21,7 @@ async function check(req, res, next) {
 
 		const itemsArray = items.map(item => {
 			return {
-				id: item.id,
+				id: item.idProduct,
 				title: item.name,
 				unit_price: item.price,
 				quantity: item.qty,
