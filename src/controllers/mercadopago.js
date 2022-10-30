@@ -77,21 +77,34 @@ async function check(req, res, next) {
 	}
 }
 
-// async function getPaymentById(req, res, next) {
-// 	const { id } = req.params;
 
-// 	try {
-// 		const payment = await axios.get(`https://api.mercadopago.com/v1/payments/${id}`, {
-// 			headers: {
-// 				"Content-Type": "application/json",
-// 				Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
-// 			}
-// 		});
-// 		res.status(200).json(payment.data);
-// 	} catch (error) {
-// 		next(error);
-// 	}
-// }
+async function feedback(req, res, next) {
+	const { payment_id, status, merchant_order_id } = req.query;
+	console.log("holita");
+
+	return res.status(200).json({
+		Payment: payment_id,
+		Status: status,
+		MerchantOrder: merchant_order_id
+	});
+}
+
+async function getPaymentById(req, res, next) {
+	const { id } = req.params;
+
+	try {
+		const payment = await axios.get(`https://api.mercadopago.com/v1/payments/${id}`, {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
+			}
+		});
+		res.status(200).json(payment.data);
+	} catch (error) {
+		next(error);
+	}
+}
+
 
 async function notification(req, res, next) {
 	const { query, body } = req;
@@ -107,6 +120,26 @@ async function notification(req, res, next) {
 				const payment = await mercadopago.payment.findById(paymentId);
 				// console.log("payment.body: ", payment.body);
 				merchantOrder = await mercadopago.merchant_orders.findById(payment.body.order.id);
+
+				console.log(merchantOrder);
+				// const info = await axios.get(
+				// 	`https://api.mercadopago.com/checkout/preferences/${merchantOrder.body.preference_id}`,
+				// 	{
+				// 		headers: {
+				// 			"Content-Type": "application/json",
+				// 			Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
+				// 		}
+				// 	}
+				// );
+
+				return res.status(200).json(merchantOrder);
+				// const auth = await authMethods.emailVerify(info.payer.email);
+				// if (payment.body.status === "approved") {
+				// 	console.log("estoy approved");
+				// 	console.log(auth);
+				// 	//CREAR ORDEN
+				// }
+
 				break;
 			case "merchant_order":
 				const orderId = query.id;
@@ -139,6 +172,9 @@ async function notification(req, res, next) {
 			console.log("El pago NO se completó!");
 			return res.status(200).json({ errorMessage: "The payment has not been completed" });
 		}
+
+		return res.status(200).send("Holi");
+
 	} catch (error) {
 		next(error);
 	}
