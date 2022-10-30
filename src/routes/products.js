@@ -5,9 +5,7 @@ const {
 	createProduct,
 	updateProduct,
 	deleteProduct,
-	updateStockOfProduct,
-	getProductsWithDiscount,
-	updateDiscountOfProduct
+	updateStockOfProduct
 } = require("../controllers/products");
 const router = Router();
 
