@@ -1,20 +1,28 @@
 const prisma = require("../utils/prisma");
-const adminMethods = require("../methods/admin");
 const usersMethods = require("../methods/users");
 
-const getUserNameQuery = () => {
+const getUserNameQuery = async (req, res) => {
 	const { name } = req.query;
 	try {
-		if (!name) {
-			res.status(404).json({ errorMessage: "" });
+		if (name) {
+			const nameUsers = await prisma.user.findMany({
+				where: {
+					name: {
+						contains: name,
+						mode: "insensitive"
+					}
+				}
+			});
+			if (nameUsers.length) res.status(200).json(nameUsers);
+			else res.status(200).json({ errorMessage: "There is no users with that name" });
 		} else {
-			const foundUsersAll = usersMethods.getAllUsers();
-			const UsersFilterQuery = foundUsersAll.filter(el => el.name.toLowerCase().includes(name.toLowerCase()));
+			const usersFound = await usersMethods.findAll();
 
-			!UsersFilterQuery ? res.status(404).json({ errorMessage: "" }) : res.status(200).json({ UsersFilterQuery });
+			if (usersFound) res.status(200).json(usersFound);
+			else res.status(404).json({ errorMessage: "User Not Found" });
 		}
 	} catch (err) {
-		res.status(404).json({ errorMessage: "" });
+		throw new Error({ errorMessage: err });
 	}
 };
 

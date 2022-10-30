@@ -6,11 +6,11 @@ const loginRoute = require("./login");
 const cartRoute = require("./cart");
 const orderRoute = require("./order");
 const mercadopago = require("./mercadopago");
+const adminRoute = require("./admin");
 
 const newsletter = require("./newsletter");
 
 const reviewRoute = require("./review");
-
 
 const router = Router();
 
@@ -23,6 +23,6 @@ router.use("/order", orderRoute);
 router.use("/pay", mercadopago);
 router.use("/newsletter", newsletter);
 router.use("/review", reviewRoute);
-
+router.use("/admin", adminRoute);
 
 module.exports = router;
