@@ -4,7 +4,6 @@ const { getAllOrders, getOrdersByUser, getOrderById } = require("../controllers/
 
 const router = Router();
 
-
 router.get("/", getAllOrders);
 router.get("/user/:id", getOrdersByUser);
 router.get("/:id", getOrderById);
