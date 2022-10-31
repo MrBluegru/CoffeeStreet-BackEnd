@@ -10,7 +10,6 @@ const {
 	updateUser
 } = require("../controllers/users");
 const { mainAuthToken } = require("../lib/middlewares/authToken");
-
 const router = Router();
 
 router.get("/", [mainAuthToken], getUsers);

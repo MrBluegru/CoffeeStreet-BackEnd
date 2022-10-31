@@ -59,6 +59,7 @@ const getOrdersByUser = async (req, res) => {
 const changeStatus = async (req, res, next) => {
 	const { id } = req.params;
 	const { statusDelivery } = req.body;
+
 	try {
 		const foundOrder = await prisma.order.findUnique({
 			where: {
@@ -78,6 +79,7 @@ const changeStatus = async (req, res, next) => {
 				statusDelivery
 			}
 		});
+
 		const userInfo = await prisma.user.findUnique({
 			where: {
 				id: updatedStatus.idUser
@@ -94,6 +96,8 @@ const changeStatus = async (req, res, next) => {
 		if (statusDelivery === "complete") {
 			sendOrderDeliver(userInfo.auth.email, userInfo);
 		}
+
+
 
 		return res
 			.status(200)

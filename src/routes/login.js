@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { login, logout, refresh, forgotPassword, resetPassword } = require("../controllers/login");
-const router = Router();
 const { secondAuthToken, thirdAuthToken, mainAuthToken } = require("../lib/middlewares/authToken");
+const router = Router();
 
 router.post("/", login);
 router.post("/refresh", [secondAuthToken], refresh);
