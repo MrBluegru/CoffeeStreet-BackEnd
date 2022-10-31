@@ -77,6 +77,33 @@ async function check(req, res, next) {
 	}
 }
 
+async function feedback(req, res, next) {
+	const { payment_id, status, merchant_order_id } = req.query;
+	console.log("holita");
+
+	return res.status(200).json({
+		Payment: payment_id,
+		Status: status,
+		MerchantOrder: merchant_order_id
+	});
+}
+
+async function getPaymentById(req, res, next) {
+	const { id } = req.params;
+
+	try {
+		const payment = await axios.get(`https://api.mercadopago.com/v1/payments/${id}`, {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
+			}
+		});
+		res.status(200).json(payment.data);
+	} catch (error) {
+		next(error);
+	}
+}
+
 // async function getPaymentById(req, res, next) {
 // 	const { id } = req.params;
 
@@ -92,6 +119,7 @@ async function check(req, res, next) {
 // 		next(error);
 // 	}
 // }
+
 
 async function notification(req, res, next) {
 	const { query } = req;
@@ -137,6 +165,9 @@ async function notification(req, res, next) {
 			console.log("El pago NO se completó!");
 			return res.status(200).json({ errorMessage: "The payment has not been completed" });
 		}
+
+		return res.status(200).send("Holi");
+
 	} catch (error) {
 		next(error);
 	}
