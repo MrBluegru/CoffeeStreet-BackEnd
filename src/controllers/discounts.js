@@ -7,7 +7,7 @@ const getProductsWithDiscount = async (req, res, next) => {
 				state: "active"
 			}
 		});
-		const discountedProducts = products.filter(e => typeof e.discount === "number");
+		const discountedProducts = products.filter(e => typeof e.discount === "number" && e.discount > 0);
 		if (discountedProducts.length === 0) {
 			return res.status(200).json({ message: "There are not discounted products" });
 		} else return res.status(200).json(discountedProducts);
