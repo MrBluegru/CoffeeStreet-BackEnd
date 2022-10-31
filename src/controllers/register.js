@@ -91,11 +91,13 @@ const checkEmail = async (req, res, next) => {
 
 const checkPassword = async (req, res, next) => {
 	const { password } = req.query;
+	const { email } = req.body;
 
 	if (!password) return res.status(404).json({ errorMessage: "No password sent" });
 
 	try {
-		const auth = await prisma.auth.findFirst({ where: { password } });
+		const auth = await prisma.auth.findFirst({ where: { email } });
+
 		const pass_compare = await bcrypt.compare(password, auth.password);
 		if (pass_compare) {
 			return res.status(200).send({ password: true });
