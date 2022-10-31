@@ -10,7 +10,6 @@ const newsletter = require("./newsletter");
 const reviewRoute = require("./review");
 const adminRoute = require("./admin");
 const discountRoute = require("./discounts");
-
 const router = Router();
 
 router.use("/users", usersRoute);
