@@ -65,12 +65,11 @@ const findOrdersByUser = async id => {
 };
 
 const createOrder = async (statusMP, statusDelivery, idUser, total, ordersByProduct) => {
-
 	const user = await prisma.user.findUnique({ where: { id: idUser } });
 	if (user.role === "admin" || user.role === "employee") throw new Error("The user must be client");
 
 	let date = new Date();
-	date.setSeconds(date.getSeconds() -10800)  // ARG date
+	date.setSeconds(date.getSeconds() - 10800); // ARG date
 
 	const createdOrder = await prisma.order.create({
 		data: { statusMP, statusDelivery, total, date, idUser }
