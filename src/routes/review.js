@@ -1,8 +1,9 @@
 const { Router } = require("express");
-const { getReviews, createReview, updateDescription, updateRating, removeReview } = require("../controllers/review");
+const { getReviews, getReviewsByUser, createReview, updateDescription, updateRating, removeReview } = require("../controllers/review");
 const router = Router();
 
 router.get("/", getReviews);
+router.get("/:id/user", getReviewsByUser)
 router.post("/create", createReview);
 router.put("/:id/changedescription", updateDescription);
 router.put("/:id/changerating", updateRating);

@@ -22,6 +22,23 @@ const getReviews = async (req, res, next) => {
 	}
 };
 
+const getReviewsByUser = async (req, res, next) => {
+	const { id } = req.params; //id del user
+
+	try {
+		if (!id) return res.status(404).json({ errorMessage: "Not user id given" });
+		const user = await prisma.user.findUnique({
+			where: { id }
+		});
+		const userReviews = await prisma.review.findMany({ where: { idUser: user.id } });
+		if (userReviews.length === 0) return res.status(404).json({ msg: "This User has no reviews" });
+
+		return res.status(200).json(userReviews);
+	} catch (error) {
+		next(error);
+	}
+};
+
 const createReview = async (req, res, next) => {
 	const { description, rating, idUser } = req.body;
 	try {
@@ -131,4 +148,4 @@ const removeReview = async (req, res, next) => {
 	}
 };
 
-module.exports = { getReviews, createReview, updateDescription, updateRating, removeReview };
+module.exports = { getReviews, getReviewsByUser, createReview, updateDescription, updateRating, removeReview };
