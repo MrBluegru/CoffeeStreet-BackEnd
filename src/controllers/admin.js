@@ -10,9 +10,11 @@ const getUsers = async (req, res) => {
 					name: {
 						contains: name,
 						mode: "insensitive"
-					}
+					},
+					state: "active"
 				}
 			});
+
 			if (nameUsers.length) res.status(200).json(nameUsers);
 			else res.status(200).json({ errorMessage: "There is no users with that name" });
 		} else {
