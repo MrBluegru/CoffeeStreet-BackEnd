@@ -15,8 +15,8 @@ const sendEmailForgotPassword = (token, email) => {
 		from: "coffee.street.company@gmail.com",
 		to: `${email}`,
 		subject: "CoffeeStreet | Forgotten Password",
-		html: `<img src="cid:coffee" width="300" title="Logo">
-		<b>Hi there! Have you forgotten your password? Click here [link] in order to set your new password!</b>
+		html: `<img src="cid:coffee" width="300" title="Logo"><br/>
+		<b>Hi there! Have you forgotten your password? Click here [link] in order to set your new password!</b><br/>
     <a href="${process.env.CORS_URL}/resetPass/${token}>
       <span>Reset Password</span>
     </a>`,
