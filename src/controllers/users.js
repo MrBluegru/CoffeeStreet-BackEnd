@@ -262,7 +262,7 @@ const updateUser = async (req, res) => {
 			if (id && typeof id !== "string") {
 				res.status(400).json({ messageError: "An error occurred with the id" });
 			} // ?
-			const userFound = await usersMethod.findById(id);
+			const userFound = await usersMethods.findById(id);
 			if (userFound) {
 				const userUpdate = await prisma.user.update({
 					where: {
