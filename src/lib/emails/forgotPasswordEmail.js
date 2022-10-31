@@ -15,15 +15,15 @@ const sendEmailForgotPassword = (token, email) => {
 		from: "coffee.street.company@gmail.com",
 		to: `${email}`,
 		subject: "CoffeeStreet | Forgotten Password",
-		html: `<img src="cid:coffee" width="300" title="Logo"><br/>
-		<b>Hi there! Have you forgotten your password? Click here [link] in order to set your new password!</b><br/>
+		html: `<img src="cid:coffee" width="100%" title="Logo"><br/>
+		<center><b>Hi there! Have you forgotten your password? Click here [link] in order to set your new password!</b><br/>
     <a href="${process.env.CORS_URL}/resetPass/${token}>
       <span>Reset Password</span>
-    </a>`,
+    </a></center>`,
 		attachments: [
 			{
-				filename: "coffee.png",
-				path: __dirname + "/coffee.png",
+				filename: "coffee.jpeg",
+				path: __dirname + "/coffee.jpeg",
 				cid: "coffee"
 			}
 		]

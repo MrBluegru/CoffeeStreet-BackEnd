@@ -14,14 +14,14 @@ const sendEmailNewsletter = (email, newsletter) => {
 		from: "coffee.street.company@gmail.com",
 		to: `${email}`,
 		subject: "CoffeeStreet | Newsletter",
-		html: `<img src="cid:coffee" width="300" title="Logo"><br/>
-		<b>Hi! Thanks for subscribing to our newsletter!</b><br/>
-		<b>We will be sending you our news every week!</b>
+		html: `<img src="cid:coffee" width="100%" title="Logo"><br/>
+		<center><b>Hi! Thanks for subscribing to our newsletter!<br/>
+		We will be sending you our news every week!</b></center>
 `,
 		attachments: [
 			{
-				filename: "coffee.png",
-				path: __dirname + "/coffee.png",
+				filename: "coffee.jpeg",
+				path: __dirname + "/coffee.jpeg",
 				cid: "coffee"
 			}
 		]
