@@ -21,7 +21,7 @@ async function check(req, res, next) {
 
 		const itemsArray = items.map(item => {
 			return {
-				id: item.id,
+				id: item.idProduct,
 				title: item.name,
 				unit_price: item.price,
 				quantity: item.qty,
@@ -77,7 +77,6 @@ async function check(req, res, next) {
 	}
 }
 
-
 async function feedback(req, res, next) {
 	const { payment_id, status, merchant_order_id } = req.query;
 	console.log("holita");
@@ -104,7 +103,6 @@ async function getPaymentById(req, res, next) {
 		next(error);
 	}
 }
-
 
 async function notification(req, res, next) {
 	const { query, body } = req;
@@ -174,7 +172,6 @@ async function notification(req, res, next) {
 		}
 
 		return res.status(200).send("Holi");
-
 	} catch (error) {
 		next(error);
 	}
