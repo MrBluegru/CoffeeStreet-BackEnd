@@ -7,6 +7,7 @@ const cartRoute = require("./cart");
 const orderRoute = require("./order");
 const mercadopago = require("./mercadopago");
 const newsletter = require("./newsletter");
+const newsRoute = require("./news");
 const reviewRoute = require("./review");
 const adminRoute = require("./admin");
 const discountRoute = require("./discounts");
@@ -21,6 +22,7 @@ router.use("/cart", cartRoute);
 router.use("/order", orderRoute);
 router.use("/pay", mercadopago);
 router.use("/newsletter", newsletter);
+router.use("/news", newsRoute);
 router.use("/review", reviewRoute);
 router.use("/admin", adminRoute);
 

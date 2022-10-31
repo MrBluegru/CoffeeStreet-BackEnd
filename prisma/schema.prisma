@@ -131,6 +131,16 @@ model Newsletter {
   email String @unique
 }
 
+model News {
+  id          String @id @default(uuid())
+  title       String
+  image       String
+  description String
+  paragraph1  String
+  paragraph2  String
+  paragraph3  String
+}
+
 enum Role {
   admin
   employee

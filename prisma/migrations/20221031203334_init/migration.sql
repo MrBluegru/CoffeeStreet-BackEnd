@@ -163,6 +163,19 @@ CREATE TABLE "Newsletter" (
     CONSTRAINT "Newsletter_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "News" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "paragraph1" TEXT NOT NULL,
+    "paragraph2" TEXT NOT NULL,
+    "paragraph3" TEXT NOT NULL,
+
+    CONSTRAINT "News_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Auth_email_key" ON "Auth"("email");
 
