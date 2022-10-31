@@ -220,7 +220,7 @@ const deleteUser = async (req, res, next) => {
 						.status(200)
 						.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
 				} else return res.status(404).json({ errorMessage: "This user is not authenticated" });
-			} else return res.status(404).json({ errorMessage: "There is not a valid email" });
+			} else return res.status(404).json({ errorMessage: "There is no user registered with that email" });
 		} else return res.status(400).json({ errorMessage: "Please enter an email" });
 	} catch (error) {
 		next(error);
@@ -262,7 +262,7 @@ const updateUser = async (req, res) => {
 			if (id && typeof id !== "string") {
 				res.status(400).json({ messageError: "An error occurred with the id" });
 			} // ?
-			const userFound = await usersMethod.findById(id);
+			const userFound = await usersMethods.findById(id);
 			if (userFound) {
 				const userUpdate = await prisma.user.update({
 					where: {
