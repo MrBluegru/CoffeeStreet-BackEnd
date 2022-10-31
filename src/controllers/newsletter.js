@@ -1,4 +1,5 @@
 const prisma = require("../utils/prisma");
+const { sendEmailNewsletter } = require("../lib/emails/newsletter");
 
 const saveEmailOnNewsletter = async (req, res, next) => {
 	let { email } = req.body;
@@ -19,12 +20,21 @@ const saveEmailOnNewsletter = async (req, res, next) => {
 
 const createNewsletter = async (req, res, next) => {
 	const { description, title, image } = req.body;
-	console.log({ description, title, image });
 	try {
-		if (description || typeof description === "string" || title || typeof title === "string") {
-			if (image || typeof image === "string") {
-				// nodemailer a todos los emails de newsletter table
-				// todavía no está finalizada
+		if (description && typeof description === "string" && title && typeof title === "string") {
+			if (image && typeof image === "string") {
+				const newsletter = { description, title, image };
+
+				const userEmails = await prisma.newsletter.findMany({
+					select: {
+						email: true
+					}
+				});
+
+				userEmails.forEach(el => {
+					sendEmailNewsletter(el.email, newsletter);
+				})
+
 
 				return res.status(200).json({ message: `The newsletter was successfully sent` });
 			} else return res.status(404).json({ errorMessage: "Please enter a valid image" });
