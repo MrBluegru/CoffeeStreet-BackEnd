@@ -12,16 +12,21 @@ const getUsers = async (req, res) => {
 						mode: "insensitive"
 					},
 					state: "active"
-				},
-				include: {
-					idAuth: true
 				}
 			});
 
 			if (nameUsers.length) res.status(200).json(nameUsers);
 			else res.status(200).json({ errorMessage: "There is no users with that name" });
 		} else {
-			const usersFound = await usersMethods.findAll();
+			const usersFound = await await prisma.user.findMany({
+				include: {
+					auth: {
+						select: {
+							email: true
+						}
+					}
+				}
+			});
 
 			if (usersFound) res.status(200).json(usersFound);
 			else res.status(404).json({ errorMessage: "User Not Found" });
