@@ -9,6 +9,7 @@ const { setAuth } = require("./src/seed/auth.seed");
 const { setUsersDB } = require("./src/seed/user.seed");
 const { setProductsDB } = require("./src/seed/products.seed");
 const { setReviewsDB } = require("./src/seed/review.seed");
+const { setNewsDb } = require("./src/seed/news.seed");
 
 server.listen(PORT || 3002, () => {
 	prisma.auth
@@ -18,7 +19,8 @@ server.listen(PORT || 3002, () => {
 				setAuth()
 					.then(e => setUsersDB())
 					.then(e => setProductsDB())
-					.then(e => setReviewsDB());
+					.then(e => setReviewsDB())
+					.then(e => setNewsDb());
 			}
 		})
 		.catch(error => console.error(error));

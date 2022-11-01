@@ -3,6 +3,13 @@ const { verifyTitle, verifyImage, verifyDescription, verifyParagraph } = require
 
 const getNews = async (req, res, next) => {
 	try {
+		const findAllNews = await prisma.news.findMany();
+		console.log(findAllNews);
+		if (!findAllNews) {
+			res.status(404).json({ errorMessage: "News not found" });
+		} else {
+			res.status(200).json(findAllNews);
+		}
 	} catch (error) {
 		next(error);
 	}
