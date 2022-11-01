@@ -18,19 +18,19 @@ const updateNews = async (req, res, next) => {
 		if (!title && !image && !description && !paragraph1 && paragraph2 && paragraph3)
 			return res.status(404).json({ errorMessage: "There is nothing to update" });
 		if (title && verifyTitle(title))
-			return res.status(400).json({ errorMessage: "The title must be a string and have a minimum length of 7" });
+			return res.status(400).json({ errorMessage: "The title must be a string and have a minimum length of 8" });
 		if (image && verifyImage(image))
 			return res
 				.status(400)
 				.json({ errorMessage: "The image must be a string, have a minimum length of 5 and have a valid extension" });
 		if (description && verifyDescription(description))
-			return res.status(400).json({ errorMessage: "The description must be a string and have a minimum length of 15" });
+			return res.status(400).json({ errorMessage: "The description must be a string and have a minimum length of 20" });
 		if (paragraph1 && verifyParagraph(paragraph1))
-			return res.status(400).json({ errorMessage: "The paragraph must be a string and have a minimum length of 30" });
+			return res.status(400).json({ errorMessage: "The paragraph must be a string and have a minimum length of 40" });
 		if (paragraph2 && verifyParagraph(paragraph2))
-			return res.status(400).json({ errorMessage: "The paragraph must be a string and have a minimum length of 30" });
+			return res.status(400).json({ errorMessage: "The paragraph must be a string and have a minimum length of 40" });
 		if (paragraph3 && verifyParagraph(paragraph3))
-			return res.status(400).json({ errorMessage: "The paragraph must be a string and have a minimum length of 30" });
+			return res.status(400).json({ errorMessage: "The paragraph must be a string and have a minimum length of 40" });
 
 		const updatedNews = await prisma.news.update({
 			where: {
