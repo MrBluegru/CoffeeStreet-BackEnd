@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendEmailOrderInfo = (email, order) => {
+const sendEmailNewsletterContent = email => {
 	const config = {
 		host: "smtp.gmail.com",
 		port: 465,
@@ -13,12 +13,11 @@ const sendEmailOrderInfo = (email, order) => {
 	const message = {
 		from: "coffee.street.company@gmail.com",
 		to: `${email}`,
-		subject: "CoffeeStreet | Order Info",
+		subject: "CoffeeStreet | Newsletter",
 		html: `<img src="cid:coffee" width="100%" title="Logo"><br/>
-		<center><b>Hello ${order.name} ${order.surname}! There you have the information of your order:</b><br/>
-    <span>Status: ${order.status}</span><br/>
-    <span>Total: ${order.total}</span><br/>
-    <span>Date: ${order.date}</span></center>`,
+		<center><b>Hi! Thanks for subscribing to our newsletter!<br/>
+		We will be sending you our news every week!</b></center>
+`,
 		attachments: [
 			{
 				filename: "coffee.jpeg",
@@ -41,4 +40,4 @@ const sendEmailOrderInfo = (email, order) => {
 	});
 };
 
-module.exports = { sendEmailOrderInfo };
+module.exports = { sendEmailNewsletterContent };

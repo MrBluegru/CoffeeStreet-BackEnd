@@ -2,7 +2,7 @@ const prisma = require("../utils/prisma");
 const authMethods = require("../methods/auth");
 const usersMethods = require("../methods/users");
 const productsMethods = require("../methods/products");
-const { verifyData, verifyDatatypes, verifyNameLength, verifySurnameLength } = require("../validations/users");
+const { verifyName, verifySurname, verifyImage, verifyPassword } = require("../validations/users");
 
 const getUsers = async (req, res, next) => {
 	const { email } = req.body;
@@ -14,12 +14,11 @@ const getUsers = async (req, res, next) => {
 			const user = await usersMethods.findByIdAuth(auth.id);
 			if (!user) return res.status(404).json({ errorMessage: "No user info found" });
 			else return res.status(200).json({ user });
+		} else {
+			const users = await usersMethods.findAll();
+			if (users) return res.status(200).json(users);
+			else return res.status(404).json({ errorMessage: "Users Not Found" });
 		}
-		// } else {
-		// 	const users = await usersMethods.findAll();
-
-		// if (users) return res.status(200).json(users);
-		// else return res.status(404).json({ errorMessage: "Users Not Found" });
 	} catch (error) {
 		next(error);
 	}
@@ -220,70 +219,60 @@ const deleteUser = async (req, res, next) => {
 						.status(200)
 						.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
 				} else return res.status(404).json({ errorMessage: "This user is not authenticated" });
-			} else return res.status(404).json({ errorMessage: "There is not a valid email" });
+			} else return res.status(404).json({ errorMessage: "There is no user registered with that email" });
 		} else return res.status(400).json({ errorMessage: "Please enter an email" });
 	} catch (error) {
 		next(error);
 	}
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
 	const { id } = req.params;
-	const { name, surname, image } = req.body;
-	const data = { name, surname, image };
+	const { name, surname, image, password, confirmPassword } = req.body;
 
 	try {
-		//----------------------------VALIDATIONS------------------------------------------------------------------------//
+		const userFound = await usersMethods.findById(id);
+		if (!userFound) return res.status(404).json({ errorMessage: "There is no user with that id" });
 
-		//validaciones generales
-		if (verifyData(data)) {
-			return res.status(400).json({ errorMessage: "You need to modify some field to be able to update" });
-		}
+		if (!name && !surname && !image && !password && !confirmPassword)
+			return res.status(400).json({ errorMessage: "There is nothing to update" });
 
-		if (verifyDatatypes(data)) {
-			return res.status(400).json({ errorMessage: "The entered fields must be text type" });
-		}
+		if (name && verifyName(name))
+			return res.status(400).json({ errorMessage: "The name must be a string and have a minimum length of 2" });
+		if (surname && verifySurname(surname))
+			return res.status(400).json({ errorMessage: "The surname must be a string and have a minimum length of 2" });
+		if (image && verifyImage(image))
+			return res.status(400).json({
+				errorMessage: "The image must be a string, have a minimum length of 5 and end with a valid extension"
+			});
+		if (password && verifyPassword(password))
+			return res.status(400).json({
+				errorMessage:
+					"The password must be a string with the following requirements: minimum length of 6, a number, an upper case letter, a lower case letter and a special character"
+			});
+		if (password && password !== confirmPassword)
+			return res.status(400).json({ errorMessage: "The password field and the confirmPassword field must be equals" });
+		if (confirmPassword && confirmPassword !== password)
+			return res.status(400).json({ errorMessage: "The password field and the confirmPassword field must be equals" });
 
-		// validaciones especificas (que no excedan un limite de caracteres)
-		if (name) {
-			if (verifyNameLength(data)) {
-				res.status(400).json({ errorMessage: "Name cannot be more than 12 characters long" });
+		const userUpdated = await prisma.user.update({
+			where: {
+				id: id
+			},
+			data: {
+				name,
+				surname,
+				image
 			}
-		}
+		});
 
-		if (surname) {
-			if (verifySurnameLength(data)) {
-				res.status(400).json({ errorMessage: "Surname cannot be more than 15 characters long" });
-			}
+		if (password) {
+			const gettingUserToChangePass = await authMethods.findById(userFound.idAuth);
+			await authMethods.updatePassword({ email: gettingUserToChangePass.email, newPassword: password });
 		}
-
-		if (id) {
-			//SI SE ENCUENTRA EL ID DE PARAMS REALIZA LO SIGUIENTE
-			if (id && typeof id !== "string") {
-				res.status(400).json({ messageError: "An error occurred with the id" });
-			} // ?
-			const userFound = await usersMethod.findById(id);
-			if (userFound) {
-				const userUpdate = await prisma.user.update({
-					where: {
-						id: id
-					},
-					data: {
-						name,
-						surname,
-						image
-					}
-				});
-				if (!userUpdate) return res.status(404).json({ errorMessage: "Error at updating user" });
-				else return res.status(200).json(userUpdate);
-			} else {
-				res.status(404).json({ errorMessage: "Username does not exist" });
-			}
-		} else {
-			res.status(400).json({ errorMessage: "An error ocurred. An id must come" });
-		}
-	} catch (err) {
-		throw new Error(err.message);
+		return res.status(200).json({ message: "The user has been updated successfully", userUpdated });
+	} catch (error) {
+		next(error);
 	}
 };
 
