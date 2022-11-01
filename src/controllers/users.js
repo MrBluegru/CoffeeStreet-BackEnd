@@ -266,9 +266,10 @@ const updateUser = async (req, res, next) => {
 			}
 		});
 
-		if (password) {
+		if (password && !name && !surname && !image) {
 			const gettingUserToChangePass = await authMethods.findById(userFound.idAuth);
 			await authMethods.updatePassword({ email: gettingUserToChangePass.email, newPassword: password });
+			return res.status(200).json({ message: "The user password has been updated successfully" });
 		}
 		return res.status(200).json({ message: "The user has been updated successfully", userUpdated });
 	} catch (error) {
