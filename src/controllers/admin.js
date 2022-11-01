@@ -1,5 +1,6 @@
 const prisma = require("../utils/prisma");
 const usersMethods = require("../methods/users");
+const authMethods = require("../methods/auth");
 
 const getUsers = async (req, res) => {
 	const { name } = req.query;
@@ -36,4 +37,28 @@ const getUsers = async (req, res) => {
 	}
 };
 
-module.exports = { getUsers };
+const deleteUser = async (req, res, next) => {
+	const { email } = req.body;
+
+	console.log(req);
+	console.log(email);
+
+	try {
+		if (email) {
+			const userFound = await authMethods.emailVerify(email);
+			if (userFound) {
+				const user = await usersMethods.findByIdAuth(userFound.id);
+				if (user) {
+					const userToDelete = await usersMethods.logicDeleteUser(user.id);
+					return res
+						.status(200)
+						.json({ message: `'${userToDelete.name} ${userToDelete.surname}' deleted successfully from the DB` });
+				} else return res.status(404).json({ errorMessage: "This user is not authenticated" });
+			} else return res.status(404).json({ errorMessage: "There is no user registered with that email" });
+		} else return res.status(400).json({ errorMessage: "Please enter an email" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports = { getUsers, deleteUser };
