@@ -1,26 +1,29 @@
-// update user validations
-const verifyData = data => {
-	if (!data.name && !data.surname && !data.image) {
-		return true;
-	}
-};
-// que no sea vacio
-
-const verifyDatatypes = data => {
-	return typeof data.name !== "string" || typeof data.surname !== "string" || typeof data.image !== "string";
+const verifyName = name => {
+	return typeof name !== "string" || name.length < 2;
 };
 
-const verifyNameLength = data => {
-	return data.name.length > 12;
+const verifySurname = surname => {
+	return typeof surname !== "string" || surname.length < 2;
 };
 
-const verifySurnameLength = data => {
-	return data.surname.length > 15;
+const verifyImage = image => {
+	return (
+		image.length < 5 ||
+		typeof image !== "string" ||
+		(!/.gif$/.test(image) &&
+			!/.png$/.test(image) &&
+			!/.jpg$/.test(image) &&
+			!/.jpeg$/.test(image) &&
+			!/.webp$/.test(image) &&
+			!/.svg$/.test(image) &&
+			!/.tif$/.test(image))
+	);
 };
 
-module.exports = {
-	verifyData,
-	verifyDatatypes,
-	verifyNameLength,
-	verifySurnameLength
+const verifyPassword = password => {
+	return (
+		typeof password !== "string" || !/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{6,}$/.test(password)
+	);
 };
+
+module.exports = { verifyName, verifySurname, verifyImage, verifyPassword };
