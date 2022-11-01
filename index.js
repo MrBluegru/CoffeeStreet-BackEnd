@@ -6,10 +6,10 @@ const cron = require("node-cron");
 const prisma = require("./src/utils/prisma");
 
 const { setAuth } = require("./src/seed/auth.seed");
-const { setUsersDB } = require("./src/seed/user.seed");
+const { setUsersDB } = require("./src/seed/users.seed");
 const { setProductsDB } = require("./src/seed/products.seed");
-const { setReviewsDB } = require("./src/seed/review.seed");
-const { setNewsDb } = require("./src/seed/news.seed");
+const { setReviewsDB } = require("./src/seed/reviews.seed");
+const { setNewsDB } = require("./src/seed/news.seed");
 
 server.listen(PORT || 3002, () => {
 	prisma.auth
@@ -20,7 +20,7 @@ server.listen(PORT || 3002, () => {
 					.then(e => setUsersDB())
 					.then(e => setProductsDB())
 					.then(e => setReviewsDB())
-					.then(e => setNewsDb());
+					.then(e => setNewsDB());
 			}
 		})
 		.catch(error => console.error(error));

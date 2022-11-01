@@ -1,7 +1,7 @@
 const prisma = require("../utils/prisma");
-const newsData = require("../data/news");
+const newsData = require("../data/newsData");
 
-const setNewsDb = async () => {
+const setNewsDB = async () => {
 	try {
 		await prisma.news.create({
 			data: newsData
@@ -13,4 +13,4 @@ const setNewsDb = async () => {
 	}
 };
 
-module.exports = { setNewsDb };
+module.exports = { setNewsDB };

@@ -1,5 +1,5 @@
 const prisma = require("../utils/prisma");
-const reviews = require("../data/reviews");
+const reviews = require("../data/reviewsData");
 
 const setReviewsDB = async () => {
 	try {
