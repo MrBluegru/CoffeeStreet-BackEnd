@@ -156,7 +156,7 @@ const deleteByProduct = async (req, res, next) => {
 			);
 			if (done.length < 1) return res.status(404).json({ errorMessage: "Error at deleting Product" });
 			else {
-				await prisma.cart.update({ where: { id: cart.id }, data: { total: 0 } });
+				await prisma.cart.update({ where: { id: cart.id }, data: { total: cart.total - items[0].price } });
 				return res.status(200).json({ errorMessage: "Success. Product is deleted" });
 			}
 		} else {
