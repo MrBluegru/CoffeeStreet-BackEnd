@@ -12,6 +12,9 @@ const getUsers = async (req, res) => {
 						mode: "insensitive"
 					},
 					state: "active"
+				},
+				include: {
+					idAuth: true
 				}
 			});
 
