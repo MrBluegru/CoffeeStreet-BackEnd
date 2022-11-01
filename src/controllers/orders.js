@@ -79,6 +79,9 @@ const changeStatus = async (req, res, next) => {
 				statusDelivery
 			}
 		});
+		if (updatedStatus.statusDelivery === "complete") {
+			return;
+		}
 		return res
 			.status(200)
 			.json({ message: `The statusDelivery has been updated successfully to '${statusDelivery}'`, updatedStatus });
