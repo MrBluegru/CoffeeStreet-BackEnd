@@ -38,10 +38,7 @@ const getUsers = async (req, res) => {
 };
 
 const deleteUser = async (req, res, next) => {
-	const { email } = req.body;
-
-	console.log(req);
-	console.log(email);
+	const { email } = req.query;
 
 	try {
 		if (email) {
