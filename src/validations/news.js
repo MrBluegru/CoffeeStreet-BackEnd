@@ -1,5 +1,5 @@
 const verifyTitle = title => {
-	return typeof title !== "string" || title.length < 7;
+	return typeof title !== "string" || title.length < 8;
 };
 
 const verifyImage = image => {
@@ -11,11 +11,11 @@ const verifyImage = image => {
 };
 
 const verifyDescription = description => {
-	return typeof description !== "string" || title.length < 15;
+	return typeof description !== "string" || description.length < 20;
 };
 
 const verifyParagraph = paragraph => {
-	return typeof paragraph !== "string" || paragraph.length < 30;
+	return typeof paragraph !== "string" || paragraph.length < 40;
 };
 
 module.exports = { verifyTitle, verifyImage, verifyDescription, verifyParagraph };

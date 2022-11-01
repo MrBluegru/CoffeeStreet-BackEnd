@@ -1,5 +1,5 @@
 const prisma = require("../utils/prisma");
-const { verifyTitle } = require("../validations/news");
+const { verifyTitle, verifyImage, verifyDescription, verifyParagraph } = require("../validations/news");
 
 const getNews = async (req, res, next) => {
 	try {
