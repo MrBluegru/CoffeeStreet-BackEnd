@@ -19,7 +19,7 @@ const GetOrCreateCart = async (req, res, next) => {
 		} else {
 			const cart_product = await prisma.cart_Product.findMany({ where: { idCart: cart.id } });
 			console.log(cart_product);
-			let totalDiscounted = 0;
+			let total = 0;
 			if (cart_product.length) {
 				const items = await Promise.all(
 					cart_product.map(async e => {
@@ -28,17 +28,19 @@ const GetOrCreateCart = async (req, res, next) => {
 						e.image = y.image;
 						e.discount = y.discount;
 						delete e.id;
-						if (e.discount !== null) {
+						if (e.discount !== null || e.discount > 0) {
 							e.discountedPrice = parseFloat(e.price * (1 - e.discount));
-							totalDiscounted += e.discountedPrice;
-						} else e.discountedPrice = null;
+							total += e.discountedPrice;
+						} else {
+							e.discountedPrice = null;
+							total += e.price;
+						}
 						return e;
 					})
 				);
-				console.log(cart.total);
-				console.log(totalDiscounted);
+				// console.log(cart.total - total);
 
-				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total - (cart.total - totalDiscounted), items });
+				return res.status(200).json({ cartId: cart.id, cartTotal: total, items });
 			} else {
 				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total, items: [] });
 			}
