@@ -14,9 +14,24 @@ const sendOrderDeliver = (email, userInfo) => {
 		from: "coffee.street.company@gmail.com",
 		to: `${email}`,
 		subject: "CoffeeStreet | Order Complete",
-		html: `<img src="cid:coffee" width="100%" title="Logo"><br/>
-		<center><b>Hello ${userInfo.name} ${userInfo.surname}!<br/>
-		The order is ready, you can come to pick it up</b></center>`,
+		html: `
+		
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				height: "100vh",
+				justifyContent: "space-between"
+			}}
+		>
+			<img src="cid:coffee" width="100%" title="Logo"><br/>
+			<h1>Ready to pick up</h1>
+			<h2>Hello ${userInfo.name} ${userInfo.surname}!</h2
+			<h3>The order is ready, you can come to pick it up</h3>
+			<img src="cid:coffee" width="100%" title="Logo"><br/>
+		</div>
+		`,
 		attachments: [
 			{
 				filename: "coffee.jpeg",
