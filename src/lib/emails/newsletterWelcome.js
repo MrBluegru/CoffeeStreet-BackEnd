@@ -14,9 +14,23 @@ const sendEmailNewsletterContent = email => {
 		from: "coffee.street.company@gmail.com",
 		to: `${email}`,
 		subject: "CoffeeStreet | Newsletter",
-		html: `<img src="cid:coffee" width="100%" title="Logo"><br/>
-		<center><b>Hi! Thanks for subscribing to our newsletter!<br/>
-		We will be sending you our news every week!</b></center>
+		html: `
+		
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				height: "100vh",
+				justifyContent: "space-between"
+			}}
+		>
+			<img src="cid:coffee" width="100%" title="Logo"><br/>
+			<h1>Hi! Thanks for subscribing to our newsletter!</h1>
+			<h2>Hi! Thanks for subscribing to our newsletter!</h2>
+			<h3>We will be sending you our news every week!</h3>
+			<img src="cid:coffee" width="100%" title="Logo"><br/>
+		</div>		
 `,
 		attachments: [
 			{
