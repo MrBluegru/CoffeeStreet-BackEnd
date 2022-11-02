@@ -35,7 +35,6 @@ const GetOrCreateCart = async (req, res, next) => {
 						return e;
 					})
 				);
-				console.log(items);
 
 				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total - totalDiscounted, items });
 			} else {
@@ -150,8 +149,6 @@ const deleteByProduct = async (req, res, next) => {
 		if (!product) return res.status(404).json({ errorMessage: "Product not found" });
 
 		const items = await prisma.cart_Product.findMany({ where: { idProduct } });
-		console.log("itemsssssssss");
-		console.log(items);
 
 		if (items.length) {
 			const done = await Promise.all(
