@@ -19,6 +19,7 @@ const GetOrCreateCart = async (req, res, next) => {
 		} else {
 			const cart_product = await prisma.cart_Product.findMany({ where: { idCart: cart.id } });
 			console.log(cart_product);
+			let totalDiscounted = 0;
 			if (cart_product.length) {
 				const items = await Promise.all(
 					cart_product.map(async e => {
@@ -27,13 +28,16 @@ const GetOrCreateCart = async (req, res, next) => {
 						e.image = y.image;
 						e.discount = y.discount;
 						delete e.id;
-						if (e.discount !== null) e.discountedPrice = (e.price * (1 - e.discount)).toFixed(3);
-						else e.discountedPrice = null;
+						if (e.discount !== null) {
+							e.discountedPrice = parseFloat(e.price * (1 - e.discount));
+							totalDiscounted += e.discountedPrice;
+						} else e.discountedPrice = null;
 						return e;
 					})
 				);
+				console.log(items);
 
-				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total, items });
+				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total - totalDiscounted, items });
 			} else {
 				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total, items: [] });
 			}
@@ -146,6 +150,7 @@ const deleteByProduct = async (req, res, next) => {
 		if (!product) return res.status(404).json({ errorMessage: "Product not found" });
 
 		const items = await prisma.cart_Product.findMany({ where: { idProduct } });
+		console.log("itemsssssssss");
 		console.log(items);
 
 		if (items.length) {
