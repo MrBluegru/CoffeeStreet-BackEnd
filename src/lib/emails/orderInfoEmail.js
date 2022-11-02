@@ -14,11 +14,26 @@ const sendEmailOrderInfo = (email, order) => {
 		from: "coffee.street.company@gmail.com",
 		to: `${email}`,
 		subject: "CoffeeStreet | Order Info",
-		html: `<img src="cid:coffee" width="100%" title="Logo"><br/>
-		<center><b>Hello ${order.name} ${order.surname}! There you have the information of your order:</b><br/>
-    <span>Status: ${order.status}</span><br/>
-    <span>Total: ${order.total}</span><br/>
-    <span>Date: ${order.date}</span></center>`,
+		html: `
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				height: "100vh",
+				justifyContent: "space-between"
+			}}
+		>
+			<img src="cid:coffee" width="100%" title="Logo"><br/>
+			<h1>Order Info</h1>
+			<h2>Hello ${order.name} ${order.surname}! There you have the information of your order:</h2>
+			<span>Status: ${order.status}</span><br/>
+			<span>Total: ${order.total}</span><br/>
+			<span>Date: ${order.date}</span></center>
+			
+			<img src="cid:coffee" width="100%" title="Logo"><br/>
+		</div>
+		`,
 		attachments: [
 			{
 				filename: "coffee.jpeg",
