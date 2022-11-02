@@ -35,8 +35,10 @@ const GetOrCreateCart = async (req, res, next) => {
 						return e;
 					})
 				);
+				console.log(cart.total);
+				console.log(totalDiscounted);
 
-				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total - totalDiscounted, items });
+				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total - (cart.total - totalDiscounted), items });
 			} else {
 				return res.status(200).json({ cartId: cart.id, cartTotal: cart.total, items: [] });
 			}
