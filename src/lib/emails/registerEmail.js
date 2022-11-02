@@ -15,8 +15,23 @@ const sendEmailRegister = (email, name, surname) => {
 		from: "coffee.street.company@gmail.com",
 		to: `${email}`,
 		subject: "CoffeeStreet | Successful Registration!",
-		html: `<img src="cid:coffee" width="100%" title="CoffeeStreet"><br/>
-		<center><b>Welcome, ${name} ${surname}, thank you for registering in CoffeeStreet!</b></center>`,
+		html: `
+		
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				height: "100vh",
+				justifyContent: "space-between"
+			}}
+		>
+			<img src="cid:coffee" width="100%" title="Logo"><br/>
+			<center><h1>Welcome, ${name} ${surname}, thank you for registering in CoffeeStreet!</h1></center>
+			<img src="cid:coffee" width="100%" title="Logo"><br/>
+			
+		</div>
+		`,
 		attachments: [
 			{
 				filename: "coffee.jpeg",
