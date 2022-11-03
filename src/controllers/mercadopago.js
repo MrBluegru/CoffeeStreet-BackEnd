@@ -64,7 +64,7 @@ async function check(req, res, next) {
 				],
 				installments: 6
 			},
-			notification_url: "https://a385-2803-c080-b-69b8-44a-6feb-557e-41f5.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
+			notification_url: (process.env.NGROK || process.env.BACK_URL) + "/pay/mercadopago/notification", // debe cambiarse por ruta deployada
 			statement_descriptor: "Coffee Street",
 			external_reference: order.id
 		};
