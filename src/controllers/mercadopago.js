@@ -51,9 +51,9 @@ async function check(req, res, next) {
 				}
 			},
 			back_urls: {
-				success: "http://localhost:3000/menu", // debe cambiarse por ruta deployada
-				failure: "http://localhost:3000/menu", // debe cambiarse por ruta deployada
-				pending: "http://localhost:3000/menu" // debe cambiarse por ruta deployada
+				success: process.env.CORS_URL + "menu", // debe cambiarse por ruta deployada
+				failure: process.env.CORS_URL + "menu", // debe cambiarse por ruta deployada
+				pending: process.env.CORS_URL + "menu" // debe cambiarse por ruta deployada
 			},
 			auto_return: "approved",
 			payment_methods: {
@@ -64,7 +64,7 @@ async function check(req, res, next) {
 				],
 				installments: 6
 			},
-			notification_url: "https://a385-2803-c080-b-69b8-44a-6feb-557e-41f5.sa.ngrok.io/pay/mercadopago/notification", // debe cambiarse por ruta deployada
+			notification_url: (process.env.NGROK || process.env.BACK_URL) + "/pay/mercadopago/notification", // debe cambiarse por ruta deployada
 			statement_descriptor: "Coffee Street",
 			external_reference: order.id
 		};
