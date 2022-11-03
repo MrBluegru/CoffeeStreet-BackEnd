@@ -51,9 +51,9 @@ async function check(req, res, next) {
 				}
 			},
 			back_urls: {
-				success: "http://localhost:3000/menu", // debe cambiarse por ruta deployada
-				failure: "http://localhost:3000/menu", // debe cambiarse por ruta deployada
-				pending: "http://localhost:3000/menu" // debe cambiarse por ruta deployada
+				success: process.env.CORS_URL + "menu", // debe cambiarse por ruta deployada
+				failure: process.env.CORS_URL + "menu", // debe cambiarse por ruta deployada
+				pending: process.env.CORS_URL + "menu" // debe cambiarse por ruta deployada
 			},
 			auto_return: "approved",
 			payment_methods: {
