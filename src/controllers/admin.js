@@ -13,6 +13,13 @@ const getUsers = async (req, res) => {
 						mode: "insensitive"
 					},
 					state: "active"
+				},
+				include: {
+					auth: {
+						select: {
+							email: true
+						}
+					}
 				}
 			});
 
