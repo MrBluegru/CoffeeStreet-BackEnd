@@ -1,21 +1,25 @@
-# CoffeeStreet-back-end
+# CoffeeStreet-BackEnd
 
 <p align="center">
   <img height="350" src="./img/coffeeStreet.png" />
 </p>
 
-Api de proyecto final para Soy Henry - FT-29a
+API para la App Coffee Street.
 
 # Arrancar el proyecto de manera local
 
-1. Crear una base de datos en PostgreSQL "coffee"
+0. Crear una nueva base de datos, en la consola de PostgreSQL ejecuta el comando `create database coffee`
 
-2. Instalar las dependencias necesarias para el correcto funcionamiento, ejecuta el comando `npm install`
+1. Instalar las dependencias necesarias para el correcto funcionamiento, ejecuta el comando `npm install`
 
-3. Clonar el archivo `.env.template` y renombrarlo a `.env`
+2. Clonar el archivo `.env.template` y renombrarlo a `.env`
 
-4. Una vez instalada las dependencias, se realiza la creación de las entidades con prisma. Ejecuta el siguiente comando
+3. Una vez instalada las dependencias, se realiza la creación de las entidades con prisma. Ejecuta el siguiente comando
    `npx prisma migrate dev --name init`
+
+4. Ejecutar el comando npm start 
+
+5. Para visualizar el frontEnd descargar el repo <a href="https://github.com/MrBluegru/CoffeeStreet-FrontEnd" target="_blank" rel="noreferrer">CoffeeStreet-FrontEnd</a> 
 
 \*\*\* En el caso de querer hacer un vaciado de la base de datos (borrar la carpeta de migrations), ejecuta el comando `npm run prisma-d`, para después crear ejecutar `npx prisma migrate dev --name init` (crearla de nuevo).
 
